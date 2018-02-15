@@ -31,3 +31,4 @@ stack test
 stack ghci
 ```
 
+.
