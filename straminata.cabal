@@ -2,12 +2,12 @@ name:                straminata
 version:             0.1
 -- synopsis:
 -- description:
--- homepage:
+homepage: https://github.com/cmc-haskell-2018/straminata
 -- license:
 -- license-file:
-author:              Author name here
-maintainer:          author@email.com
-copyright:           2017 Author name here
+author:              Команда №1 (Team #1)
+maintainer:          alois9866@gmail.com
+copyright:           2017 Team #1
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
