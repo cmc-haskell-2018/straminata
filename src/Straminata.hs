@@ -6,9 +6,11 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game (Event)
 
 import WindowConstants
+import Model.CommonTypes
+import Util.Common
 
 -- | Represents a game session.
-data Game = Game {
+data Game = Game { objects :: [Object]
                  }
 
 -- | Starts game main loop.
@@ -28,25 +30,44 @@ window = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Initial game state.
 initialWorld :: Game
-initialWorld = Game
+initialWorld = Game { objects = initialObjects
+                    }
 
+-- todo: get from file
+initialObjects :: [Object]
+initialObjects = [ playerInitialState
+                 ]
+
+-- todo: get from file
+playerInitialState :: Object
+playerInitialState = Object { name = "Player 1"
+                            , position = Position (0, 0)
+                            , dimensions = Dimensions (15, 25)
+                            , scaling = Scaling (1, 1)
+                            , velocity = Vector (0, 0)
+                            }
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render = const picture
+render = picture
 
 
 -- | Generates next game state based on user input.
 handleInput :: Event -> Game -> Game
-handleInput _ _ = Game
+handleInput _ _ = initialWorld
 
 
 -- | Advances game state one step further.
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame _ _ = Game
+advanceGame _ _ = initialWorld
 
 
-picture :: Picture
-picture = Translate (-170) 0 $ Scale 0.5 0.5 $ Text "Hello World"
+-- | Composes all game @objects@ in a list of pictures.
+picture :: Game -> Picture
+picture game = Pictures $ map (\object ->
+                               uncurry Translate (unwrap $ position object)
+                               $ uncurry Scale (unwrap $ scaling object)
+                               $ Polygon (formPath (position object) (dimensions object)))
+                        $ objects game
