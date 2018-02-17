@@ -54,3 +54,7 @@ type Movement = (Float -> Float)
 
 -- | Describes restrictions imposed on position of an object.
 type PositionConstraint = (Float -> Bool)
+
+-- | Represents a game session.
+data Game = Game { objects :: [Object]
+                 }
