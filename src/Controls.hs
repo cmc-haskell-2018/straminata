@@ -48,9 +48,9 @@ movePlayers time game = let playersList = players game
                             player2 = secondPlayer playersList
                             obj1 = object player1
                             obj2 = object player2
-                        in game { players = (players game) { firstPlayer = player1 { object = moveObject time obj1 }
-                                                           , secondPlayer = player2 { object = moveObject time obj2 }
-                                                           }
+                        in game { players = playersList { firstPlayer = player1 { object = moveObject time obj1 }
+                                                        , secondPlayer = player2 { object = moveObject time obj2 }
+                                                        }
                                 }
 
 

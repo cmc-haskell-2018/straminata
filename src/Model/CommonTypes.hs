@@ -1,5 +1,7 @@
 module Model.CommonTypes where
 
+import Graphics.Gloss (Color)
+
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
@@ -44,7 +46,8 @@ type Time = Float
 
 
 data Hitbox = Hitbox { position :: Position -- ^ Object position
-                     , boxes :: [Rectangle]
+                     , displayBox :: Rectangle
+                     , collisionBoxes :: [Rectangle]
                      , scaling :: Scaling -- todo 16.02.18: describe scaling parameter
                      }
 
@@ -54,10 +57,8 @@ data Object = Object { name :: String -- ^ Unique object identifier.
                      , velocity :: Vector -- ^ X and Y velocity components.
                      }
 
-data PlayerInfo = PlayerInfo
-
 data Player = Player { object :: Object
-                     , playerInfo :: PlayerInfo
+                     , playerColor :: Color
                      }
 
 data Players = Players { firstPlayer :: Player

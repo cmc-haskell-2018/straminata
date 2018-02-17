@@ -24,6 +24,6 @@ picture game = let player1 = firstPlayer . players $ game
                    scale' = uncurry Scale . unwrap . scaling . hitbox
                    polygon' = Polygon . formPath . hitbox
                    picture' = \o -> translate' o $ scale' o $ polygon' o
-               in Pictures $ (picture' (object player1))
-                           : (picture' (object player2))
+               in Pictures $ (Color (playerColor player1) (picture' (object player1)))
+                           : (Color (playerColor player2) (picture' (object player2)))
                            : map picture' (objects game)
