@@ -7,7 +7,6 @@ import Graphics.Gloss.Interface.IO.Game (Event)
 
 import WindowConstants
 import Model.CommonTypes
-import Util.Common
 import Visual.Renderer
 
 -- | Starts game main loop.
@@ -34,9 +33,10 @@ initialObjects = [ playerInitialState
 -- todo: get from file
 playerInitialState :: Object
 playerInitialState = Object { name = "Player 1"
-                            , position = Position (0, 0)
-                            , dimensions = Dimensions (15, 25)
-                            , scaling = Scaling (1, 1)
+                            , hitbox = Hitbox { position = Position (0, 0)
+                                              , scaling = Scaling (1, 1)
+                                              , boxes = [Rectangle (Position (0, 0), Position (30, 50))]
+                                              }
                             , velocity = Vector (0, 0)
                             }
 

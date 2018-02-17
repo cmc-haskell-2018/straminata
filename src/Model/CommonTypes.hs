@@ -18,10 +18,10 @@ instance (UnwrapablePair Dimensions) where
   unwrap (Dimensions t) = t
 
 -- todo: refactor
-newtype Rectangle = Rectangle (Position, Position, Position, Position)
+newtype Rectangle = Rectangle (Position, Position)
   deriving (Show, Eq)
 
-unwrapRectangle :: Rectangle -> (Position, Position, Position, Position)
+unwrapRectangle :: Rectangle -> (Position, Position)
 unwrapRectangle (Rectangle t) = t
 
 type Bounds = Rectangle
@@ -39,11 +39,14 @@ newtype Vector = Vector (Float, Float)
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
 
+data Hitbox = Hitbox { position :: Position -- ^ Object position
+                     , boxes :: [Rectangle]
+                     , scaling :: Scaling -- todo 16.02.18: describe scaling parameter
+                     }
+
 -- | Contains information about a movable game entity.
 data Object = Object { name :: String -- ^ Unique object identifier.
-                     , position :: Position -- ^ Center of a rectangle.
-                     , dimensions :: Dimensions -- ^ Half of rectangle width and height.
-                     , scaling :: Scaling -- todo 16.02.18: describe scaling parameter
+                     , hitbox :: Hitbox -- ^ Object hitbox
                      , velocity :: Vector -- ^ X and Y velocity components.
                      }
 
