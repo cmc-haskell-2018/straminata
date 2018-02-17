@@ -39,6 +39,10 @@ newtype Vector = Vector (Float, Float)
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
 
+
+type Time = Float
+
+
 data Hitbox = Hitbox { position :: Position -- ^ Object position
                      , boxes :: [Rectangle]
                      , scaling :: Scaling -- todo 16.02.18: describe scaling parameter
@@ -50,7 +54,15 @@ data Object = Object { name :: String -- ^ Unique object identifier.
                      , velocity :: Vector -- ^ X and Y velocity components.
                      }
 
-type Player = Object
+data PlayerInfo = PlayerInfo
+
+data Player = Player { object :: Object
+                     , playerInfo :: PlayerInfo
+                     }
+
+data Players = Players { firstPlayer :: Player
+                       , secondPlayer :: Player
+                       }
 
 -- | Describes object movement along a single axis.
 type Movement = (Float -> Float)
@@ -59,5 +71,6 @@ type Movement = (Float -> Float)
 type PositionConstraint = (Float -> Bool)
 
 -- | Represents a game session.
-data Game = Game { objects :: [Object]
+data Game = Game { players :: Players
+                 , objects :: [Object]
                  }
