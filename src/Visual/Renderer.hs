@@ -18,8 +18,12 @@ render = picture
 
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
-picture game = Pictures $ map (\object ->
-                               uncurry Translate (unwrap $ position.hitbox $ object)
-                               $ uncurry Scale (unwrap $ scaling.hitbox $ object)
-                               $ Polygon (formPath $ hitbox object))
-                        $ objects game
+picture game = let player1 = firstPlayer . players $ game
+                   player2 = secondPlayer . players $ game
+                   translate' = uncurry Translate . unwrap . position . hitbox
+                   scale' = uncurry Scale . unwrap . scaling . hitbox
+                   polygon' = Polygon . formPath . hitbox
+                   picture' = \o -> translate' o $ scale' o $ polygon' o
+               in Pictures $ (picture' (object player1))
+                           : (picture' (object player2))
+                           : map picture' (objects game)

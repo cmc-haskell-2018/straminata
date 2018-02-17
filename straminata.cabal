@@ -15,8 +15,12 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   ghc-options:         -Wall -fno-warn-type-defaults
-  exposed-modules:
-    Straminata, WindowConstants, Model.CommonTypes, Util.Common, Visual.Renderer
+  exposed-modules:     Straminata
+                     , WindowConstants
+                     , Model.CommonTypes
+                     , Util.Common
+                     , Visual.Renderer
+                     , Controls
   build-depends:       base >= 4.7 && < 5
                      , gloss
   default-language:    Haskell2010
