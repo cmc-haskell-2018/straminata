@@ -7,30 +7,13 @@ import Model.CommonTypes
 -- | Generates next game state based on user input.
 handleInput :: Event -> Game -> Game
 handleInput event game = game { players = (players game)
-                                          { firstPlayer = movePlayer (firstPlayer . players $ game) event }
+                                          { firstPlayer = movePlayer (firstPlayer . players $ game) event
+                                          , secondPlayer = movePlayer (secondPlayer . players $ game) event
+                                          }
                               }
 
 movePlayer :: Player -> Event -> Player
-movePlayer player event = let playerObject = object player
-                              playerVelocity = velocity playerObject
-                          in case event of
-  (EventKey (SpecialKey KeyRight) Down _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-  (EventKey (SpecialKey KeyRight) Up _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-  (EventKey (SpecialKey KeyLeft) Down _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-  (EventKey (SpecialKey KeyLeft) Up _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-  (EventKey (SpecialKey KeyUp) Down _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-  (EventKey (SpecialKey KeyUp) Up _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-  (EventKey (SpecialKey KeyDown) Down _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-  (EventKey (SpecialKey KeyDown) Up _ _)
-    -> player { object = playerObject { velocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-  _ -> player
+movePlayer player event = (playerControls player) player event
 
 changePlayerVelocity :: Vector -- ^ Velocity change.
                      -> Vector -- ^ Player velocity
