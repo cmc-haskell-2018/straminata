@@ -7,6 +7,7 @@ import Graphics.Gloss
 import WindowConstants
 import Model.CommonTypes
 import Visual.Renderer
+import Util.Common
 import Controls
 
 -- | Starts game main loop.
@@ -23,7 +24,7 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game { objects = initialObjects
-                    , players = Players { firstPlayer = playerInitialState, secondPlayer = playerInitialState }
+                    , players = Players { firstPlayer = playerInitialState, secondPlayer = player2InitialState }
                     }
 
 -- todo: get from file
@@ -34,12 +35,23 @@ initialObjects = []
 playerInitialState :: Player
 playerInitialState = Player { object = Object { name = "Player 1"
                                               , hitbox = Hitbox { position = Position (0, 0)
-                                                                , scaling = Scaling (1, 1)
-                                                                , boxes = [Rectangle (Position (0, 0), Position (30, 50))]
+                                                                , displayBox = Rectangle (Position (0, 0), Position (100, 100))
+                                                                , collisionBoxes = [Rectangle (Position (0, 0), Position (100, 100))]
                                                                 }
                                               , velocity = Vector (0, 0)
                                               }
-                            , playerInfo = PlayerInfo
+                            , playerColor = red
+                            }
+
+player2InitialState :: Player
+player2InitialState = Player { object = Object { name = "Player 2"
+                                              , hitbox = Hitbox { position = Position (0, 0)
+                                                                , displayBox = Rectangle (Position (0, 0), Position (50, 50))
+                                                                , collisionBoxes = [Rectangle (Position (0, 0), Position (50, 50))]
+                                                                }
+                                              , velocity = Vector (0, 0)
+                                              }
+                            , playerColor = red
                             }
 
 
@@ -47,4 +59,17 @@ playerInitialState = Player { object = Object { name = "Player 1"
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame time = moveObjects time . movePlayers time
+advanceGame time = updatePlayers . moveObjects time . movePlayers time
+
+-- temporary
+updatePlayers :: Game -> Game
+updatePlayers game = let playersList = players game
+                         player1 = firstPlayer playersList
+                         player2 = secondPlayer playersList
+                         h1 = hitbox . object $ player1
+                         h2 = hitbox . object $ player2
+                         changeColor = hitboxesCollide h1 h2
+                     in game { players = playersList { firstPlayer = player1 { playerColor = if changeColor then red else blue }
+                                                     , secondPlayer = player2 { playerColor = if changeColor then green else blue }
+                                                     }
+                             }
