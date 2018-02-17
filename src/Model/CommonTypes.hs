@@ -28,13 +28,6 @@ unwrapRectangle (Rectangle t) = t
 
 type Bounds = Rectangle
 
-
-newtype Scaling = Scaling (Float, Float)
-  deriving (Show, Eq)
-
-instance (UnwrapablePair Scaling) where
-  unwrap (Scaling t) = t
-
 newtype Vector = Vector (Float, Float)
   deriving (Show, Eq)
 
@@ -48,18 +41,20 @@ type Time = Float
 data Hitbox = Hitbox { position :: Position -- ^ Object position
                      , displayBox :: Rectangle
                      , collisionBoxes :: [Rectangle]
-                     , scaling :: Scaling -- todo 16.02.18: describe scaling parameter
                      }
+  deriving Show
 
 -- | Contains information about a movable game entity.
 data Object = Object { name :: String -- ^ Unique object identifier.
                      , hitbox :: Hitbox -- ^ Object hitbox
                      , velocity :: Vector -- ^ X and Y velocity components.
                      }
+  deriving Show
 
 data Player = Player { object :: Object
                      , playerColor :: Color
                      }
+  deriving Show
 
 data Players = Players { firstPlayer :: Player
                        , secondPlayer :: Player

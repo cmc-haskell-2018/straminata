@@ -24,7 +24,7 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game { objects = initialObjects
-                    , players = Players { firstPlayer = playerInitialState, secondPlayer = playerInitialState }
+                    , players = Players { firstPlayer = playerInitialState, secondPlayer = player2InitialState }
                     }
 
 -- todo: get from file
@@ -35,9 +35,19 @@ initialObjects = []
 playerInitialState :: Player
 playerInitialState = Player { object = Object { name = "Player 1"
                                               , hitbox = Hitbox { position = Position (0, 0)
-                                                                , scaling = Scaling (1, 1)
-                                                                , displayBox = Rectangle (Position (0, 0), Position (30, 50))
-                                                                , collisionBoxes = [Rectangle (Position (0, 0), Position (30, 50))]
+                                                                , displayBox = Rectangle (Position (0, 0), Position (100, 100))
+                                                                , collisionBoxes = [Rectangle (Position (0, 0), Position (100, 100))]
+                                                                }
+                                              , velocity = Vector (0, 0)
+                                              }
+                            , playerColor = red
+                            }
+
+player2InitialState :: Player
+player2InitialState = Player { object = Object { name = "Player 2"
+                                              , hitbox = Hitbox { position = Position (0, 0)
+                                                                , displayBox = Rectangle (Position (0, 0), Position (50, 50))
+                                                                , collisionBoxes = [Rectangle (Position (0, 0), Position (50, 50))]
                                                                 }
                                               , velocity = Vector (0, 0)
                                               }
