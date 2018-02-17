@@ -1,6 +1,7 @@
 module Model.CommonTypes where
 
 import Graphics.Gloss (Color)
+import Graphics.Gloss.Interface.IO.Game (Event)
 
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
@@ -51,10 +52,15 @@ data Object = Object { name :: String -- ^ Unique object identifier.
                      }
   deriving Show
 
+type PlayerControls = (Player -> Event -> Player)
+
 data Player = Player { object :: Object
                      , playerColor :: Color
+                     , playerControls :: PlayerControls
                      }
-  deriving Show
+
+instance Show Player where
+  show player = "Player {" ++ show (object player) ++ ", " ++ show (playerColor player) ++ "}"
 
 data Players = Players { firstPlayer :: Player
                        , secondPlayer :: Player
