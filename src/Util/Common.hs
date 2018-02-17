@@ -1,8 +1,9 @@
--- | Contains commonly used functions
+-- | Contains commonly used functions.
 module Util.Common where
 
 import Model.CommonTypes
 
+-- | Check if two hitboxes collide.
 hitboxesCollide :: Hitbox -> Hitbox -> Bool
 hitboxesCollide h1 h2 = let boxes1 = collisionBoxes h1
                             boxes2 = collisionBoxes h2
@@ -13,11 +14,13 @@ hitboxesCollide h1 h2 = let boxes1 = collisionBoxes h1
                                              ) boxes2
                                ) boxes1
 
+-- | Returns Rectangle which coordinates are offsetted by Position.
 offsetRectangle :: Position -> Rectangle -> Rectangle
 offsetRectangle (Position (x, y))
                 (Rectangle ( (Position (x1, y1))
                            , (Position (x2, y2)))) = Rectangle (Position (x1 / 2 + x, y1 / 2 + y), Position (x2 / 2 + x, y2 / 2 + y))
 
+-- | Checks if two rectangles are colliding.
 collide :: Rectangle -> Rectangle -> Bool
 collide (Rectangle ( (Position (x11, y11))
                    , (Position (x12, y12))))
