@@ -25,7 +25,7 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game { objects = initialObjects
-                    , players = Players { firstPlayer = playerInitialState, secondPlayer = player2InitialState }
+                    , players = [playerInitialState, player2InitialState]
                     }
 
 -- todo: get from file
@@ -108,13 +108,11 @@ advanceGame time = updatePlayers . moveObjects time . movePlayers time
 
 -- temporary
 updatePlayers :: Game -> Game
-updatePlayers game = let playersList = players game
-                         player1 = firstPlayer playersList
-                         player2 = secondPlayer playersList
+updatePlayers game = let playerList = players game
+                         player1 = (playerList !! 0)
+                         player2 = (playerList !! 1)
                          h1 = hitbox . object $ player1
                          h2 = hitbox . object $ player2
                          changeColor = hitboxesCollide h1 h2
-                     in game { players = playersList { firstPlayer = player1 { playerColor = if changeColor then red else blue }
-                                                     , secondPlayer = player2 { playerColor = if changeColor then green else blue }
-                                                     }
+                     in game { players = map (\player -> player {playerColor = if changeColor then red else blue}) playerList
                              }

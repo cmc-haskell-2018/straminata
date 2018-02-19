@@ -4,7 +4,6 @@ import Graphics.Gloss
 
 import WindowConstants
 import Model.CommonTypes
-import Util.Common
 
 -- | Initial window state.
 newWindow :: Display
@@ -18,14 +17,11 @@ render = picture
 
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
-picture game = let player1 = firstPlayer . players $ game
-                   player2 = secondPlayer . players $ game
-                   translate' = uncurry Translate . unwrap . position . hitbox
+picture game = let translate' = uncurry Translate . unwrap . position . hitbox
                    polygon' = Polygon . formPath . hitbox
                    picture' = \o -> translate' o $ polygon' o
-               in Pictures $ (Color (playerColor player1) (picture' (object player1)))
-                           : (Color (playerColor player2) (picture' (object player2)))
-                           : map picture' (objects game)
+               in Pictures $ map (\player -> Color (playerColor player) (picture' . object $ player)) (players game)
+                           ++ map picture' (objects game)
 
 
 -- | Creates a path – a sequential list of polygon vertices.

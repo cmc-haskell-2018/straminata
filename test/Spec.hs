@@ -1,7 +1,6 @@
 -- file Spec.hs
 import Test.Hspec
 
-import Util.Common
 import Model.CommonTypes
 
 main :: IO ()

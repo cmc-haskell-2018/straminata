@@ -62,9 +62,7 @@ data Player = Player { object :: Object
 instance Show Player where
   show player = "Player {" ++ show (object player) ++ ", " ++ show (playerColor player) ++ "}"
 
-data Players = Players { firstPlayer :: Player
-                       , secondPlayer :: Player
-                       }
+type Players = [Player]
 
 -- | Describes object movement along a single axis.
 type Movement = (Float -> Float)
