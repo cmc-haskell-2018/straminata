@@ -1,8 +1,8 @@
 -- file Spec.hs
 import Test.Hspec
 
-import Util.Common
 import Model.CommonTypes
+import Util.Common
 
 main :: IO ()
 main = hspec $ do
@@ -10,7 +10,6 @@ main = hspec $ do
       h2 = Rectangle (Position (1, 1), Position (3, 3))
       h3 = Rectangle (Position (3, 0), Position (5, 2))
       h4 = Rectangle (Position (-1, -1), Position (1, 1))
-      p1 = Position (1, 1)
   describe "Prelude.head" $ do
     it "checks if rectangles collide" $ do
       collide h1 h2 `shouldBe` True

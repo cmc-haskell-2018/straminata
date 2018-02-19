@@ -6,14 +6,10 @@ import Model.CommonTypes
 
 -- | Generates next game state based on user input.
 handleInput :: Event -> Game -> Game
-handleInput event game = game { players = (players game)
-                                          { firstPlayer = movePlayer (firstPlayer . players $ game) event
-                                          , secondPlayer = movePlayer (secondPlayer . players $ game) event
-                                          }
-                              }
+handleInput event game = game { players = map (movePlayer event) (players game) }
 
-movePlayer :: Player -> Event -> Player
-movePlayer player event = (playerControls player) player event
+movePlayer :: Event -> Player -> Player
+movePlayer event player = (playerControls player) player event
 
 changePlayerVelocity :: Vector -- ^ Velocity change.
                      -> Vector -- ^ Player velocity
@@ -26,15 +22,7 @@ moveObjects time game = game { objects = move $ objects game }
   where move = map (moveObject time)
 
 movePlayers :: Time -> Game -> Game
-movePlayers time game = let playersList = players game
-                            player1 = firstPlayer playersList
-                            player2 = secondPlayer playersList
-                            obj1 = object player1
-                            obj2 = object player2
-                        in game { players = playersList { firstPlayer = player1 { object = moveObject time obj1 }
-                                                        , secondPlayer = player2 { object = moveObject time obj2 }
-                                                        }
-                                }
+movePlayers time game = game { players = map (\player -> player {object = moveObject time (object player) }) (players game) }
 
 
 moveObject :: Time -> Object -> Object
