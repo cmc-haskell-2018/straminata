@@ -7,13 +7,14 @@ import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
+class ControlType a where
+  controlPlayer :: a -> Player -> Player
 
 newtype Position = Position (Float, Float)
   deriving (Show, Eq)
 
 instance (UnwrapablePair Position) where
   unwrap (Position t) = t
-
 
 newtype Dimensions = Dimensions (Float, Float)
   deriving (Show, Eq)
@@ -45,9 +46,7 @@ instance ControlType Vector where
         currentVelocity = objectVelocity object
     in player { playerObject = object { objectVelocity = velocity `plus` currentVelocity } }
 
-
 type Time = Float
-
 
 data Hitbox = Hitbox
   { hitboxPosition :: Position -- ^ Object position
@@ -64,6 +63,8 @@ data Object = Object
   }
   deriving Show
 
+data ControlElement = forall a. ControlType a => ControlElement a
+
 type DownAction = ControlElement
 type UpAction = ControlElement
 type KeyPress = (Key, DownAction, UpAction)
@@ -71,11 +72,6 @@ type KeyPress = (Key, DownAction, UpAction)
 upOrDown :: KeyState -> KeyPress -> ControlElement
 upOrDown Down (_, x, _) = x
 upOrDown Up (_, _, x) = x
-
-class ControlType a where
-  controlPlayer :: a -> Player -> Player
-
-data ControlElement = forall a. ControlType a => ControlElement a
 
 instance ControlType ControlElement where
   controlPlayer (ControlElement x) = controlPlayer x
@@ -88,7 +84,7 @@ data Player = Player
   , playerControls :: PlayerControls
   }
 
-instance Show (Player) where
+instance Show Player where
   show player = "Player {" ++ show (playerObject player) ++ ", " ++ show (playerColor player) ++ "}"
 
 type Players = [Player]

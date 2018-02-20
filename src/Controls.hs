@@ -9,14 +9,16 @@ import Model.CommonTypes
 
 -- | Generates next game state based on user input.
 handleInput :: Event -> Game -> Game
-handleInput event game = let players = gamePlayers game in case event of
-  (EventKey key state _ _) -> game { gamePlayers = map (\player -> act player key state) players }
-  _ -> game
-  where act player key state = let controlElement = fmap (upOrDown state) $ find (predicate key) (playerControls player)
-                               in if isJust controlElement
-                                  then controlPlayer (fromJust controlElement) player
-                                  else player
-        predicate currentKey (key, _, _) = currentKey == key
+handleInput event game =
+  let players = gamePlayers game
+  in case event of
+    (EventKey key state _ _) -> game { gamePlayers = map (act key state) players }
+    _ -> game
+    where act key state player = let controlElement = (upOrDown state) <$> find (predicate key) (playerControls player)
+                                 in if isJust controlElement
+                                    then controlPlayer (fromJust controlElement) player
+                                    else player
+          predicate key (key', _, _) = key == key'
 
 bindAction :: Key -> ControlElement -> ControlElement -> KeyPress
 bindAction key up down = (key, up, down)

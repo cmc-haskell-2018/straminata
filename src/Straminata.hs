@@ -46,8 +46,7 @@ playerInitialState = Player
   }
   , playerColor = red
   , playerControls =
-      [
-        bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+      [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
       , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
       , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
       , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
@@ -67,8 +66,7 @@ player2InitialState = Player
   }
   , playerColor = red
   , playerControls =
-    [
-      bindAction (Char 'd') (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+    [ bindAction (Char 'd') (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
     , bindAction (Char 'a') (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
     , bindAction (Char 'w') (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
     , bindAction (Char 's') (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
