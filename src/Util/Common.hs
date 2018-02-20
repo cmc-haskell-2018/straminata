@@ -5,10 +5,10 @@ import Model.CommonTypes
 
 -- | Check if two hitboxes collide.
 hitboxesCollide :: Hitbox -> Hitbox -> Bool
-hitboxesCollide h1 h2 = let boxes1 = collisionBoxes h1
-                            boxes2 = collisionBoxes h2
-                            offset1 = position h1
-                            offset2 = position h2
+hitboxesCollide h1 h2 = let boxes1 = hitboxCollisionBoxes h1
+                            boxes2 = hitboxCollisionBoxes h2
+                            offset1 = hitboxPosition h1
+                            offset2 = hitboxPosition h2
                         in any (\box1 -> any (\box2 -> collide (offsetRectangle offset1 box1)
                                                                (offsetRectangle offset2 box2)
                                              ) boxes2

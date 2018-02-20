@@ -39,28 +39,31 @@ instance (UnwrapablePair Vector) where
 type Time = Float
 
 
-data Hitbox = Hitbox { position :: Position -- ^ Object position
-                     , displayBox :: Rectangle
-                     , collisionBoxes :: [Rectangle]
-                     }
+data Hitbox = Hitbox
+  { hitboxPosition :: Position -- ^ Object position
+  , hitboxDisplayBox :: Rectangle
+  , hitboxCollisionBoxes :: [Rectangle]
+  }
   deriving Show
 
 -- | Contains information about a movable game entity.
-data Object = Object { name :: String -- ^ Unique object identifier.
-                     , hitbox :: Hitbox -- ^ Object hitbox
-                     , velocity :: Vector -- ^ X and Y velocity components.
-                     }
+data Object = Object
+  { objectName :: String -- ^ Unique object identifier.
+  , objectHitbox :: Hitbox -- ^ Object hitbox
+  , objectVelocity :: Vector -- ^ X and Y velocity components.
+  }
   deriving Show
 
 type PlayerControls = (Player -> Event -> Player)
 
-data Player = Player { object :: Object
-                     , playerColor :: Color
-                     , playerControls :: PlayerControls
-                     }
+data Player = Player
+  { playerObject :: Object
+  , playerColor :: Color
+  , playerControls :: PlayerControls
+  }
 
 instance Show Player where
-  show player = "Player {" ++ show (object player) ++ ", " ++ show (playerColor player) ++ "}"
+  show player = "Player {" ++ show (playerObject player) ++ ", " ++ show (playerColor player) ++ "}"
 
 type Players = [Player]
 
@@ -71,6 +74,7 @@ type Movement = (Float -> Float)
 type PositionConstraint = (Float -> Bool)
 
 -- | Represents a game session.
-data Game = Game { players :: Players
-                 , objects :: [Object]
-                 }
+data Game = Game
+  { gamePlayers :: Players
+  , gameObjects :: [Object]
+  }
