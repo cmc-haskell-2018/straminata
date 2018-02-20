@@ -35,6 +35,9 @@ newtype Vector = Vector (Float, Float)
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
 
+plus :: Vector -> Vector -> Vector
+plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
+
 
 type Time = Float
 

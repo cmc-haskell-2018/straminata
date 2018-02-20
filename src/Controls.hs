@@ -11,11 +11,13 @@ handleInput event game = game { gamePlayers = map (movePlayer event) (gamePlayer
 movePlayer :: Event -> Player -> Player
 movePlayer event player = (playerControls player) player event
 
-changePlayerVelocity :: Vector -- ^ Velocity change.
-                     -> Vector -- ^ Player velocity
-                     -> Vector
-changePlayerVelocity (Vector (cx, cy)) (Vector (x, y)) = Vector (x + cx, y + cy)
-
+changeVelocityOnCopy :: Vector
+                     -> Player
+                     -> Player
+changeVelocityOnCopy velocity player =
+  let object = playerObject player
+      currentVelocity = objectVelocity object
+  in player { playerObject = object { objectVelocity = velocity `plus` currentVelocity } }
 
 moveObjects :: Time -> Game -> Game
 moveObjects time game = game { gameObjects = move $ gameObjects game }
