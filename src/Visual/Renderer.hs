@@ -17,17 +17,18 @@ render = picture
 
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
-picture game = let translate' = uncurry Translate . unwrap . position . hitbox
-                   polygon' = Polygon . formPath . hitbox
+picture game = let translate' = uncurry Translate . unwrap . hitboxPosition . objectHitbox
+                   polygon' = Polygon . formPath . objectHitbox
                    picture' = \o -> translate' o $ polygon' o
-               in Pictures $ map (\player -> Color (playerColor player) (picture' . object $ player)) (players game)
-                           ++ map picture' (objects game)
+               in Pictures
+                 $ map (\player -> Color (playerColor player) (picture' . playerObject $ player)) (gamePlayers game)
+                   ++ map picture' (gameObjects game)
 
 
 -- | Creates a path – a sequential list of polygon vertices.
 formPath :: Hitbox -> [(Float, Float)]
-formPath h = let pos = position h
-                 box = displayBox h
+formPath h = let pos = hitboxPosition h
+                 box = hitboxDisplayBox h
                  x = fst . unwrap $ pos
                  y = snd . unwrap $ pos
                  p1 = unwrap . fst . unwrapRectangle $ box
