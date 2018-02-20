@@ -45,27 +45,12 @@ playerInitialState = Player
     , objectVelocity = Vector (0, 0)
   }
   , playerColor = red
-  , playerControls = (\player event ->
-      let object = playerObject player
-          playerVelocity = objectVelocity object
-      in case event of
-        (EventKey (SpecialKey KeyRight) Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-        (EventKey (SpecialKey KeyRight) Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-        (EventKey (SpecialKey KeyLeft) Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-        (EventKey (SpecialKey KeyLeft) Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-        (EventKey (SpecialKey KeyUp) Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-        (EventKey (SpecialKey KeyUp) Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-        (EventKey (SpecialKey KeyDown) Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-        (EventKey (SpecialKey KeyDown) Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-        _ -> player )
+  , playerControls =
+      [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+      , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
+      , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
+      , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
+      ]
   }
 
 player2InitialState :: Player
@@ -80,27 +65,12 @@ player2InitialState = Player
     , objectVelocity = Vector (0, 0)
   }
   , playerColor = red
-  , playerControls = (\player event ->
-      let object = playerObject player
-          playerVelocity = objectVelocity object
-      in case event of
-        (EventKey (Char 'd') Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-        (EventKey (Char 'd') Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-        (EventKey (Char 'a') Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (-1, 0)) playerVelocity } }
-        (EventKey (Char 'a') Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (1, 0)) playerVelocity } }
-        (EventKey (Char 'w') Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-        (EventKey (Char 'w') Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-        (EventKey (Char 's') Down _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, -1)) playerVelocity } }
-        (EventKey (Char 's') Up _ _)
-          -> player { playerObject = object { objectVelocity = changePlayerVelocity (Vector (0, 1)) playerVelocity } }
-        _ -> player )
+  , playerControls =
+    [ bindAction (Char 'd') (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+    , bindAction (Char 'a') (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
+    , bindAction (Char 'w') (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
+    , bindAction (Char 's') (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
+    ]
   }
 
 -- | Advances game state one step further.
