@@ -1,7 +1,8 @@
+{-# OPTIONS -XExistentialQuantification #-}
 module Model.CommonTypes where
 
 import Graphics.Gloss (Color)
-import Graphics.Gloss.Interface.IO.Game (Event)
+import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
@@ -38,6 +39,12 @@ instance (UnwrapablePair Vector) where
 plus :: Vector -> Vector -> Vector
 plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
 
+instance ControlType Vector where
+  controlPlayer velocity player =
+    let object = playerObject player
+        currentVelocity = objectVelocity object
+    in player { playerObject = object { objectVelocity = velocity `plus` currentVelocity } }
+
 
 type Time = Float
 
@@ -57,7 +64,23 @@ data Object = Object
   }
   deriving Show
 
-type PlayerControls = (Player -> Event -> Player)
+type DownAction = ControlElement
+type UpAction = ControlElement
+type KeyPress = (Key, DownAction, UpAction)
+
+upOrDown :: KeyState -> KeyPress -> ControlElement
+upOrDown Down (_, x, _) = x
+upOrDown Up (_, _, x) = x
+
+class ControlType a where
+  controlPlayer :: a -> Player -> Player
+
+data ControlElement = forall a. ControlType a => ControlElement a
+
+instance ControlType ControlElement where
+  controlPlayer (ControlElement x) = controlPlayer x
+
+type PlayerControls = [KeyPress]
 
 data Player = Player
   { playerObject :: Object
@@ -65,7 +88,7 @@ data Player = Player
   , playerControls :: PlayerControls
   }
 
-instance Show Player where
+instance Show (Player) where
   show player = "Player {" ++ show (playerObject player) ++ ", " ++ show (playerColor player) ++ "}"
 
 type Players = [Player]

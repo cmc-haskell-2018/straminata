@@ -45,16 +45,13 @@ playerInitialState = Player
     , objectVelocity = Vector (0, 0)
   }
   , playerColor = red
-  , playerControls = (\player event -> case event of
-      (EventKey (SpecialKey KeyRight) Down _ _) -> changeVelocityOnCopy (Vector (1, 0)) player
-      (EventKey (SpecialKey KeyRight) Up _ _) -> changeVelocityOnCopy (Vector (-1, 0)) player
-      (EventKey (SpecialKey KeyLeft) Down _ _) -> changeVelocityOnCopy (Vector (-1, 0)) player
-      (EventKey (SpecialKey KeyLeft) Up _ _) -> changeVelocityOnCopy (Vector (1, 0)) player
-      (EventKey (SpecialKey KeyUp) Down _ _) -> changeVelocityOnCopy (Vector (0, 1)) player
-      (EventKey (SpecialKey KeyUp) Up _ _) -> changeVelocityOnCopy (Vector (0, -1)) player
-      (EventKey (SpecialKey KeyDown) Down _ _) -> changeVelocityOnCopy (Vector (0, -1)) player
-      (EventKey (SpecialKey KeyDown) Up _ _) -> changeVelocityOnCopy (Vector (0, 1)) player
-      _ -> player)
+  , playerControls =
+      [
+        bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+      , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
+      , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
+      , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
+      ]
   }
 
 player2InitialState :: Player
@@ -69,16 +66,13 @@ player2InitialState = Player
     , objectVelocity = Vector (0, 0)
   }
   , playerColor = red
-  , playerControls = (\player event -> case event of
-      (EventKey (Char 'd') Down _ _) -> changeVelocityOnCopy (Vector (1, 0)) player
-      (EventKey (Char 'd') Up _ _) -> changeVelocityOnCopy (Vector (-1, 0)) player
-      (EventKey (Char 'a') Down _ _) -> changeVelocityOnCopy (Vector (-1, 0)) player
-      (EventKey (Char 'a') Up _ _) -> changeVelocityOnCopy (Vector (1, 0)) player
-      (EventKey (Char 'w') Down _ _) -> changeVelocityOnCopy (Vector (0, 1)) player
-      (EventKey (Char 'w') Up _ _) -> changeVelocityOnCopy (Vector (0, -1)) player
-      (EventKey (Char 's') Down _ _) -> changeVelocityOnCopy (Vector (0, -1)) player
-      (EventKey (Char 's') Up _ _) -> changeVelocityOnCopy (Vector (0, 1)) player
-      _ -> player)
+  , playerControls =
+    [
+      bindAction (Char 'd') (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
+    , bindAction (Char 'a') (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
+    , bindAction (Char 'w') (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
+    , bindAction (Char 's') (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
+    ]
   }
 
 -- | Advances game state one step further.

@@ -1,23 +1,25 @@
 module Controls where
 
+import Data.Maybe (isJust, fromJust)
+import Data.List (find)
+
 import Graphics.Gloss.Interface.IO.Game hiding (Vector)
 
 import Model.CommonTypes
 
 -- | Generates next game state based on user input.
 handleInput :: Event -> Game -> Game
-handleInput event game = game { gamePlayers = map (movePlayer event) (gamePlayers game) }
+handleInput event game = let players = gamePlayers game in case event of
+  (EventKey key state _ _) -> game { gamePlayers = map (\player -> act player key state) players }
+  _ -> game
+  where act player key state = let controlElement = fmap (upOrDown state) $ find (predicate key) (playerControls player)
+                               in if isJust controlElement
+                                  then controlPlayer (fromJust controlElement) player
+                                  else player
+        predicate currentKey (key, _, _) = currentKey == key
 
-movePlayer :: Event -> Player -> Player
-movePlayer event player = (playerControls player) player event
-
-changeVelocityOnCopy :: Vector
-                     -> Player
-                     -> Player
-changeVelocityOnCopy velocity player =
-  let object = playerObject player
-      currentVelocity = objectVelocity object
-  in player { playerObject = object { objectVelocity = velocity `plus` currentVelocity } }
+bindAction :: Key -> ControlElement -> ControlElement -> KeyPress
+bindAction key up down = (key, up, down)
 
 moveObjects :: Time -> Game -> Game
 moveObjects time game = game { gameObjects = move $ gameObjects game }
