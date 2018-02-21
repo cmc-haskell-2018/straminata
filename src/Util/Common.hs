@@ -22,5 +22,4 @@ offsetRectangle (Position (x, y))
 -- | Checks if two rectangles are colliding.
 collide :: Rectangle -> Rectangle -> Bool
 collide (Position (x11, y11), Position (x12, y12))
-          (Position (x21, y21), Position (x22, y22)) =
-            x11 < x22 && x12 > x21 && y11 < y22 && y12 > y21
+        (Position (x21, y21), Position (x22, y22)) = x11 < x22 && x12 > x21 && y11 < y22 && y12 > y21
