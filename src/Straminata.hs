@@ -39,8 +39,8 @@ playerInitialState = Player
     { objectName = "Player 1"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxDisplayBox = Rectangle (Position (0, 0), Position (100, 100))
-      , hitboxCollisionBoxes = [Rectangle (Position (0, 0), Position (100, 100))]
+      , hitboxDisplayBox = (Position (0, 0), Position (100, 100))
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (100, 100))]
       }
     , objectVelocity = Vector (0, 0)
   }
@@ -59,8 +59,8 @@ player2InitialState = Player
     { objectName = "Player 2"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxDisplayBox = Rectangle (Position (0, 0), Position (50, 50))
-      , hitboxCollisionBoxes = [Rectangle (Position (0, 0), Position (50, 50))]
+      , hitboxDisplayBox = (Position (0, 0), Position (50, 50))
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (50, 50))]
       }
     , objectVelocity = Vector (0, 0)
   }

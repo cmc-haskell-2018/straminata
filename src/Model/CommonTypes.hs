@@ -23,11 +23,7 @@ instance (UnwrapablePair Dimensions) where
   unwrap (Dimensions t) = t
 
 -- todo: refactor
-newtype Rectangle = Rectangle (Position, Position)
-  deriving (Show, Eq)
-
-unwrapRectangle :: Rectangle -> (Position, Position)
-unwrapRectangle (Rectangle t) = t
+type Rectangle = (Position, Position)
 
 type Bounds = Rectangle
 

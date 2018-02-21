@@ -17,13 +17,9 @@ hitboxesCollide h1 h2 = let boxes1 = hitboxCollisionBoxes h1
 -- | Returns Rectangle which coordinates are offsetted by Position.
 offsetRectangle :: Position -> Rectangle -> Rectangle
 offsetRectangle (Position (x, y))
-                (Rectangle ( (Position (x1, y1))
-                           , (Position (x2, y2)))) = Rectangle (Position (x1 / 2 + x, y1 / 2 + y), Position (x2 / 2 + x, y2 / 2 + y))
+                (Position (x1, y1), Position (x2, y2)) = (Position (x1 / 2 + x, y1 / 2 + y), Position (x2 / 2 + x, y2 / 2 + y))
 
 -- | Checks if two rectangles are colliding.
 collide :: Rectangle -> Rectangle -> Bool
-collide (Rectangle ( (Position (x11, y11))
-                   , (Position (x12, y12))))
-        (Rectangle ( (Position (x21, y21))
-                   , (Position (x22, y22)))) =
-            x11 < x22 && x12 > x21 && y11 < y22 && y12 > y21
+collide (Position (x11, y11), Position (x12, y12))
+        (Position (x21, y21), Position (x22, y22)) = x11 < x22 && x12 > x21 && y11 < y22 && y12 > y21

@@ -31,8 +31,8 @@ formPath h = let pos = hitboxPosition h
                  box = hitboxDisplayBox h
                  x = fst . unwrap $ pos
                  y = snd . unwrap $ pos
-                 p1 = unwrap . fst . unwrapRectangle $ box
-                 p2 = unwrap . snd . unwrapRectangle $ box
+                 p1 = unwrap . fst $ box
+                 p2 = unwrap . snd $ box
                  x1 = fst p1 + x
                  y1 = snd p1 + y
                  x2 = fst p2 + x
