@@ -3,6 +3,10 @@ module Util.Common where
 
 import Model.CommonTypes
 import Visual.WindowConstants
+
+frameWidth :: Float
+frameWidth = 25
+
 -- | Check if two hitboxes collide.
 hitboxesCollide :: Hitbox -> Hitbox -> Bool
 hitboxesCollide h1 h2 = let boxes1 = hitboxCollisionBoxes h1
@@ -33,20 +37,17 @@ updateCamera game = game
     }
   }
   where
-    playerHitboxes = map (objectHitbox . playerObject) (gamePlayers game)
-    displayBoxes = map offsetDisplayBox playerHitboxes
-    centers = map boxCenter displayBoxes
+    displayBoxes = map (offsetDisplayBox . objectHitbox . playerObject) (gamePlayers game)
     offsetDisplayBox = \hitbox -> offsetRectangle (hitboxPosition hitbox) (hitboxDisplayBox hitbox)
-    boxCenter = \box -> ((positionToVector . fst $ box) `plus` (positionToVector . snd $ box)) `divByNumber` 2.0
-    position = foldr plus (Vector (0, 0)) centers `divByNumber` (fromIntegral . length $ centers)
-    rect = [ minimum (map (fst . unwrap . fst) displayBoxes)
-           , minimum (map (snd . unwrap . fst) displayBoxes)
-           , maximum (map (fst . unwrap . snd) displayBoxes)
-           , maximum (map (snd . unwrap . snd) displayBoxes)
+    position = (Vector (rect !! 0, rect !! 1) `plus` Vector (rect !! 2, rect !! 3)) `divByNumber` 2
+    rect = [ minimum (map (fst . unwrap . fst) displayBoxes) - frameWidth
+           , minimum (map (snd . unwrap . fst) displayBoxes) - frameWidth
+           , maximum (map (fst . unwrap . snd) displayBoxes) + frameWidth
+           , maximum (map (snd . unwrap . snd) displayBoxes) + frameWidth
            ]
     boundaryDimensions = (rect !! 2 - rect !! 0, rect !! 3 - rect !! 1)
     -- todo: indentWindowContent is quick workaround; add better way to create additional bounds to window contents.
-    ratio = minimum [ (fromIntegral . indentWindowContent . fst $ initialWindowDimensions) / (fst boundaryDimensions)
-                    , (fromIntegral . indentWindowContent . snd $ initialWindowDimensions) / (snd boundaryDimensions)
+    ratio = minimum [ (fromIntegral . fst $ initialWindowDimensions) / (fst boundaryDimensions)
+                    , (fromIntegral . snd $ initialWindowDimensions) / (snd boundaryDimensions)
                     , 1
                     ]

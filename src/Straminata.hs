@@ -45,7 +45,7 @@ playerInitialState = Player
   { playerObject = Object
     { objectName = "Player 1"
     , objectHitbox = Hitbox
-      { hitboxPosition = Position (0, 0)
+      { hitboxPosition = Position (1000, 1000)
       , hitboxDisplayBox = (Position (0, 0), Position (100, 100))
       , hitboxCollisionBoxes = [(Position (0, 0), Position (100, 100))]
       }
@@ -53,10 +53,10 @@ playerInitialState = Player
   }
   , playerColor = red
   , playerControls =
-      [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
-      , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
-      , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 1))) (ControlElement (Vector (0, -1)))
-      , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -1))) (ControlElement (Vector (0, 1)))
+      [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (10, 0))) (ControlElement (Vector (-10, 0)))
+      , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-10, 0))) (ControlElement (Vector (10, 0)))
+      , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 10))) (ControlElement (Vector (0, -10)))
+      , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -10))) (ControlElement (Vector (0, 10)))
       ]
   }
 
@@ -66,17 +66,17 @@ player2InitialState = Player
     { objectName = "Player 2"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxDisplayBox = (Position (0, 0), Position (50, 50))
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (50, 50))]
+      , hitboxDisplayBox = (Position (0, 0), Position (200, 200))
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (200, 200))]
       }
     , objectVelocity = Vector (0, 0)
   }
   , playerColor = red
   , playerControls =
-    [ bindAction (Char 'd') (ControlElement (Vector (2, 0))) (ControlElement (Vector (-2, 0)))
-    , bindAction (Char 'a') (ControlElement (Vector (-2, 0))) (ControlElement (Vector (2, 0)))
-    , bindAction (Char 'w') (ControlElement (Vector (0, 2))) (ControlElement (Vector (0, -2)))
-    , bindAction (Char 's') (ControlElement (Vector (0, -2))) (ControlElement (Vector (0, 2)))
+    [ bindAction (Char 'd') (ControlElement (Vector (20, 0))) (ControlElement (Vector (-20, 0)))
+    , bindAction (Char 'a') (ControlElement (Vector (-20, 0))) (ControlElement (Vector (20, 0)))
+    , bindAction (Char 'w') (ControlElement (Vector (0, 20))) (ControlElement (Vector (0, -20)))
+    , bindAction (Char 's') (ControlElement (Vector (0, -20))) (ControlElement (Vector (0, 20)))
     ]
   }
 

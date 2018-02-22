@@ -17,6 +17,3 @@ backgroundColor = white
 
 fps :: Int
 fps = 60
-
-indentWindowContent :: Int -> Int
-indentWindowContent coordinate = coordinate - 50
