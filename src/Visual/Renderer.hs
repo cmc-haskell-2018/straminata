@@ -2,7 +2,7 @@ module Visual.Renderer where
 
 import Graphics.Gloss
 
-import WindowConstants
+import Visual.WindowConstants
 import Model.CommonTypes
 
 -- | Initial window state.
@@ -12,7 +12,7 @@ newWindow = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render = picture
+render game = positionPicture (gameCamera game) (picture game)
 
 
 -- | Composes all game @objects@ in a list of pictures.
@@ -21,20 +21,26 @@ picture game = let translate' = uncurry Translate . unwrap . hitboxPosition . ob
                    polygon' = Polygon . formPath . objectHitbox
                    picture' = \o -> translate' o $ polygon' o
                in Pictures
-                 $ map (\player -> Color (playerColor player) (picture' . playerObject $ player)) (gamePlayers game)
-                   ++ map picture' (gameObjects game)
+                 $ map (Color green . picture' . unwrapMapTile) (concat . levelMap . gameLevel $ game)
+                   ++ map (\player -> Color (playerColor player) (picture' . playerObject $ player)) (gamePlayers game)
+                   ++ map (Color blue . picture') (gameObjects game)
 
 
 -- | Creates a path – a sequential list of polygon vertices.
 formPath :: Hitbox -> [(Float, Float)]
-formPath h = let pos = hitboxPosition h
-                 box = hitboxDisplayBox h
-                 x = fst . unwrap $ pos
-                 y = snd . unwrap $ pos
+formPath h = let box = hitboxDisplayBox h
                  p1 = unwrap . fst $ box
                  p2 = unwrap . snd $ box
-                 x1 = fst p1 + x
-                 y1 = snd p1 + y
-                 x2 = fst p2 + x
-                 y2 = snd p2 + y
+                 x1 = fst p1
+                 y1 = snd p1
+                 x2 = fst p2
+                 y2 = snd p2
              in [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+
+
+positionPicture :: Camera -> Picture -> Picture
+positionPicture camera pic = Scale ratio ratio (Translate x y pic)
+  where ratio = cameraRatio camera
+        offset = unwrap . invertVector . positionToVector . cameraPosition $ camera
+        x = fst offset
+        y = snd offset

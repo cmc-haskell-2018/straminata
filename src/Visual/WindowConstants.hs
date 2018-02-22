@@ -1,5 +1,5 @@
 -- |This module keeps default parameters describing the game window
-module WindowConstants where
+module Visual.WindowConstants where
 
 import Graphics.Gloss
 
@@ -15,5 +15,5 @@ initialWindowPosition = (10, 10)
 backgroundColor :: Color
 backgroundColor = white
 
-stepsPerSecond :: Int
-stepsPerSecond = 30
+fps :: Int
+fps = 60

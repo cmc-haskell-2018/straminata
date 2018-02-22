@@ -16,6 +16,12 @@ newtype Position = Position (Float, Float)
 instance (UnwrapablePair Position) where
   unwrap (Position t) = t
 
+vectorToPosition :: Vector -> Position
+vectorToPosition v = Position (fst . unwrap $ v, snd . unwrap $ v)
+
+positionToVector :: Position -> Vector
+positionToVector p = Vector (fst . unwrap $ p, snd . unwrap $ p)
+
 newtype Dimensions = Dimensions (Float, Float)
   deriving (Show, Eq)
 
@@ -36,6 +42,13 @@ instance (UnwrapablePair Vector) where
 plus :: Vector -> Vector -> Vector
 plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
 
+divByNumber :: Vector -> Float -> Vector
+divByNumber _ 0 = Vector (0, 0)
+divByNumber (Vector (x, y)) number = Vector (x / number, y / number)
+
+invertVector :: Vector -> Vector
+invertVector (Vector (x, y)) = Vector ((- x), (- y))
+
 instance ControlType Vector where
   controlPlayer velocity player =
     let object = playerObject player
@@ -48,16 +61,14 @@ data Hitbox = Hitbox
   { hitboxPosition :: Position -- ^ Object position
   , hitboxDisplayBox :: Rectangle
   , hitboxCollisionBoxes :: [Rectangle]
-  }
-  deriving Show
+  } deriving Show
 
 -- | Contains information about a movable game entity.
 data Object = Object
   { objectName :: String -- ^ Unique object identifier.
   , objectHitbox :: Hitbox -- ^ Object hitbox
   , objectVelocity :: Vector -- ^ X and Y velocity components.
-  }
-  deriving Show
+  } deriving Show
 
 data ControlElement = forall a. ControlType a => ControlElement a
 
@@ -95,4 +106,29 @@ type PositionConstraint = (Float -> Bool)
 data Game = Game
   { gamePlayers :: Players
   , gameObjects :: [Object]
-  }
+  , gameLevel :: Level
+  , gameCamera :: Camera
+  } deriving (Show)
+
+data Camera = Camera
+  { cameraPosition :: Position
+  , cameraRatio :: Float
+  } deriving (Show)
+
+data Level = Level
+  { levelMap :: Map
+  , levelColNumber :: Int
+  , levelRowNumber :: Int
+  , levelTileSize :: Int
+  } deriving (Show)
+
+type Map = [MapRow]
+
+type MapRow = [MapTile]
+
+data MapTile = Solid Object | Transparent Object
+  deriving (Show)
+
+unwrapMapTile :: MapTile -> Object
+unwrapMapTile (Solid o) = o
+unwrapMapTile (Transparent o) = o
