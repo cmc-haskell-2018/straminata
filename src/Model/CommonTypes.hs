@@ -52,8 +52,8 @@ data Appearance = Appearance
 computeScale :: Rectangle
              -> Dimensions
              -> (Float, Float)
-computeScale (_, (Position (wantedX, wantedY)))
-             (Dimensions (width, height)) = (wantedX / width, wantedY / height)
+computeScale ((Position (lx, ly)), (Position (rx, ry)))
+             (Dimensions (width, height)) = ((abs $ rx - lx) / width, (abs $ ry - ly) / height)
 
 data Hitbox = Hitbox
   { hitboxPosition :: Position -- ^ Object position
