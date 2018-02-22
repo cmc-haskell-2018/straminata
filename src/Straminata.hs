@@ -40,12 +40,12 @@ playerInitialState = Player
     { objectName = "Player 1"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (100, 100))]
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (60, 80))]
       }
     , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (100, 100))
-      , appearanceActualSize = fst floorTile
-      , appearancePicture = snd floorTile
+      { appearanceBox = (Position (0, 0), Position (60, 80))
+      , appearanceActualSize = fst marioTexture
+      , appearancePicture = snd marioTexture
       }
     , objectVelocity = Vector (0, 0)
   }
@@ -63,12 +63,12 @@ player2InitialState = Player
     { objectName = "Player 2"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (50, 50))]
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (120, 150))]
       }
     , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (50, 50))
-      , appearanceActualSize = fst floorTile
-      , appearancePicture = snd floorTile
+      { appearanceBox = (Position (0, 0), Position (150, 150))
+      , appearanceActualSize = fst luigiTexture
+      , appearancePicture = snd luigiTexture
       }
     , objectVelocity = Vector (0, 0)
   }
