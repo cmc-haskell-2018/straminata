@@ -1,7 +1,7 @@
 {-# OPTIONS -XExistentialQuantification #-}
 module Model.CommonTypes where
 
-import Graphics.Gloss (Color)
+import Graphics.Gloss (Picture)
 import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 
 class UnwrapablePair a where
@@ -28,7 +28,6 @@ newtype Dimensions = Dimensions (Float, Float)
 instance (UnwrapablePair Dimensions) where
   unwrap (Dimensions t) = t
 
--- todo: refactor
 type Rectangle = (Position, Position)
 
 type Bounds = Rectangle
@@ -57,16 +56,28 @@ instance ControlType Vector where
 
 type Time = Float
 
+data Appearance = Appearance
+  { appearanceBox :: Rectangle
+  , appearanceActualSize :: Dimensions
+  , appearancePicture :: Picture
+  } deriving (Show)
+
+computeScale :: Rectangle
+             -> Dimensions
+             -> (Float, Float)
+computeScale ((Position (lx, ly)), (Position (rx, ry)))
+             (Dimensions (width, height)) = ((abs $ rx - lx) / width, (abs $ ry - ly) / height)
+
 data Hitbox = Hitbox
   { hitboxPosition :: Position -- ^ Object position
-  , hitboxDisplayBox :: Rectangle
   , hitboxCollisionBoxes :: [Rectangle]
   } deriving Show
 
 -- | Contains information about a movable game entity.
 data Object = Object
   { objectName :: String -- ^ Unique object identifier.
-  , objectHitbox :: Hitbox -- ^ Object hitbox
+  , objectHitbox :: Hitbox -- ^ Object hitbox.
+  , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   } deriving Show
 
@@ -87,12 +98,11 @@ type PlayerControls = [KeyPress]
 
 data Player = Player
   { playerObject :: Object
-  , playerColor :: Color
   , playerControls :: PlayerControls
   }
 
 instance Show Player where
-  show player = "Player {" ++ show (playerObject player) ++ ", " ++ show (playerColor player) ++ "}"
+  show player = "Player {" ++ show (playerObject player) ++ "}"
 
 type Players = [Player]
 
