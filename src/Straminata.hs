@@ -8,6 +8,7 @@ import Graphics.Gloss.Interface.IO.Game hiding (Vector)
 import WindowConstants
 import Model.CommonTypes
 import Visual.Renderer
+import Visual.TextureLoader
 import Util.Common
 import Controls
 
@@ -39,12 +40,15 @@ playerInitialState = Player
     { objectName = "Player 1"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxDisplayBox = (Position (0, 0), Position (100, 100))
       , hitboxCollisionBoxes = [(Position (0, 0), Position (100, 100))]
+      }
+    , objectAppearance = Appearance
+      { appearanceBox = (Position (0, 0), Position (100, 100))
+      , appearanceActualSize = fst floorTile
+      , appearancePicture = snd floorTile
       }
     , objectVelocity = Vector (0, 0)
   }
-  , playerColor = red
   , playerControls =
       [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
       , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
@@ -59,12 +63,15 @@ player2InitialState = Player
     { objectName = "Player 2"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxDisplayBox = (Position (0, 0), Position (50, 50))
       , hitboxCollisionBoxes = [(Position (0, 0), Position (50, 50))]
+      }
+    , objectAppearance = Appearance
+      { appearanceBox = (Position (0, 0), Position (50, 50))
+      , appearanceActualSize = fst floorTile
+      , appearancePicture = snd floorTile
       }
     , objectVelocity = Vector (0, 0)
   }
-  , playerColor = red
   , playerControls =
     [ bindAction (Char 'd') (ControlElement (Vector (1, 0))) (ControlElement (Vector (-1, 0)))
     , bindAction (Char 'a') (ControlElement (Vector (-1, 0))) (ControlElement (Vector (1, 0)))
@@ -77,16 +84,29 @@ player2InitialState = Player
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame time = updatePlayers . moveObjects time . movePlayers time
+-- advanceGame time = updatePlayers . moveObjects time . movePlayers time
+advanceGame time = moveObjects time . movePlayers time
 
 -- temporary
 updatePlayers :: Game -> Game
 updatePlayers game = let playerList = gamePlayers game
                          player1 = (playerList !! 0)
                          player2 = (playerList !! 1)
-                         h1 = objectHitbox . playerObject $ player1
-                         h2 = objectHitbox . playerObject $ player2
-                         changeColor = hitboxesCollide h1 h2
-                     in game { gamePlayers = map (\player -> player {playerColor = if changeColor then red else blue})
-                                                 playerList
-                             }
+                         object1 = playerObject player1
+                         object2 = playerObject player2
+                         playersColliding = hitboxesCollide (objectHitbox object1) (objectHitbox object2)
+                         recolorPlayer player = player
+                                                { playerObject = (playerObject player)
+                                                  { objectAppearance = (objectAppearance . playerObject $ player)
+                                                    { appearancePicture =
+                                                      (if playersColliding
+                                                      then Color red
+                                                      else Color blue)
+                                                        (Polygon $ formPath
+                                                          (hitboxPosition . objectHitbox . playerObject $ player)
+                                                          (appearanceBox . objectAppearance . playerObject $ player)
+                                                        )
+                                                    }
+                                                  }
+                                                }
+                     in game { gamePlayers = map recolorPlayer playerList }
