@@ -129,7 +129,7 @@ data Level = Level
   { levelMap :: Map
   , levelColNumber :: Int
   , levelRowNumber :: Int
-  , levelTileSize :: Int
+  , levelTileSize :: Float
   } deriving (Show)
 
 type Map = [MapRow]

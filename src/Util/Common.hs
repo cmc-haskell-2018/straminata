@@ -5,7 +5,7 @@ import Model.CommonTypes
 import Visual.WindowConstants
 
 frameWidth :: Float
-frameWidth = 25
+frameWidth = 0
 
 -- | Check if two hitboxes collide.
 hitboxesCollide :: Hitbox -> Hitbox -> Bool
@@ -37,16 +37,15 @@ updateCamera game = game
     }
   }
   where
-    displayBoxes = map (offsetDisplayBox . objectHitbox . playerObject) (gamePlayers game)
-    offsetDisplayBox = \hitbox -> offsetRectangle (hitboxPosition hitbox) (hitboxDisplayBox hitbox)
+    appearanceBoxes = map (offsetAppearanceBox . playerObject) (gamePlayers game)
+    offsetAppearanceBox = \object -> offsetRectangle (hitboxPosition . objectHitbox $ object) (appearanceBox . objectAppearance $ object)
     position = (Vector (rect !! 0, rect !! 1) `plus` Vector (rect !! 2, rect !! 3)) `divByNumber` 2
-    rect = [ minimum (map (fst . unwrap . fst) displayBoxes) - frameWidth
-           , minimum (map (snd . unwrap . fst) displayBoxes) - frameWidth
-           , maximum (map (fst . unwrap . snd) displayBoxes) + frameWidth
-           , maximum (map (snd . unwrap . snd) displayBoxes) + frameWidth
+    rect = [ minimum (map (fst . unwrap . fst) appearanceBoxes) - frameWidth
+           , minimum (map (snd . unwrap . fst) appearanceBoxes) - frameWidth
+           , maximum (map (fst . unwrap . snd) appearanceBoxes) + frameWidth
+           , maximum (map (snd . unwrap . snd) appearanceBoxes) + frameWidth
            ]
     boundaryDimensions = (rect !! 2 - rect !! 0, rect !! 3 - rect !! 1)
-    -- todo: indentWindowContent is quick workaround; add better way to create additional bounds to window contents.
     ratio = minimum [ (fromIntegral . fst $ initialWindowDimensions) / (fst boundaryDimensions)
                     , (fromIntegral . snd $ initialWindowDimensions) / (snd boundaryDimensions)
                     , 1

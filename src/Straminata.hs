@@ -70,10 +70,10 @@ player2InitialState = Player
     { objectName = "Player 2"
     , objectHitbox = Hitbox
       { hitboxPosition = Position (0, 0)
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (120, 150))]
+      , hitboxCollisionBoxes = [(Position (0, 0), Position (60, 80))]
       }
     , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (150, 150))
+      { appearanceBox = (Position (0, 0), Position (60, 80))
       , appearanceActualSize = fst luigiTexture
       , appearancePicture = snd luigiTexture
       }
@@ -110,7 +110,6 @@ updatePlayers game = let playerList = gamePlayers game
                                                       then Color red
                                                       else Color blue)
                                                         (Polygon $ formPath
-                                                          (hitboxPosition . objectHitbox . playerObject $ player)
                                                           (appearanceBox . objectAppearance . playerObject $ player)
                                                         )
                                                     }

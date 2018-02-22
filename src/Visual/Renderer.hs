@@ -22,7 +22,7 @@ picture game = let translate' = uncurry Translate . unwrap . hitboxPosition . ob
                                                                (appearanceActualSize . objectAppearance $ o)
                    picture' = \o -> translate' o $ scale' o $ appearancePicture (objectAppearance o)
                in Pictures
-                 $ map (Color green . picture' . unwrapMapTile) (concat . levelMap . gameLevel $ game)
+                 $ map (picture' . unwrapMapTile) (concat . levelMap . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)
                    ++ map picture' (gameObjects game)
 

@@ -1,6 +1,7 @@
 module Model.Map where
 
 import Model.CommonTypes
+import Visual.TextureLoader
 
 initialLevel :: Level
 initialLevel = Level
@@ -22,12 +23,14 @@ addMapTile row col list = let tileSize = levelTileSize initialLevel in
     { objectName = show (row, col)
     , objectVelocity = Vector (0, 0)
     , objectHitbox = Hitbox
-      { hitboxPosition = Position (fi (tileSize * row), fi (tileSize * col))
-      , hitboxDisplayBox = ( Position (0, 0)
-                           , Position (fi tileSize, fi tileSize)
-                           )
+      { hitboxPosition = Position (tileSize * (fi row), tileSize * (fi col))
       , hitboxCollisionBoxes = []
       }
+    , objectAppearance = Appearance
+            { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
+            , appearanceActualSize = fst floorTexture
+            , appearancePicture = snd floorTexture
+            }
     } : list
   where fi = fromIntegral
 
