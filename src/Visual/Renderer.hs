@@ -47,9 +47,9 @@ positionPicture camera pic = Scale ratio ratio (Translate x y pic)
 
 objectToPicture :: Object -> Picture
 objectToPicture obj = translate' obj $ scale' obj $ appearancePicture . objectAppearance $ obj
-  where scale' = \o -> uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
-                                                    (appearanceActualSize . objectAppearance $ o)
-        getOffset o = ( (positionToVector . fst . appearanceBox . objectAppearance $ o) `plus`
-                        (positionToVector . snd . appearanceBox . objectAppearance $ o)
+  where scale' o = uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
+                                                (appearanceActualSize . objectAppearance $ o)
+        getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
+                            (positionToVector . snd . appearanceBox . objectAppearance $ o)
                       ) `divByNumber` 2
         translate' = uncurry Translate . unwrap . getOffset
