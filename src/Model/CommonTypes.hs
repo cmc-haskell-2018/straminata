@@ -111,7 +111,6 @@ type PositionConstraint = (Float -> Bool)
 -- | Represents a game session.
 data Game = Game
   { gamePlayers :: Players
-  , gameObjects :: [Object]
   , gameLevel :: Level
   , gameCamera :: Camera
   } deriving (Show)
@@ -126,6 +125,7 @@ data Level = Level
   , levelColNumber :: Int
   , levelRowNumber :: Int
   , levelTileSize :: Float
+  , levelObjects :: [Object]
   } deriving (Show)
 
 type Map = [MapRow]

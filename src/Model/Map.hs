@@ -3,12 +3,16 @@ module Model.Map where
 import Model.CommonTypes
 import Visual.TextureLoader
 
+initialObjects :: [Object]
+initialObjects = []
+
 initialLevel :: Level
 initialLevel = Level
   { levelMap = initialMap
   , levelColNumber = 30
   , levelRowNumber = 40
   , levelTileSize = 50
+  , levelObjects = initialObjects
   }
 
 initialMap :: Map

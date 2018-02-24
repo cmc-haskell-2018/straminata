@@ -24,7 +24,11 @@ bindAction :: Key -> ControlElement -> ControlElement -> KeyPress
 bindAction key up down = (key, up, down)
 
 moveObjects :: Time -> Game -> Game
-moveObjects time game = game { gameObjects = move $ gameObjects game }
+moveObjects time game = game
+  { gameLevel = (gameLevel game)
+    { levelObjects = move $ levelObjects (gameLevel game)
+    }
+  }
   where move = map (moveObject time)
 
 movePlayers :: Time -> Game -> Game
