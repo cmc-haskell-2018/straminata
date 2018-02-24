@@ -126,6 +126,7 @@ data Level = Level
   , levelRowNumber :: Int
   , levelTileSize :: Float
   , levelObjects :: [Object]
+  , levelBackground :: Appearance
   } deriving (Show)
 
 type Map = [MapRow]

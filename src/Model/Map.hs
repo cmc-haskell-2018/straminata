@@ -1,7 +1,12 @@
 module Model.Map where
 
+import Control.Monad (join)
+import Control.Arrow ((***))
+
 import Model.CommonTypes
 import Visual.TextureLoader
+import Visual.WindowConstants
+import Util.Common
 
 initialObjects :: [Object]
 initialObjects = []
@@ -13,6 +18,11 @@ initialLevel = Level
   , levelRowNumber = 40
   , levelTileSize = 50
   , levelObjects = initialObjects
+  , levelBackground = Appearance
+    { appearanceBox = (join (***)) (Position . fromIntegral) initialWindowDimensions
+    , appearancePicture = snd backgroundTexture
+    , appearanceActualSize = fst backgroundTexture
+    }
   }
 
 initialMap :: Map

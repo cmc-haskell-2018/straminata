@@ -14,3 +14,6 @@ marioTexture = ((Dimensions (30, 40)), ) $! png "img/mario.png"
 
 luigiTexture :: (Dimensions, Picture)
 luigiTexture = ((Dimensions (30, 40)), ) $! png "img/luigi.png"
+
+backgroundTexture :: (Dimensions, Picture)
+backgroundTexture = ((Dimensions (1920, 1080)), ) $! png "img/background.png"

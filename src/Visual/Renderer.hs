@@ -20,7 +20,8 @@ picture :: Game -> Picture
 picture game = let translate' = uncurry Translate . unwrap . objectPosition
                    picture' = \o -> translate' o $ objectToPicture o
                in Pictures
-                 $ map (picture' . tileObject) (concat . levelMap . gameLevel $ game)
+                 $ (Scale 5 5 . appearancePicture . levelBackground . gameLevel $ game)
+                   : map (picture' . tileObject) (concat . levelMap . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)
                    ++ map picture' (levelObjects . gameLevel $ game)
 
