@@ -7,6 +7,7 @@ import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
+-- | Linear space element. You should guarantee that all operations are linear.
 class LSE a where
   plus :: a -> a -> a
 
