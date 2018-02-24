@@ -19,7 +19,9 @@ addMapRow row list = foldr (\index acc -> addMapTile row index acc) [] [0..(leve
 
 addMapTile :: Int -> Int -> MapRow -> MapRow
 addMapTile row col list = let tileSize = levelTileSize initialLevel in
-  Transparent Object
+  Tile
+  { tileType = Solid
+  , tileObject = Object
     { objectName = show (row, col)
     , objectVelocity = Vector (0, 0)
     , objectPosition = Position (tileSize * (fi row), tileSize * (fi col))
@@ -29,7 +31,8 @@ addMapTile row col list = let tileSize = levelTileSize initialLevel in
             , appearanceActualSize = fst floorTexture
             , appearancePicture = snd floorTexture
             }
-    } : list
+    }
+  } : list
   where fi = fromIntegral
 
 

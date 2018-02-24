@@ -130,11 +130,12 @@ data Level = Level
 
 type Map = [MapRow]
 
-type MapRow = [MapTile]
+type MapRow = [Tile]
 
-data MapTile = Solid Object | Transparent Object
+data TileType = Solid | Transparent
   deriving (Show)
 
-unwrapMapTile :: MapTile -> Object
-unwrapMapTile (Solid o) = o
-unwrapMapTile (Transparent o) = o
+data Tile = Tile
+  { tileType :: TileType
+  , tileObject :: Object
+  } deriving (Show)
