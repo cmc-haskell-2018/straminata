@@ -18,9 +18,7 @@ render game = positionPicture (gameCamera game) (picture game)
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
 picture game = let translate' = uncurry Translate . unwrap . hitboxPosition . objectHitbox
-                   scale' = \o -> uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
-                                                               (appearanceActualSize . objectAppearance $ o)
-                   picture' = \o -> translate' o $ scale' o $ appearancePicture (objectAppearance o)
+                   picture' = \o -> translate' o $ objectToPicture o
                in Pictures
                  $ map (picture' . unwrapMapTile) (concat . levelMap . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)
@@ -44,3 +42,14 @@ positionPicture camera pic = Scale ratio ratio (Translate x y pic)
         offset = unwrap . invertVector . positionToVector . cameraPosition $ camera
         x = fst offset
         y = snd offset
+
+
+
+objectToPicture :: Object -> Picture
+objectToPicture obj = translate' obj $ scale' obj $ appearancePicture . objectAppearance $ obj
+  where scale' o = uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
+                                                (appearanceActualSize . objectAppearance $ o)
+        getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
+                            (positionToVector . snd . appearanceBox . objectAppearance $ o)
+                      ) `divByNumber` 2
+        translate' = uncurry Translate . unwrap . getOffset

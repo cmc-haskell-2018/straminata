@@ -5,7 +5,7 @@ import Model.CommonTypes
 import Visual.WindowConstants
 
 frameWidth :: Float
-frameWidth = 0
+frameWidth = 25
 
 -- | Check if two hitboxes collide.
 hitboxesCollide :: Hitbox -> Hitbox -> Bool
