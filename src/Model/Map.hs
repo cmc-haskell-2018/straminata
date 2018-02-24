@@ -40,10 +40,10 @@ addMapTile row col list = let tileSize = levelTileSize initialLevel in
     , objectPosition = Position (tileSize * (fi row), tileSize * (fi col))
     , objectCollisionBoxes = []
     , objectAppearance = Appearance
-            { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
-            , appearanceActualSize = fst floorTexture
-            , appearancePicture = snd floorTexture
-            }
+      { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
+      , appearanceActualSize = fst floorTexture
+      , appearancePicture = snd floorTexture
+      }
     }
   } : list
   where fi = fromIntegral
