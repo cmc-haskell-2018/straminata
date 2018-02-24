@@ -39,7 +39,7 @@ formPath box = let p1 = unwrap . fst $ box
 positionPicture :: Camera -> Picture -> Picture
 positionPicture camera pic = Scale ratio ratio (Translate x y pic)
   where ratio = cameraRatio camera
-        offset = unwrap . invertVector . positionToVector . cameraPosition $ camera
+        offset = unwrap . invert . cameraPosition $ camera
         x = fst offset
         y = snd offset
 
@@ -49,7 +49,7 @@ objectToPicture :: Object -> Picture
 objectToPicture obj = translate' obj $ scale' obj $ appearancePicture . objectAppearance $ obj
   where scale' o = uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
                                                 (appearanceActualSize . objectAppearance $ o)
-        getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
-                            (positionToVector . snd . appearanceBox . objectAppearance $ o)
+        getOffset o = (plus (fst . appearanceBox . objectAppearance $ o)
+                            (snd . appearanceBox . objectAppearance $ o)
                       ) `divByNumber` 2
         translate' = uncurry Translate . unwrap . getOffset

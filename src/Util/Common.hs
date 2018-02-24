@@ -32,14 +32,14 @@ collide (Position (x11, y11), Position (x12, y12))
 updateCamera :: Game -> Game
 updateCamera game = game
   { gameCamera = (gameCamera game)
-    { cameraPosition = vectorToPosition position
+    { cameraPosition = position
     , cameraRatio = ratio
     }
   }
   where
     appearanceBoxes = map (offsetAppearanceBox . playerObject) (gamePlayers game)
     offsetAppearanceBox = \object -> offsetRectangle (hitboxPosition . objectHitbox $ object) (appearanceBox . objectAppearance $ object)
-    position = (Vector (rect !! 0, rect !! 1) `plus` Vector (rect !! 2, rect !! 3)) `divByNumber` 2
+    position = (Position (rect !! 0, rect !! 1) `plus` Position (rect !! 2, rect !! 3)) `divByNumber` 2
     rect = [ minimum (map (fst . unwrap . fst) appearanceBoxes) - frameWidth
            , minimum (map (snd . unwrap . fst) appearanceBoxes) - frameWidth
            , maximum (map (fst . unwrap . snd) appearanceBoxes) + frameWidth

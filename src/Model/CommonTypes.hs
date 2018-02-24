@@ -7,20 +7,36 @@ import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
+class LSE a where
+  plus :: a -> a -> a
+
+  minus :: a -> a -> a
+  minus x y = plus x (invert y)
+
+  invert :: a -> a
+
+  mulByNumber :: a -> Float -> a
+  mulByNumber x n = divByNumber x (1 / n)
+
+  divByNumber :: a -> Float -> a
+  divByNumber x n = mulByNumber x (1 / n)
+
+
 class ControlType a where
   controlPlayer :: a -> Player -> Player
 
 newtype Position = Position (Float, Float)
   deriving (Show, Eq)
 
-instance (UnwrapablePair Position) where
+instance UnwrapablePair Position where
   unwrap (Position t) = t
 
-vectorToPosition :: Vector -> Position
-vectorToPosition v = Position (fst . unwrap $ v, snd . unwrap $ v)
+instance LSE Position where
+  plus (Position (x1, y1)) (Position (x2, y2)) = Position (x1 + x2, y1 + y2)
 
-positionToVector :: Position -> Vector
-positionToVector p = Vector (fst . unwrap $ p, snd . unwrap $ p)
+  invert (Position (x, y)) = Position (-x, -y)
+
+  mulByNumber (Position (x, y)) number = Position (x * number, y * number)
 
 newtype Dimensions = Dimensions (Float, Float)
   deriving (Show, Eq)
@@ -38,15 +54,13 @@ newtype Vector = Vector (Float, Float)
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
 
-plus :: Vector -> Vector -> Vector
-plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
+instance LSE Vector where
+  plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
 
-divByNumber :: Vector -> Float -> Vector
-divByNumber _ 0 = Vector (0, 0)
-divByNumber (Vector (x, y)) number = Vector (x / number, y / number)
+  invert (Vector (x, y)) = Vector ((- x), (- y))
 
-invertVector :: Vector -> Vector
-invertVector (Vector (x, y)) = Vector ((- x), (- y))
+  divByNumber _ 0 = Vector (0, 0)
+  divByNumber (Vector (x, y)) number = Vector (x / number, y / number)
 
 instance ControlType Vector where
   controlPlayer velocity player =
