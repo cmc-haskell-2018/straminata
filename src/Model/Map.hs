@@ -6,7 +6,6 @@ import Control.Arrow ((***))
 import Model.CommonTypes
 import Visual.TextureLoader
 import Visual.WindowConstants
-import Util.Common
 
 initialObjects :: [Object]
 initialObjects = []
@@ -19,7 +18,7 @@ initialLevel = Level
   , levelTileSize = 50
   , levelObjects = initialObjects
   , levelBackground = Appearance
-    { appearanceBox = (join (***)) (Position . fromIntegral) initialWindowDimensions
+    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
     , appearancePicture = snd backgroundTexture
     , appearanceActualSize = fst backgroundTexture
     }
