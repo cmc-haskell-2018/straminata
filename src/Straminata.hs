@@ -45,17 +45,15 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "Player 1"
-    , objectHitbox = Hitbox
-      { hitboxPosition = Position (0, 0)
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (60, 80))]
-      }
+    , objectPosition = Position (0, 0)
+    , objectCollision = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
       , appearanceActualSize = fst marioTexture
       , appearancePicture = snd marioTexture
       }
     , objectVelocity = Vector (0, 0)
-  }
+    }
   , playerControls =
       [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (10, 0))) (ControlElement (Vector (-10, 0)))
       , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-10, 0))) (ControlElement (Vector (10, 0)))
@@ -68,17 +66,15 @@ player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
     { objectName = "Player 2"
-    , objectHitbox = Hitbox
-      { hitboxPosition = Position (0, 0)
-      , hitboxCollisionBoxes = [(Position (0, 0), Position (60, 80))]
-      }
+    , objectPosition = Position (0, 0)
+    , objectCollision = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
       , appearanceActualSize = fst luigiTexture
       , appearancePicture = snd luigiTexture
       }
     , objectVelocity = Vector (0, 0)
-  }
+    }
   , playerControls =
     [ bindAction (Char 'd') (ControlElement (Vector (20, 0))) (ControlElement (Vector (-20, 0)))
     , bindAction (Char 'a') (ControlElement (Vector (-20, 0))) (ControlElement (Vector (20, 0)))
@@ -101,7 +97,7 @@ updatePlayers game = let playerList = gamePlayers game
                          player2 = (playerList !! 1)
                          object1 = playerObject player1
                          object2 = playerObject player2
-                         playersColliding = hitboxesCollide (objectHitbox object1) (objectHitbox object2)
+                         playersColliding = objectsCollide object1 object2
                          recolorPlayer player = player
                                                 { playerObject = (playerObject player)
                                                   { objectAppearance = (objectAppearance . playerObject $ player)

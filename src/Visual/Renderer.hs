@@ -17,7 +17,7 @@ render game = positionPicture (gameCamera game) (picture game)
 
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
-picture game = let translate' = uncurry Translate . unwrap . hitboxPosition . objectHitbox
+picture game = let translate' = uncurry Translate . unwrap . objectPosition
                    picture' = \o -> translate' o $ objectToPicture o
                in Pictures
                  $ map (picture' . unwrapMapTile) (concat . levelMap . gameLevel $ game)

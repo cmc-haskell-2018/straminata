@@ -68,15 +68,11 @@ computeScale :: Rectangle
 computeScale ((Position (lx, ly)), (Position (rx, ry)))
              (Dimensions (width, height)) = ((abs $ rx - lx) / width, (abs $ ry - ly) / height)
 
-data Hitbox = Hitbox
-  { hitboxPosition :: Position -- ^ Object position
-  , hitboxCollisionBoxes :: [Rectangle]
-  } deriving Show
-
 -- | Contains information about a movable game entity.
 data Object = Object
   { objectName :: String -- ^ Unique object identifier.
-  , objectHitbox :: Hitbox -- ^ Object hitbox.
+  , objectPosition :: Position -- ^ Object position
+  , objectCollision :: [Rectangle]
   , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   } deriving Show

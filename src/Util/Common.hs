@@ -8,11 +8,11 @@ frameWidth :: Float
 frameWidth = 25
 
 -- | Check if two hitboxes collide.
-hitboxesCollide :: Hitbox -> Hitbox -> Bool
-hitboxesCollide h1 h2 = let boxes1 = hitboxCollisionBoxes h1
-                            boxes2 = hitboxCollisionBoxes h2
-                            offset1 = hitboxPosition h1
-                            offset2 = hitboxPosition h2
+objectsCollide :: Object -> Object -> Bool
+objectsCollide h1 h2 = let boxes1 = objectCollision h1
+                           boxes2 = objectCollision h2
+                           offset1 = objectPosition h1
+                           offset2 = objectPosition h2
                         in any (\box1 -> any (\box2 -> collide (offsetRectangle offset1 box1)
                                                                (offsetRectangle offset2 box2)
                                              ) boxes2
@@ -38,7 +38,7 @@ updateCamera game = game
   }
   where
     appearanceBoxes = map (offsetAppearanceBox . playerObject) (gamePlayers game)
-    offsetAppearanceBox = \object -> offsetRectangle (hitboxPosition . objectHitbox $ object) (appearanceBox . objectAppearance $ object)
+    offsetAppearanceBox = \object -> offsetRectangle (objectPosition $ object) (appearanceBox . objectAppearance $ object)
     position = (Vector (rect !! 0, rect !! 1) `plus` Vector (rect !! 2, rect !! 3)) `divByNumber` 2
     rect = [ minimum (map (fst . unwrap . fst) appearanceBoxes) - frameWidth
            , minimum (map (snd . unwrap . fst) appearanceBoxes) - frameWidth
