@@ -72,7 +72,7 @@ computeScale ((Position (lx, ly)), (Position (rx, ry)))
 data Object = Object
   { objectName :: String -- ^ Unique object identifier.
   , objectPosition :: Position -- ^ Object position
-  , objectCollision :: [Rectangle]
+  , objectCollisionBoxes :: [Rectangle]
   , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   } deriving Show

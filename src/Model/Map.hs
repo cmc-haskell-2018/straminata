@@ -23,7 +23,7 @@ addMapTile row col list = let tileSize = levelTileSize initialLevel in
     { objectName = show (row, col)
     , objectVelocity = Vector (0, 0)
     , objectPosition = Position (tileSize * (fi row), tileSize * (fi col))
-    , objectCollision = []
+    , objectCollisionBoxes = []
     , objectAppearance = Appearance
             { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
             , appearanceActualSize = fst floorTexture

@@ -9,8 +9,8 @@ frameWidth = 25
 
 -- | Check if two hitboxes collide.
 objectsCollide :: Object -> Object -> Bool
-objectsCollide h1 h2 = let boxes1 = objectCollision h1
-                           boxes2 = objectCollision h2
+objectsCollide h1 h2 = let boxes1 = objectCollisionBoxes h1
+                           boxes2 = objectCollisionBoxes h2
                            offset1 = objectPosition h1
                            offset2 = objectPosition h2
                         in any (\box1 -> any (\box2 -> collide (offsetRectangle offset1 box1)
