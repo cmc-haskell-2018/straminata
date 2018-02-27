@@ -34,10 +34,9 @@ movePlayers time game = game
 
 
 moveObject :: Time -> Object -> Object
-moveObject time obj = let h = objectHitbox obj
-                          v = objectVelocity obj
-                          pos = hitboxPosition h
-                      in obj { objectHitbox = h { hitboxPosition = performMove time v pos } }
+moveObject time obj = let v = objectVelocity obj
+                          pos = objectPosition obj
+                      in obj { objectPosition = performMove time v pos }
 
 standardVelocity :: Float
 standardVelocity = 30
