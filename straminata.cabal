@@ -5,9 +5,9 @@ version:             0.2
 homepage: https://github.com/cmc-haskell-2018/straminata
 -- license:
 -- license-file:
-author:              Команда №1 (Team #1)
+author:              Team "Awesome"
 maintainer:          alois9866@gmail.com
-copyright:           2017 Team #1
+copyright:           2018 Team Awesome
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
