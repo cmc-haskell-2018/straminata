@@ -2,6 +2,7 @@ module Controls where
 
 import Data.Maybe (isJust, fromJust)
 import Data.List (find)
+import Data.Char (toLower)
 
 import Graphics.Gloss.Interface.IO.Game hiding (Vector)
 
@@ -18,6 +19,7 @@ handleInput event game =
                                  in if isJust controlElement
                                     then controlPlayer (fromJust controlElement) player
                                     else player
+          predicate (Char key) ((Char key'), _, _) = (toLower key) == key'
           predicate key (key', _, _) = key == key'
 
 bindAction :: Key -> ControlElement -> ControlElement -> KeyPress
