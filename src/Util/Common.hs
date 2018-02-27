@@ -50,3 +50,12 @@ updateCamera game = game
                     , (fromIntegral . snd $ initialWindowDimensions) / (snd boundaryDimensions)
                     , 1
                     ]
+
+
+gameObjects :: Game -> [Object]
+gameObjects game = map playerObject (gamePlayers game)
+                   ++ levelObjects (gameLevel game)
+
+
+updateObjects :: Game -> Game
+updateObjects game = foldr (\obj -> (objectOnUpdate obj) obj) game (gameObjects game)

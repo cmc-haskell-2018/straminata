@@ -39,7 +39,7 @@ initialWorld = Game
 playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
-    { objectName = "Player 1"
+    { objectName = "mario"
     , objectPosition = Position (0, 0)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
@@ -48,6 +48,8 @@ playerInitialState = Player
       , appearancePicture = snd marioTexture
       }
     , objectVelocity = Vector (0, 0)
+    , objectOnUpdate = activatePlayer "luigi"
+    , objectOnActivate = \_ _ -> id
     }
   , playerControls =
       [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (10, 0))) (ControlElement (Vector (-10, 0)))
@@ -60,7 +62,7 @@ playerInitialState = Player
 player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
-    { objectName = "Player 2"
+    { objectName = "luigi"
     , objectPosition = Position (0, 0)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
@@ -69,6 +71,8 @@ player2InitialState = Player
       , appearancePicture = snd luigiTexture
       }
     , objectVelocity = Vector (0, 0)
+    , objectOnUpdate = \_ -> id
+    , objectOnActivate = resizeSelf
     }
   , playerControls =
     [ bindAction (Char 'd') (ControlElement (Vector (20, 0))) (ControlElement (Vector (-20, 0)))
@@ -82,8 +86,40 @@ player2InitialState = Player
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
--- advanceGame time = updatePlayers . updateCamera . moveObjects time . movePlayers time
-advanceGame time = updateCamera . moveObjects time . movePlayers time
+advanceGame time = updateCamera . moveObjects time . movePlayers time . updateObjects
+
+
+activatePlayer :: String -> Object -> Game -> Game
+activatePlayer name object game =
+  foldr (\player -> (objectOnActivate . playerObject $ player)
+                    (objectsCollide object (playerObject player))
+                    (playerObject player)
+        )
+        game
+        (filter isTarget (gamePlayers game))
+  where isTarget player = (objectName . playerObject $ player) == name
+
+
+resizeSelf :: Bool -> Object -> Game -> Game
+resizeSelf state self game = game
+  { gamePlayers = map (\player -> if isSelf player
+                                  then if state
+                                       then enlarge player
+                                       else reduce player
+                                  else player
+                      ) (gamePlayers game)
+  }
+  where isSelf player = (objectName . playerObject $ player) == (objectName self)
+        enlarge = changeSize (Position (-30, -40), Position (90, 120))
+        reduce = changeSize (Position (0, 0), Position (60, 80))
+        changeSize rect player = player
+          { playerObject = (playerObject player)
+            { objectAppearance = (objectAppearance . playerObject $ player)
+              { appearanceBox = rect
+              }
+            }
+          }
+
 
 -- temporary
 updatePlayers :: Game -> Game
