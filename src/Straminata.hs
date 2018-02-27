@@ -80,6 +80,7 @@ player2InitialState = Player
     , bindAction (Char 'a') (ControlElement (Vector (-20, 0))) (ControlElement (Vector (20, 0)))
     , bindAction (Char 'w') (ControlElement (Vector (0, 20))) (ControlElement (Vector (0, -20)))
     , bindAction (Char 's') (ControlElement (Vector (0, -20))) (ControlElement (Vector (0, 20)))
+    -- for Microsoft Windows
     , bindAction (Char '\226') (ControlElement (Vector (20, 0))) (ControlElement (Vector (-20, 0)))
     , bindAction (Char '\244') (ControlElement (Vector (-20, 0))) (ControlElement (Vector (20, 0)))
     , bindAction (Char '\246') (ControlElement (Vector (0, 20))) (ControlElement (Vector (0, -20)))
