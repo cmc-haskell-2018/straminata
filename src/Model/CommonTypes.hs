@@ -140,3 +140,5 @@ data Tile = Tile
   { tileType :: TileType
   , tileObject :: Object
   } deriving (Show)
+
+type Texture = (Dimensions, Picture)

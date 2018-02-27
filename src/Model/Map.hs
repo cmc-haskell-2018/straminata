@@ -28,21 +28,30 @@ initialMap :: Map
 initialMap = foldr (\index acc -> addMapRow index acc) [] [0..(levelRowNumber initialLevel - 1)]
 
 addMapRow :: Int -> Map -> Map
-addMapRow row list = foldr (\index acc -> addMapTile row index acc) [] [0..(levelColNumber initialLevel - 1)] : list
+addMapRow row list = foldr (\index acc -> if even index
+                                          then addBasicMapTile (Solid, floorTexture) row index acc
+                                          else addBasicMapTile (Transparent, backgroundTexture) row index acc)
+                           []
+                           [0..(levelColNumber initialLevel - 1)] : list
 
-addMapTile :: Int -> Int -> MapRow -> MapRow
-addMapTile row col list = let tileSize = levelTileSize initialLevel in
+-- | Adds basic map tile to map tile row. Basic map tile has a single rectangle as a collision box.
+addBasicMapTile :: (TileType, Texture)
+           -> Int
+           -> Int
+           -> MapRow
+           -> MapRow
+addBasicMapTile (typ, texture) row col list = let tileSize = levelTileSize initialLevel in
   Tile
-  { tileType = Solid
+  { tileType = typ
   , tileObject = Object
-    { objectName = show (row, col)
+    { objectName = show (row, col) -- Should be unique
     , objectVelocity = Vector (0, 0)
     , objectPosition = Position (tileSize * (fi row), tileSize * (fi col))
-    , objectCollisionBoxes = []
+    , objectCollisionBoxes = [(Position (0, 0), Position (tileSize, tileSize))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
-      , appearanceActualSize = fst floorTexture
-      , appearancePicture = snd floorTexture
+      , appearanceActualSize = fst texture
+      , appearancePicture = snd texture
       }
     }
   } : list

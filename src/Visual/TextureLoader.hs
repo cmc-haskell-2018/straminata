@@ -1,19 +1,18 @@
 {-# LANGUAGE TupleSections #-}
 module Visual.TextureLoader where
 
-import Graphics.Gloss.Data.Picture (Picture)
 import Graphics.Gloss.Game (png)
 
 import Model.CommonTypes
 
-floorTexture :: (Dimensions, Picture)
+floorTexture :: Texture
 floorTexture = ((Dimensions (400, 400)), ) $! png "img/floor.png"
 
-marioTexture :: (Dimensions, Picture)
+marioTexture :: Texture
 marioTexture = ((Dimensions (30, 40)), ) $! png "img/mario.png"
 
-luigiTexture :: (Dimensions, Picture)
+luigiTexture :: Texture
 luigiTexture = ((Dimensions (30, 40)), ) $! png "img/luigi.png"
 
-backgroundTexture :: (Dimensions, Picture)
+backgroundTexture :: Texture
 backgroundTexture = ((Dimensions (1920, 1080)), ) $! png "img/background.png"
