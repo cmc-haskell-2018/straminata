@@ -27,18 +27,13 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game
-  { gameObjects = initialObjects
-  , gamePlayers = [playerInitialState, player2InitialState]
+  { gamePlayers = [playerInitialState, player2InitialState]
   , gameLevel = initialLevel
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
     , cameraRatio = 1
     }
   }
-
--- todo: get from file
-initialObjects :: [Object]
-initialObjects = []
 
 -- todo: get from file
 playerInitialState :: Player

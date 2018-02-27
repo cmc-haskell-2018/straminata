@@ -111,7 +111,6 @@ type PositionConstraint = (Float -> Bool)
 -- | Represents a game session.
 data Game = Game
   { gamePlayers :: Players
-  , gameObjects :: [Object]
   , gameLevel :: Level
   , gameCamera :: Camera
   } deriving (Show)
@@ -126,15 +125,20 @@ data Level = Level
   , levelColNumber :: Int
   , levelRowNumber :: Int
   , levelTileSize :: Float
+  , levelObjects :: [Object]
+  , levelBackground :: Appearance
   } deriving (Show)
 
 type Map = [MapRow]
 
-type MapRow = [MapTile]
+type MapRow = [Tile]
 
-data MapTile = Solid Object | Transparent Object
+data TileType = Solid | Transparent
   deriving (Show)
 
-unwrapMapTile :: MapTile -> Object
-unwrapMapTile (Solid o) = o
-unwrapMapTile (Transparent o) = o
+data Tile = Tile
+  { tileType :: TileType
+  , tileObject :: Object
+  } deriving (Show)
+
+type Texture = (Dimensions, Picture)
