@@ -117,6 +117,7 @@ resizeSelf state self game = game
             { objectAppearance = (objectAppearance . playerObject $ player)
               { appearanceBox = rect
               }
+            , objectCollisionBoxes = [rect]
             }
           }
 

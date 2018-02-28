@@ -58,4 +58,4 @@ gameObjects game = map playerObject (gamePlayers game)
 
 
 updateObjects :: Game -> Game
-updateObjects game = foldr (\obj -> (objectOnUpdate obj) obj) game (gameObjects game)
+updateObjects game = foldr (\obj -> objectOnUpdate obj $ obj) game (gameObjects game)
