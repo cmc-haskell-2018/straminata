@@ -3,6 +3,8 @@ module Util.Common where
 
 import Model.CommonTypes
 import Visual.WindowConstants
+import Data.Foldable
+import Data.Maybe
 
 frameWidth :: Float
 frameWidth = 25
@@ -58,4 +60,54 @@ gameObjects game = map playerObject (gamePlayers game)
 
 
 updateObjects :: Game -> Game
-updateObjects game = foldr (\obj -> objectOnUpdate obj $ obj) game (gameObjects game)
+updateObjects game = foldr (\obj -> stringToUpdateFunction (objectOnUpdateName obj) $ obj) game (gameObjects game)
+
+activatePlayer :: String -> Object -> Game -> Game
+activatePlayer name object game =
+  foldr (\player -> (stringToActivateFunction (objectOnActivateName . playerObject $ player))
+                    (objectsCollide object (playerObject player))
+                    (playerObject player)
+        )
+        game
+        (filter isTarget (gamePlayers game))
+  where isTarget player = (objectName . playerObject $ player) == name
+
+namedUpdateFunctions :: [NamedUpdateFunction]
+namedUpdateFunctions = [("onUpdateMario", activatePlayer "luigi")]
+
+namedActivateFunctions :: [NamedActivateFunction]
+namedActivateFunctions = [("resizeSelf", resizeSelf)]
+
+stringToUpdateFunction :: String -> Object -> Game -> Game
+stringToUpdateFunction name = let namedFunction = find (\(x,_) -> x == name) namedUpdateFunctions
+                              in if isJust namedFunction
+                                 then snd (fromJust namedFunction) 
+                                 else (\_ -> id) 
+
+stringToActivateFunction :: String -> Bool -> Object -> Game -> Game
+stringToActivateFunction name = let namedFunction = find (\(x,_) -> x == name) namedActivateFunctions
+                                in if isJust namedFunction
+                                   then snd (fromJust namedFunction) 
+                                   else (\_ _ -> id)  
+
+resizeSelf :: Bool -> Object -> Game -> Game
+resizeSelf state self game = game
+  { gamePlayers = map (\player -> if isSelf player
+                                  then if state
+                                       then enlarge player
+                                       else reduce player
+                                  else player
+                      ) (gamePlayers game)
+  }
+  where isSelf player = (objectName . playerObject $ player) == (objectName self)
+        enlarge = changeSize (Position (-30, -40), Position (90, 120))
+        reduce = changeSize (Position (0, 0), Position (60, 80))
+        changeSize rect player = player
+          { playerObject = (playerObject player)
+            { objectAppearance = (objectAppearance . playerObject $ player)
+              { appearanceBox = rect
+              }
+            , objectCollisionBoxes = [rect]
+            }
+          }
+          

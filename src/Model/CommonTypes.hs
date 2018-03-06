@@ -79,17 +79,9 @@ data Object = Object
   , objectCollisionBoxes :: [Rectangle]
   , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
-  , objectOnUpdate :: Object -> Game -> Game
-  , objectOnActivate :: Bool -> Object -> Game -> Game
-  }
-
-instance Show Object where
-  show object = "Object { objectName = " ++ show (objectName object)
-                ++ "objectPosition = " ++ show (objectPosition object)
-                ++ "objectCollisionBoxes = " ++ show (objectCollisionBoxes object)
-                ++ "objectAppearance = " ++ show (objectAppearance object)
-                ++ "objectVelocity = " ++ show (objectVelocity object)
-                ++ "}"
+  , objectOnUpdateName :: String
+  , objectOnActivateName :: String
+  } deriving Show
 
 data ControlElement = forall a. ControlType a => ControlElement a
 
@@ -143,7 +135,7 @@ data Level = Level
   , levelBackground :: Appearance
   } deriving (Show)
 
-type Map = [MapRow]
+type Map = [MapRow] 
 
 type MapRow = [Tile]
 
@@ -156,3 +148,7 @@ data Tile = Tile
   } deriving (Show)
 
 type Texture = (Dimensions, Picture)
+
+type NamedUpdateFunction = (String, Object -> Game -> Game)
+
+type NamedActivateFunction = (String, Bool -> Object -> Game -> Game)
