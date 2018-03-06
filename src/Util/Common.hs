@@ -59,3 +59,31 @@ gameObjects game = map playerObject (gamePlayers game)
 
 updateObjects :: Game -> Game
 updateObjects game = foldr (\obj -> objectOnUpdate obj $ obj) game (gameObjects game)
+
+
+movePlayer :: Vector -> Action
+movePlayer vector =
+  PlayerAction (\player ->
+    let object = playerObject player
+        currentVelocity = objectVelocity object
+    in player { playerObject = object { objectVelocity = vector `plus` currentVelocity } }
+  )
+
+setTextureByName :: String -> Texture -> Action
+setTextureByName name texture =
+  GameAction (\_ game ->
+    game { gamePlayers =
+             map (\player -> if isTarget player
+                             then player {
+                                    playerObject = (playerObject player) {
+                                      objectAppearance = (objectAppearance . playerObject $ player) {
+                                        appearanceActualSize = fst texture
+                                      , appearancePicture = snd texture
+                                      }
+                                    }
+                                  }
+                             else player
+             ) (gamePlayers game)
+         }
+  )
+  where isTarget player = (objectName . playerObject $ player) == name

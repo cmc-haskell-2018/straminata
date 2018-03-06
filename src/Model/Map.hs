@@ -53,6 +53,8 @@ addBasicMapTile (typ, texture) row col list = let tileSize = levelTileSize initi
       , appearanceActualSize = fst texture
       , appearancePicture = snd texture
       }
+    , objectOnUpdate = \_ -> id
+    , objectOnActivate = \_ _ -> id
     }
   } : list
   where fi = fromIntegral

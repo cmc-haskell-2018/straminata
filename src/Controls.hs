@@ -12,16 +12,28 @@ handleInput :: Event -> Game -> Game
 handleInput event game =
   let players = gamePlayers game
   in case event of
-    (EventKey key state _ _) -> game { gamePlayers = map (act key state) players }
+    (EventKey key state _ _) -> foldr (actOnGame key state)
+                                      game { gamePlayers = map (actOnPlayer key state) players
+                                           }
+                                      players
     _ -> game
-    where act key state player = let controlElement = (upOrDown state) <$> find (predicate key) (playerControls player)
-                                 in if isJust controlElement
-                                    then controlPlayer (fromJust controlElement) player
-                                    else player
+    where actOnPlayer key state player = let action = findAction key state player
+                                         in if isJust action
+                                            then performOnPlayer (fromJust action) player
+                                            else player
+          actOnGame key state player game' = let action = findAction key state player
+                                            in if isJust action
+                                               then performOnGame (fromJust action) player game'
+                                               else game'
+          findAction key state player = (upOrDown state) <$> find (predicate key) (playerControls player)
           predicate key (key', _, _) = key == key'
 
-bindAction :: Key -> ControlElement -> ControlElement -> KeyPress
+bindAction :: Key -> Action -> Action -> KeyPress
 bindAction key up down = (key, up, down)
+
+upOrDown :: KeyState -> KeyPress -> Action
+upOrDown Down (_, x, _) = x
+upOrDown Up (_, _, x) = x
 
 moveObjects :: Time -> Game -> Game
 moveObjects time game = game
