@@ -45,6 +45,10 @@ divByNumber :: Vector -> Float -> Vector
 divByNumber _ 0 = Vector (0, 0)
 divByNumber (Vector (x, y)) number = Vector (x / number, y / number)
 
+mulByNumber :: Vector -> Float -> Vector
+mulByNumber _ 0 = Vector (0, 0)
+mulByNumber (Vector (x, y)) number = Vector (x * number, y * number)
+
 invertVector :: Vector -> Vector
 invertVector (Vector (x, y)) = Vector ((- x), (- y))
 
@@ -75,7 +79,17 @@ data Object = Object
   , objectCollisionBoxes :: [Rectangle]
   , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
-  } deriving Show
+  , objectOnUpdate :: Object -> Game -> Game
+  , objectOnActivate :: Bool -> Object -> Game -> Game
+  }
+
+instance Show Object where
+  show object = "Object { objectName = " ++ show (objectName object)
+                ++ "objectPosition = " ++ show (objectPosition object)
+                ++ "objectCollisionBoxes = " ++ show (objectCollisionBoxes object)
+                ++ "objectAppearance = " ++ show (objectAppearance object)
+                ++ "objectVelocity = " ++ show (objectVelocity object)
+                ++ "}"
 
 data ControlElement = forall a. ControlType a => ControlElement a
 
