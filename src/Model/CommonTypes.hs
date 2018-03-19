@@ -38,6 +38,9 @@ instance (UnwrapablePair Vector) where
 plus :: Vector -> Vector -> Vector
 plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
 
+subtractVector :: Vector -> Vector -> Vector
+subtractVector v1 v2 = v1 `plus` invertVector v2
+
 divByNumber :: Vector -> Float -> Vector
 divByNumber _ 0 = Vector (0, 0)
 divByNumber (Vector (x, y)) number = Vector (x / number, y / number)
@@ -48,6 +51,35 @@ mulByNumber (Vector (x, y)) number = Vector (x * number, y * number)
 
 invertVector :: Vector -> Vector
 invertVector (Vector (x, y)) = Vector ((- x), (- y))
+
+vectorLength :: Vector -> Float
+vectorLength (Vector (x, y)) = sqrt (x * x + y * y)
+
+normalizeVector :: Vector -> Vector
+normalizeVector vector = vector `divByNumber` vectorLength vector
+
+takeShortest :: Vector -> Vector -> Vector
+takeShortest v1 v2 = if (vectorLength v1) > (vectorLength v2)
+                     then v2
+                     else v1
+
+projectVector :: Vector -> Vector -> Vector
+projectVector _ (Vector (0, 0)) = zeroVector
+projectVector v1 v2 = v2 `mulByNumber` ((v1 `dotProduct` v2) / (v2 `dotProduct` v2))
+
+dotProduct :: Vector -> Vector -> Float
+dotProduct (Vector (x1, y1)) (Vector (x2, y2)) = x1 * x2 + y1 * y2
+
+angleCosBetweenVectors :: Vector -> Vector -> Float
+angleCosBetweenVectors v1 v2 = (v1 `dotProduct` v2) / (vectorLength v1 * vectorLength v2)
+
+zeroVector :: Vector
+zeroVector = Vector (0, 0)
+
+instance ControlType Vector where
+  controlPlayer movement player =
+    let currentControlVector = playerControlVector player
+    in player { playerControlVector = movement `plus` currentControlVector }
 
 type Time = Float
 
@@ -72,6 +104,8 @@ data Object = Object
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   , objectOnUpdate :: Object -> Game -> Game
   , objectOnActivate :: Bool -> Object -> Game -> Game
+  , objectMass :: Float -- ^ Mass. Can be infinite (1/0)
+  , objectAcceleration :: Vector
   }
 
 instance Show Object where
@@ -103,6 +137,7 @@ type PlayerControls = [KeyPress]
 data Player = Player
   { playerObject :: Object
   , playerControls :: PlayerControls
+  , playerControlVector :: Vector
   }
 
 instance Show Player where
@@ -141,12 +176,7 @@ type Map = [MapRow]
 
 type MapRow = [Tile]
 
-data TileType = Solid | Transparent
+data Tile = Solid Appearance | Transparent Appearance
   deriving (Show)
-
-data Tile = Tile
-  { tileType :: TileType
-  , tileObject :: Object
-  } deriving (Show)
 
 type Texture = (Dimensions, Picture)

@@ -11,7 +11,7 @@ import Visual.WindowConstants
 import Visual.Renderer
 import Visual.TextureLoader
 import Util.Common
-import Controls
+import Util.Controls
 
 -- | Starts game main loop.
 run :: IO ()
@@ -50,6 +50,8 @@ playerInitialState = Player
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = activatePlayer "luigi"
     , objectOnActivate = \_ _ -> id
+    , objectMass = 0
+    , objectAcceleration = zeroVector
     }
   , playerControls =
       [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (10, 0))) (movePlayer (Vector (-10, 0)))
@@ -57,6 +59,7 @@ playerInitialState = Player
       , bindAction (SpecialKey KeyUp) (movePlayer (Vector (0, 10))) (movePlayer (Vector (0, -10)))
       , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -10))) (movePlayer (Vector (0, 10)))
       ]
+  , playerControlVector = zeroVector
   }
 
 player2InitialState :: Player
@@ -73,6 +76,8 @@ player2InitialState = Player
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = \_ -> id
     , objectOnActivate = resizeSelf
+    , objectMass = 0
+    , objectAcceleration = zeroVector
     }
   , playerControls =
     [ bindAction (Char 'd') (movePlayer (Vector (20, 0))) (movePlayer (Vector (-20, 0)))
@@ -81,13 +86,14 @@ player2InitialState = Player
     , bindAction (Char 's') (movePlayer (Vector (0, -20))) (movePlayer (Vector (0, 20)))
     , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
     ]
+  , playerControlVector = zeroVector
   }
 
 -- | Advances game state one step further.
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame time = updateCamera . moveObjects time . movePlayers time . updateObjects
+advanceGame time = updateCamera . updatePhysics time . updateObjects
 
 
 activatePlayer :: String -> Object -> Game -> Game
@@ -124,24 +130,24 @@ resizeSelf state self game = game
 
 
 -- temporary
-updatePlayers :: Game -> Game
-updatePlayers game = let playerList = gamePlayers game
-                         player1 = (playerList !! 0)
-                         player2 = (playerList !! 1)
-                         object1 = playerObject player1
-                         object2 = playerObject player2
-                         playersColliding = objectsCollide object1 object2
-                         recolorPlayer player = player
-                                                { playerObject = (playerObject player)
-                                                  { objectAppearance = (objectAppearance . playerObject $ player)
-                                                    { appearancePicture =
-                                                      (if playersColliding
-                                                      then Color red
-                                                      else Color blue)
-                                                        (Polygon $ formPath
-                                                          (appearanceBox . objectAppearance . playerObject $ player)
-                                                        )
-                                                    }
-                                                  }
-                                                }
-                     in game { gamePlayers = map recolorPlayer playerList }
+-- updatePlayers :: Game -> Game
+-- updatePlayers game = let playerList = gamePlayers game
+--                          player1 = (playerList !! 0)
+--                          player2 = (playerList !! 1)
+--                          object1 = playerObject player1
+--                          object2 = playerObject player2
+--                          playersColliding = objectsCollide object1 object2
+--                          recolorPlayer player = player
+--                                                 { playerObject = (playerObject player)
+--                                                   { objectAppearance = (objectAppearance . playerObject $ player)
+--                                                     { appearancePicture =
+--                                                       (if playersColliding
+--                                                       then Color red
+--                                                       else Color blue)
+--                                                         (Polygon $ formPath
+--                                                           (appearanceBox . objectAppearance . playerObject $ player)
+--                                                         )
+--                                                     }
+--                                                   }
+--                                                 }
+--                      in game { gamePlayers = map recolorPlayer playerList }

@@ -1,4 +1,4 @@
-module Controls where
+module Util.Controls where
 
 import Data.Maybe (isJust, fromJust)
 import Data.List (find)

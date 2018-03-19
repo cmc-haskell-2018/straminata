@@ -19,10 +19,10 @@ library
                      , Model.CommonTypes
                      , Model.Map
                      , Util.Common
+                     , Util.Controls
                      , Visual.WindowConstants
                      , Visual.Renderer
                      , Visual.TextureLoader
-                     , Controls
   build-depends:       base >= 4.7 && < 5
                      , gloss
                      , gloss-juicy
