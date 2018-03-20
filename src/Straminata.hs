@@ -52,10 +52,10 @@ playerInitialState = Player
     , objectOnActivate = \_ _ -> id
     }
   , playerControls =
-      [ bindAction (SpecialKey KeyRight) (ControlElement (Vector (10, 0))) (ControlElement (Vector (-10, 0)))
-      , bindAction (SpecialKey KeyLeft) (ControlElement (Vector (-10, 0))) (ControlElement (Vector (10, 0)))
-      , bindAction (SpecialKey KeyUp) (ControlElement (Vector (0, 10))) (ControlElement (Vector (0, -10)))
-      , bindAction (SpecialKey KeyDown) (ControlElement (Vector (0, -10))) (ControlElement (Vector (0, 10)))
+      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (10, 0))) (movePlayer (Vector (-10, 0)))
+      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-10, 0))) (movePlayer (Vector (10, 0)))
+      , bindAction (SpecialKey KeyUp) (movePlayer (Vector (0, 10))) (movePlayer (Vector (0, -10)))
+      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -10))) (movePlayer (Vector (0, 10)))
       ]
   }
 
@@ -75,10 +75,11 @@ player2InitialState = Player
     , objectOnActivate = resizeSelf
     }
   , playerControls =
-    [ bindAction (Char 'd') (ControlElement (Vector (20, 0))) (ControlElement (Vector (-20, 0)))
-    , bindAction (Char 'a') (ControlElement (Vector (-20, 0))) (ControlElement (Vector (20, 0)))
-    , bindAction (Char 'w') (ControlElement (Vector (0, 20))) (ControlElement (Vector (0, -20)))
-    , bindAction (Char 's') (ControlElement (Vector (0, -20))) (ControlElement (Vector (0, 20)))
+    [ bindAction (Char 'd') (movePlayer (Vector (20, 0))) (movePlayer (Vector (-20, 0)))
+    , bindAction (Char 'a') (movePlayer (Vector (-20, 0))) (movePlayer (Vector (20, 0)))
+    , bindAction (Char 'w') (movePlayer (Vector (0, 20))) (movePlayer (Vector (0, -20)))
+    , bindAction (Char 's') (movePlayer (Vector (0, -20))) (movePlayer (Vector (0, 20)))
+    , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
     ]
   }
 
