@@ -4,6 +4,8 @@ module Model.CommonTypes where
 import Graphics.Gloss (Picture)
 import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
 
+import Util.Constants
+
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
@@ -27,6 +29,10 @@ instance (UnwrapablePair Dimensions) where
 
 type Rectangle = (Position, Position)
 
+infiniteRectangle = (Position (-infinity, -infinity), Position(infinity, infinity))
+
+type Line = (Position, Position)
+
 type Bounds = Rectangle
 
 newtype Vector = Vector (Float, Float)
@@ -34,6 +40,12 @@ newtype Vector = Vector (Float, Float)
 
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
+
+getY :: Vector -> Float
+getY (Vector (_, y)) = y
+
+getX :: Vector -> Float
+getX (Vector (x, _)) = x
 
 plus :: Vector -> Vector -> Vector
 plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
@@ -73,13 +85,17 @@ dotProduct (Vector (x1, y1)) (Vector (x2, y2)) = x1 * x2 + y1 * y2
 angleCosBetweenVectors :: Vector -> Vector -> Float
 angleCosBetweenVectors v1 v2 = (v1 `dotProduct` v2) / (vectorLength v1 * vectorLength v2)
 
+perpendicularVector :: Vector -> Vector
+perpendicularVector (Vector (x, y)) = Vector (y, -x)
+
+defineDescartesFourth :: Vector -> Int
+defineDescartesFourth (Vector (x, y)) =
+  if x > 0
+  then if y > 0 then 1 else 4
+  else if y > 0 then 2 else 3
+
 zeroVector :: Vector
 zeroVector = Vector (0, 0)
-
-instance ControlType Vector where
-  controlPlayer movement player =
-    let currentControlVector = playerControlVector player
-    in player { playerControlVector = movement `plus` currentControlVector }
 
 type Time = Float
 
@@ -108,6 +124,9 @@ data Object = Object
   , objectAcceleration :: Vector
   }
 
+instance Eq Object where
+  (==) o1 o2 = objectName o1 == objectName o2
+
 instance Show Object where
   show object = "Object { objectName = " ++ show (objectName object)
                 ++ "objectPosition = " ++ show (objectPosition object)
@@ -117,12 +136,12 @@ instance Show Object where
                 ++ "}"
 
 
-data Action = PlayerAction (Player -> Player)
+data Action = PlayerAction (Player -> Game -> Player)
             | GameAction (Player -> Game -> Game)
 
-performOnPlayer :: Action -> Player -> Player
-performOnPlayer (PlayerAction f) player = f player
-performOnPlayer _ player = player
+performOnPlayer :: Action -> Player -> Game -> Player
+performOnPlayer (PlayerAction f) player game = f player game
+performOnPlayer _ player _ = player
 
 performOnGame :: Action -> Player -> Game -> Game
 performOnGame (GameAction f) player game = f player game
@@ -178,5 +197,11 @@ type MapRow = [Tile]
 
 data Tile = Solid Appearance | Transparent Appearance
   deriving (Show)
+
+instance Eq Tile where
+  (==) (Solid _) (Transparent _) = False
+  (==) (Transparent _) (Solid _) = False
+  (==) (Solid a1) (Solid a2) = appearanceBox a1 == appearanceBox a2
+  (==) (Transparent a1) (Transparent a2) = appearanceBox a1 == appearanceBox a2
 
 type Texture = (Dimensions, Picture)

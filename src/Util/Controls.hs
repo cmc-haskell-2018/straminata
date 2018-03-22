@@ -13,13 +13,13 @@ handleInput event game =
   let players = gamePlayers game
   in case event of
     (EventKey key state _ _) -> foldr (actOnGame key state)
-                                      game { gamePlayers = map (actOnPlayer key state) players
+                                      game { gamePlayers = map (actOnPlayer key state game) players
                                            }
                                       players
     _ -> game
-    where actOnPlayer key state player = let action = findAction key state player
+    where actOnPlayer key state game' player = let action = findAction key state player
                                          in if isJust action
-                                            then performOnPlayer (fromJust action) player
+                                            then performOnPlayer (fromJust action) player game'
                                             else player
           actOnGame key state player game' = let action = findAction key state player
                                             in if isJust action
@@ -35,29 +35,3 @@ upOrDown :: KeyState -> KeyPress -> Action
 upOrDown Down (_, x, _) = x
 upOrDown Up (_, _, x) = x
 
-moveObjects :: Time -> Game -> Game
-moveObjects time game = game
-  { gameLevel = (gameLevel game)
-    { levelObjects = move $ levelObjects (gameLevel game)
-    }
-  }
-  where move = map (moveObject time)
-
-movePlayers :: Time -> Game -> Game
-movePlayers time game = game
-  { gamePlayers = map (\player -> player { playerObject = moveObject time (playerObject player) }) (gamePlayers game)
-  }
-
-
-moveObject :: Time -> Object -> Object
-moveObject time obj = let v = objectVelocity obj
-                          pos = objectPosition obj
-                      in obj { objectPosition = performMove time v pos }
-
-standardVelocity :: Float
-standardVelocity = 30
-
-performMove :: Time -> Vector -> Position -> Position
-performMove time (Vector (vx, vy)) (Position (x, y)) = Position ( x + vx * time * standardVelocity
-                                                                , y + vy * time * standardVelocity
-                                                                )

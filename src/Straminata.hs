@@ -56,7 +56,7 @@ playerInitialState = Player
   , playerControls =
       [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (10, 0))) (movePlayer (Vector (-10, 0)))
       , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-10, 0))) (movePlayer (Vector (10, 0)))
-      , bindAction (SpecialKey KeyUp) (movePlayer (Vector (0, 10))) (movePlayer (Vector (0, -10)))
+      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 100))) (zeroAction)
       , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -10))) (movePlayer (Vector (0, 10)))
       ]
   , playerControlVector = zeroVector

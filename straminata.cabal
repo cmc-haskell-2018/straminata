@@ -19,6 +19,7 @@ library
                      , Model.CommonTypes
                      , Model.Map
                      , Util.Common
+                     , Util.Constants
                      , Util.Controls
                      , Visual.WindowConstants
                      , Visual.Renderer
