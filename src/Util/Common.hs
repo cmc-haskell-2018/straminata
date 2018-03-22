@@ -66,18 +66,23 @@ isOnSameSide (start, end) point1 point2 =
   where sameSign f1 f2 = (f1 >= 0 && f2 >= 0) || (f1 <= 0 && f2 <= 0)
 
 
--- | Checks if line collides with rectangle.
-lineCollideWithTile :: Line -> Tile -> Bool
-lineCollideWithTile line (Solid appearance) =
-  let box = appearanceBox appearance
-  in (collide line box) && (isLineInside line box)
-  where
-    isLineInside line' (Position (x1, y1), Position (x2, y2)) =
-      (isOnSameSide line' Position (x1, y1))
-      && (isOnSameSide line' Position (x1, y2))
-      && (isOnSameSide line' Position (x2, y2))
-      && (isOnSameSide line' Position (x2, y1))
-lineCollideWithTile line _ = False
+---- | Checks if line collides with map tile.
+--lineCollideWithTile :: Line -> Tile -> Bool
+--lineCollideWithTile line (Solid appearance) =
+--  let box = appearanceBox appearance
+--  in (collide line box) && (isLineInside line box)
+--  where
+--    isLineInside line' (Position (x1, y1), Position (x2, y2)) =
+--      (isOnSameSide line' Position (x1, y1))
+--      && (isOnSameSide line' Position (x1, y2))
+--      && (isOnSameSide line' Position (x2, y2))
+--      && (isOnSameSide line' Position (x2, y1))
+--lineCollideWithTile line _ = False
+
+
+-- | Checks if line collides with another line.
+linesCollide :: Line -> Line -> Bool
+linesCollide line (p1, p2) = (collide line (p1, p2)) && (not $ isOnSameSide line p1 p2)
 
 
 -- | Checks if object collide with map tile.
@@ -94,9 +99,9 @@ objectsThatCollideWithObject :: Object -> Game -> [Object]
 objectsThatCollideWithObject object game = filter (objectsCollide object) (levelObjects . gameLevel $ game)
 
 
--- | Returns all map tiles that collide with object.
-tilesThatCollideWithObject :: Object -> Game -> [Tile]
-tilesThatCollideWithObject object game = filter (objectCollideWithTile object) (concat . levelMap . gameLevel $ game)
+---- | Returns all map tiles that collide with object.
+--tilesThatCollideWithObject :: Object -> Game -> [Tile]
+--tilesThatCollideWithObject object game = filter (objectCollideWithTile object) (concat . levelMap . gameLevel $ game)
 
 
 rectanglesDistanceDown :: Rectangle -> Rectangle -> Float
@@ -107,7 +112,7 @@ rectanglesDistanceDown ((Position(x11, y11)), (Position(x12, _))) ((Position(x21
 
 
 rectanglesDistanceUp :: Rectangle -> Rectangle -> Float
-rectanglesDistanceUp r1 r2 = rectanglesCollideDown r2 r1
+rectanglesDistanceUp r1 r2 = rectanglesDistanceDown r2 r1
 
 
 rectanglesDistanceLeft :: Rectangle -> Rectangle -> Float
@@ -118,98 +123,110 @@ rectanglesDistanceLeft ((Position(x11, y11)), (Position(_, y12))) ((Position(_, 
 
 
 rectanglesDistanceRight :: Rectangle -> Rectangle -> Float
-rectanglesDistanceRight r1 r2 = rectanglesCollideLeft r2 r1
+rectanglesDistanceRight r1 r2 = rectanglesDistanceLeft r2 r1
 
 
-restrictionBoxForMovingObject :: Object -> Float -> Game -> Rectangle
-restrictionBoxForMovingObject object time game =
-  foldr (\tile rect ->
-            foldr (shrinkRestriction $ tileRect tile) rect boxes
-        ) infiniteRectangle tiles
+restrictMovingObject :: Object -> Float -> Game -> Object
+restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
   where
-    boxes = objectCollisionBoxes object
+    restrictedVelocity =
+      foldr (\tile vel ->
+                foldr (restrictVelocity $ tileRect tile) vel boxes
+            ) velocity tiles
+    boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
     offset = objectPosition object
     velocity = objectVelocity object
     tiles = concat . levelMap . gameLevel $ game
     tileRect (Solid app) = appearanceBox app
     tileRect (Transparent _) = infiniteRectangle
-    shrinkRestriction tileBox objBox restrBox =
-      let vx = getX velocity
-          vy = getY velocity
+    restrictVelocity tileBox objBox newVelocity =
+      let vx = getX newVelocity * time
+          vy = getY newVelocity * time
           dUp = rectanglesDistanceUp objBox tileBox
           dRight = rectanglesDistanceRight objBox tileBox
           dDown = rectanglesDistanceDown objBox tileBox
           dLeft = rectanglesDistanceLeft objBox tileBox
-          x1 = fst . unwrap . fst $ objectBox
-          y1 = snd . unwrap . fst $ objectBox
-          x2 = fst . unwrap . snd $ objectBox
-          y2 = snd . unwrap . snd $ objectBox
-      in case defineDescartesFourth velocity of
+          x1 = fst . unwrap . fst $ objBox
+          y1 = snd . unwrap . fst $ objBox
+          x2 = fst . unwrap . snd $ objBox
+          y2 = snd . unwrap . snd $ objBox
+      in case defineDescartesFourth newVelocity of
            1 ->
              if (dUp > 0) && (dUp <= (vy + epsilon))
              then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
                   in if (dUp' > 0) && (dUp' <= (vy + epsilon))
-                     then restrictUp restrBox tileBox
-                     else restrBox
+                     then restrictUp newVelocity dUp
+                     else newVelocity
              else if (dRight > 0) && (dRight <= (vx + epsilon))
                   then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
                        in if (dRight' > 0) && (dRight' <= (vx + epsilon))
-                          then restrictRight restrBox tileBox
-                          else restrBox
-                  else restrictTheSideLineCollideWith (Position (x2, y2), Position (x2 + vx, y2 + vy)) tileBox restrBox
+                          then restrictRight newVelocity dRight
+                          else newVelocity
+                  else restrictRightOrUp (Position (x2, y2), Position (x2 + vx, y2 + vy)) newVelocity tileBox
            2 ->
              if (dUp > 0) && (dUp <= (vy + epsilon))
              then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
                   in if (dUp' > 0) && (dUp' <= (vy + epsilon))
-                     then restrictUp restrBox tileBox
-                     else restrBox
+                     then restrictUp newVelocity dUp
+                     else newVelocity
              else if (dLeft > 0) && (dLeft <= (- vx + epsilon))
                   then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
                        in if (dLeft' > 0) && (dLeft' <= (- vx + epsilon))
-                          then restrictLeft restrBox tileBox
-                          else restrBox
-                  else restrictTheSideLineCollideWith (Position (x1, y2), Position (x1 + vx, y2 + vy)) tileBox restrBox
+                          then restrictLeft newVelocity dLeft
+                          else newVelocity
+                  else restrictLeftOrUp (Position (x1, y2), Position (x1 + vx, y2 + vy)) newVelocity tileBox
            3 ->
              if (dDown > 0) && (dDown <= (- vy + epsilon))
              then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
                   in if (dDown' > 0) && (dDown' <= (- vy + epsilon))
-                     then restrictDown restrBox tileBox
-                     else restrBox
+                     then restrictDown newVelocity dDown
+                     else newVelocity
              else if (dLeft > 0) && (dLeft <= (- vx + epsilon))
                   then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
                        in if (dLeft' > 0) && (dLeft' <= (- vx + epsilon))
-                          then restrictLeft restrBox tileBox
-                          else restrBox
-                  else restrictTheSideLineCollideWith (Position (x1, y1), Position (x1 + vx, y1 + vy)) tileBox restrBox
-           otherwise ->
+                          then restrictLeft newVelocity dLeft
+                          else newVelocity
+                  else restrictLeftOrDown (Position (x1, y1), Position (x1 + vx, y1 + vy)) newVelocity tileBox
+           _ ->
              if (dDown > 0) && (dDown <= (- vy + epsilon))
              then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
                   in if (dDown' > 0) && (dDown' <= (- vy + epsilon))
-                     then restrictDown restrBox tileBox
-                     else restrBox
+                     then restrictDown newVelocity dDown
+                     else newVelocity
              else if (dRight > 0) && (dRight <= (vx + epsilon))
                   then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
                        in if (dRight' > 0) && (dRight' <= (vx + epsilon))
-                          then restrictRight restrBox tileBox
-                          else restrBox
-                  else restrictTheSideLineCollideWith (Position (x2, y1), Position (x2 + vx, y1 + vy)) tileBox restrBox
-    restrictDown (Position (rx1, ry1), Position (rx2, ry2)) (_, Position (_, ty)) =
-      if ty > ry1
-      then (Position (rx1, ty), Position (rx2, ry2))
-      else (Position (rx1, ry1), Position (rx2, ry2))
-    restrictUp (Position (rx1, ry1), Position (rx2, ry2)) (Position (_, ty), _) =
-      if ty < ry2
-      then (Position (rx1, ry1), Position (rx2, ty))
-      else (Position (rx1, ry1), Position (rx2, ry2))
-    restrictLeft (Position (rx1, ry1), Position (rx2, ry2)) (Position (tx, _), _) =
-      if tx > rx1
-      then (Position (tx, ry1), Position (rx2, ry2))
-      else (Position (rx1, ry1), Position (rx2, ry2))
-    restrictRight (Position (rx1, ry1), Position (rx2, ry2)) (_, Position (rx, _)) =
-      if tx < rx2
-      then (Position (rx1, ry1), Position (tx, ry2))
-      else (Position (rx1, ry1), Position (rx2, ry2))
-    restrictTheSideLineCollideWith line tileBox restrBox =
+                          then restrictRight newVelocity dRight
+                          else newVelocity
+                  else restrictRightOrDown (Position (x2, y1), Position (x2 + vx, y1 + vy)) newVelocity tileBox
+    restrictDown (Vector (x, _)) dist = (Vector (x, - (dist / time) + epsilon))
+    restrictUp (Vector (x, _)) dist = (Vector (x, (dist / time) - epsilon))
+    restrictLeft (Vector (_, y)) dist = (Vector (- (dist / time) + epsilon, y))
+    restrictRight (Vector (_, y)) dist = (Vector ((dist / time) - epsilon, y))
+    restrictRightOrUp (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
+      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x1, y2))
+      then restrictRight vel (x1 - lx1)
+      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x2, y1))
+           then restrictUp vel (y1 - ly1)
+           else vel
+    restrictLeftOrUp (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
+      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x2, y1), Position (x2, y2))
+      then restrictLeft vel (lx1 - x2)
+      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x2, y1))
+           then restrictUp vel (y1 - ly1)
+           else vel
+    restrictLeftOrDown (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
+      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x2, y1), Position (x2, y2))
+      then restrictLeft vel (lx1 - x2)
+      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y2), Position (x2, y2))
+           then restrictDown vel (ly1 - y2)
+           else vel
+    restrictRightOrDown (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
+      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x1, y2))
+      then restrictRight vel (x1 - lx1)
+      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y2), Position (x2, y2))
+           then restrictDown vel (ly1 - y2)
+           else vel
 
 
 -- tilesThatCollideWithMovingObject :: Object -> Game -> [Tile]
@@ -271,37 +288,37 @@ updatePhysics time game =
            }
          }
   where
-    updatePlayer = movePlayer . updatePlayerVelocity time . acceleratePlayer
+    updatePlayer = updatePlayerPosition . updatePlayerVelocity time . acceleratePlayer
     updateObject = moveObject time game . updateObjectVelocity time . accelerateObject
     acceleratePlayer player = player { playerObject = accelerateObject (playerObject player) }
     accelerateObject = updateAcceleration game . nullifyAcceleration
-    movePlayer player = player { playerObject = moveObject time game (playerObject player) }
+    updatePlayerPosition player = player { playerObject = moveObject time game (playerObject player) }
 
 
 moveObject :: Time -> Game -> Object -> Object
 moveObject time game obj =
-  let resObj = {- restrictObjectRelToObjects game -} (restrictObjectRelToTiles game obj)
+  let resObj = {- restrictObjectRelToObjects game -} (restrictMovingObject obj time game)
   in resObj { objectPosition = performMove time (objectVelocity resObj) (objectPosition resObj)
             }
 
 
-restrictObjectRelToTiles :: Float -> Game -> Object -> Object
-restrictObjectRelToTiles time game obj =
-  let vel = objectVelocity obj
-      pos = objectPosition obj
-      newObj = obj { objectPosition = performMove time vel pos }
-      oldColTiles = tilesThatCollideWithObject obj game
-      newColTiles = tilesThatCollideWithMovingObject newObj game
-      diffColTiles = newColTiles \\ oldColTiles
-  in if null diffColTiles
-     then obj
-     else restrictObject object (restrictionBox object diffColTiles)
-  where restrictObject object box =
+--restrictObjectRelToTiles :: Float -> Game -> Object -> Object
+--restrictObjectRelToTiles time game obj =
+--  let vel = objectVelocity obj
+--      pos = objectPosition obj
+--      newObj = obj { objectPosition = performMove time vel pos }
+--      oldColTiles = tilesThatCollideWithObject obj game
+--      newColTiles = tilesThatCollideWithMovingObject newObj game
+--      diffColTiles = newColTiles \\ oldColTiles
+--  in if null diffColTiles
+--     then obj
+--     else restrictObject object (restrictionBox object diffColTiles)
+--  where restrictObject object box =
 
 
-restrictionBox :: Object -> [Tile] -> Rectangle
-restrictionBox object tiles = foldr shrinkBox infiniteRectangle tiles
-  where shrinkBox tile box =
+--restrictionBox :: Object -> [Tile] -> Rectangle
+--restrictionBox object tiles = foldr shrinkBox infiniteRectangle tiles
+--  where shrinkBox tile box =
 
 
 performMove :: Time -> Vector -> Position -> Position
@@ -312,7 +329,16 @@ performMove time (Vector (vx, vy)) (Position (x, y)) =
 
 
 objectOnGround :: Object -> Map -> Bool
-objectOnGround object tiles = any (objectCollideWithTile object) (concat tiles)
+objectOnGround object tiles =
+  any (\tile -> any (onGround tile) boxes ) (map tileRect $ concat tiles)
+  where
+    boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
+    offset = objectPosition object
+    tileRect (Solid app) = appearanceBox app
+    tileRect (Transparent _) = infiniteRectangle
+    onGround tile box =
+      let dist = rectanglesDistanceDown box tile
+      in (dist < epsilon) && (dist > (- epsilon))
 
 
 frictionVector :: Object -> Vector

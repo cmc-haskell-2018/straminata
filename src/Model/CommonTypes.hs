@@ -2,7 +2,7 @@
 module Model.CommonTypes where
 
 import Graphics.Gloss (Picture)
-import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
+import Graphics.Gloss.Interface.IO.Game (Key)
 
 import Util.Constants
 
@@ -29,6 +29,7 @@ instance (UnwrapablePair Dimensions) where
 
 type Rectangle = (Position, Position)
 
+infiniteRectangle :: Rectangle
 infiniteRectangle = (Position (-infinity, -infinity), Position(infinity, infinity))
 
 type Line = (Position, Position)
