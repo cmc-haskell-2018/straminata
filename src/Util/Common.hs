@@ -1,11 +1,8 @@
 -- | Contains commonly used functions.
 module Util.Common where
 
-import System.IO.Unsafe
-
 import Model.CommonTypes
 import Visual.WindowConstants
-import Visual.Renderer
 import Util.Constants
 
 frameWidth :: Float
@@ -65,20 +62,6 @@ isOnSameSide (start, end) point1 point2 =
   where sameSign f1 f2 = (f1 >= 0 && f2 >= 0) || (f1 <= 0 && f2 <= 0)
 
 
----- | Checks if line collides with map tile.
---lineCollideWithTile :: Line -> Tile -> Bool
---lineCollideWithTile line (Solid appearance) =
---  let box = appearanceBox appearance
---  in (collide line box) && (isLineInside line box)
---  where
---    isLineInside line' (Position (x1, y1), Position (x2, y2)) =
---      (isOnSameSide line' Position (x1, y1))
---      && (isOnSameSide line' Position (x1, y2))
---      && (isOnSameSide line' Position (x2, y2))
---      && (isOnSameSide line' Position (x2, y1))
---lineCollideWithTile line _ = False
-
-
 -- | Checks if line collides with another line.
 linesCollide :: Line -> Line -> Bool
 linesCollide line (p1, p2) = (collide line (p1, p2)) && (not $ isOnSameSide line p1 p2)
@@ -96,11 +79,6 @@ objectCollideWithTile o (Solid app) =
 -- | Returns all objects that collide with object.
 objectsThatCollideWithObject :: Object -> Game -> [Object]
 objectsThatCollideWithObject object game = filter (objectsCollide object) (levelObjects . gameLevel $ game)
-
-
----- | Returns all map tiles that collide with object.
---tilesThatCollideWithObject :: Object -> Game -> [Tile]
---tilesThatCollideWithObject object game = filter (objectCollideWithTile object) (concat . levelMap . gameLevel $ game)
 
 
 rectanglesDistanceDown :: Rectangle -> Rectangle -> Float
@@ -132,8 +110,7 @@ rectanglesDistanceRight ((Position(_, y11)), (Position(x12, y12))) ((Position(x2
 
 
 restrictMovingObject :: Object -> Float -> Game -> Object
-restrictMovingObject object time game = -- object {objectVelocity = restrictedVelocity}
- const (object {objectVelocity = restrictedVelocity}) $! unsafePerformIO (print (tileToPicture $ tiles !! 0) >> return "")
+restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
  where
     restrictedVelocity =
       foldr (\tile vel ->
@@ -235,25 +212,6 @@ restrictMovingObject object time game = -- object {objectVelocity = restrictedVe
            else vel
 
 
--- tilesThatCollideWithMovingObject :: Object -> Game -> [Tile]
--- tilesThatCollideWithMovingObject object game =
---   let boxes = objectCollisionBoxes object
---       offset = objectPosition object
---       velocity = objectVelocity object
---       tiles = concat . levelMap . gameLevel $ game
---   in filter (\tile ->
---                 any (\box ->
---                         movingObjectCollideWithTile (offsetRectangle offset box) velocity tile
---                     ) boxes
---             ) tiles
---   where
---     movingObjectCollideWithTile (Position (x1, y1), Position (x2, y2)) (Vector (x, y)) tile =
---       lineCollideWithTile (Position (x1, y1), Position (x1 + x, y1 + y)) tile
---       || lineCollideWithTile (Position (x1, y2), Position (x1 + x, y2 + y)) tile
---       || lineCollideWithTile (Position (x2, y2), Position (x2 + x, y2 + y)) tile
---       || lineCollideWithTile (Position (x2, y1), Position (x2 + x, y1 + y)) tile
---
-
 updateCamera :: Game -> Game
 updateCamera game = game
   { gameCamera = (gameCamera game)
@@ -306,25 +264,6 @@ moveObject time game obj =
   let resObj = {- restrictObjectRelToObjects game -} (restrictMovingObject obj time game)
   in resObj { objectPosition = performMove time (objectVelocity resObj) (objectPosition resObj)
             }
-
-
---restrictObjectRelToTiles :: Float -> Game -> Object -> Object
---restrictObjectRelToTiles time game obj =
---  let vel = objectVelocity obj
---      pos = objectPosition obj
---      newObj = obj { objectPosition = performMove time vel pos }
---      oldColTiles = tilesThatCollideWithObject obj game
---      newColTiles = tilesThatCollideWithMovingObject newObj game
---      diffColTiles = newColTiles \\ oldColTiles
---  in if null diffColTiles
---     then obj
---     else restrictObject object (restrictionBox object diffColTiles)
---  where restrictObject object box =
-
-
---restrictionBox :: Object -> [Tile] -> Rectangle
---restrictionBox object tiles = foldr shrinkBox infiniteRectangle tiles
---  where shrinkBox tile box =
 
 
 performMove :: Time -> Vector -> Position -> Position

@@ -127,27 +127,3 @@ resizeSelf state self game = game
             , objectCollisionBoxes = [rect]
             }
           }
-
-
--- temporary
--- updatePlayers :: Game -> Game
--- updatePlayers game = let playerList = gamePlayers game
---                          player1 = (playerList !! 0)
---                          player2 = (playerList !! 1)
---                          object1 = playerObject player1
---                          object2 = playerObject player2
---                          playersColliding = objectsCollide object1 object2
---                          recolorPlayer player = player
---                                                 { playerObject = (playerObject player)
---                                                   { objectAppearance = (objectAppearance . playerObject $ player)
---                                                     { appearancePicture =
---                                                       (if playersColliding
---                                                       then Color red
---                                                       else Color blue)
---                                                         (Polygon $ formPath
---                                                           (appearanceBox . objectAppearance . playerObject $ player)
---                                                         )
---                                                     }
---                                                   }
---                                                 }
---                      in game { gamePlayers = map recolorPlayer playerList }
