@@ -46,9 +46,14 @@ positionPicture camera pic = Scale ratio ratio (Translate x y pic)
 
 
 appearanceToPicture :: Appearance -> Picture
-appearanceToPicture app = (uncurry Translate . unwrap . fst . appearanceBox $ app) $
+appearanceToPicture app = --(uncurry Translate . unwrap . fst . appearanceBox $ app) $ --(uncurry Translate translateCoords) $
                           (uncurry Scale $ computeScale (appearanceBox app) (appearanceActualSize app))
                           (appearancePicture app)
+--  where
+--    translateCoords = (unwrap . fst . appearanceBox $ app) `tupleSum` (invert . divBy2 . unwrap . getDimensions . appearanceBox $ app)
+--    tupleSum (a, b) (c, d) = (a + c, b + d)
+--    divBy2 (a, b) = (a / 2, b / 2)
+--    invert (a, b) = (-a, -b)
 
 
 objectToPicture :: Object -> Picture
@@ -60,5 +65,8 @@ objectToPicture obj = translate' obj $ appearanceToPicture . objectAppearance $ 
 
 
 tileToPicture :: Tile -> Picture
-tileToPicture (Solid app) = appearanceToPicture app
-tileToPicture (Transparent app) = appearanceToPicture app
+tileToPicture tile = (translate' $ getAppearance tile) $ appearanceToPicture . getAppearance $ tile
+  where getOffset app = (plus (positionToVector . fst . appearanceBox $ app)
+                              (positionToVector . snd . appearanceBox $ app)
+                        ) `divByNumber` 2
+        translate' = uncurry Translate . unwrap . getOffset

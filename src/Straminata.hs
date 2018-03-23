@@ -40,7 +40,7 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "mario"
-    , objectPosition = Position (0, 0)
+    , objectPosition = Position (0, 100)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
@@ -54,10 +54,10 @@ playerInitialState = Player
     , objectAcceleration = zeroVector
     }
   , playerControls =
-      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (10, 0))) (movePlayer (Vector (-10, 0)))
-      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-10, 0))) (movePlayer (Vector (10, 0)))
-      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 100))) (zeroAction)
-      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -10))) (movePlayer (Vector (0, 10)))
+      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (50, 0))) (movePlayer (Vector (-50, 0)))
+      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-50, 0))) (movePlayer (Vector (50, 0)))
+      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 200))) (zeroAction)
+      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
       ]
   , playerControlVector = zeroVector
   }
@@ -66,7 +66,7 @@ player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
     { objectName = "luigi"
-    , objectPosition = Position (0, 0)
+    , objectPosition = Position (200, 200)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))

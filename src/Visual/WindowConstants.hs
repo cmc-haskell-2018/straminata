@@ -16,4 +16,4 @@ backgroundColor :: Color
 backgroundColor = white
 
 fps :: Int
-fps = 60
+fps = 30

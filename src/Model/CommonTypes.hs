@@ -32,6 +32,9 @@ type Rectangle = (Position, Position)
 infiniteRectangle :: Rectangle
 infiniteRectangle = (Position (-infinity, -infinity), Position(infinity, infinity))
 
+getDimensions :: Rectangle -> Dimensions
+getDimensions (Position (x1, y1), Position(x2, y2)) = Dimensions (x2 - x1, y2 - y1)
+
 type Line = (Position, Position)
 
 type Bounds = Rectangle
@@ -91,9 +94,9 @@ perpendicularVector (Vector (x, y)) = Vector (y, -x)
 
 defineDescartesFourth :: Vector -> Int
 defineDescartesFourth (Vector (x, y)) =
-  if x > 0
-  then if y > 0 then 1 else 4
-  else if y > 0 then 2 else 3
+  if x >= 0
+  then if y >= 0 then 1 else 4
+  else if y >= 0 then 2 else 3
 
 zeroVector :: Vector
 zeroVector = Vector (0, 0)
@@ -204,5 +207,9 @@ instance Eq Tile where
   (==) (Transparent _) (Solid _) = False
   (==) (Solid a1) (Solid a2) = appearanceBox a1 == appearanceBox a2
   (==) (Transparent a1) (Transparent a2) = appearanceBox a1 == appearanceBox a2
+
+getAppearance :: Tile -> Appearance
+getAppearance (Solid app) = app
+getAppearance (Transparent app) = app
 
 type Texture = (Dimensions, Picture)

@@ -1,8 +1,11 @@
 -- | Contains commonly used functions.
 module Util.Common where
 
+import System.IO.Unsafe
+
 import Model.CommonTypes
 import Visual.WindowConstants
+import Visual.Renderer
 import Util.Constants
 
 frameWidth :: Float
@@ -13,10 +16,6 @@ gravitationalVector = Vector (0, - g)
 
 frictionCoef :: Float
 frictionCoef = 100
-
-standardVelocity :: Float
-standardVelocity = 30
-
 
 cosToSin :: Float -> Float
 cosToSin = sin . acos
@@ -112,7 +111,10 @@ rectanglesDistanceDown ((Position(x11, y11)), (Position(x12, _))) ((Position(x21
 
 
 rectanglesDistanceUp :: Rectangle -> Rectangle -> Float
-rectanglesDistanceUp r1 r2 = rectanglesDistanceDown r2 r1
+rectanglesDistanceUp ((Position(x11, _)), (Position(x12, y12))) ((Position(x21, y21)), (Position(x22, _))) =
+  if (x11 < x22 && x22 < x12) || (x11 < x21 && x21 < x12)
+  then y21 - y12
+  else (- infinity)
 
 
 rectanglesDistanceLeft :: Rectangle -> Rectangle -> Float
@@ -123,12 +125,16 @@ rectanglesDistanceLeft ((Position(x11, y11)), (Position(_, y12))) ((Position(_, 
 
 
 rectanglesDistanceRight :: Rectangle -> Rectangle -> Float
-rectanglesDistanceRight r1 r2 = rectanglesDistanceLeft r2 r1
+rectanglesDistanceRight ((Position(_, y11)), (Position(x12, y12))) ((Position(x21, y21)), (Position(_, y22))) =
+  if (y11 < y22 && y22 < y12) || (y11 < y21 && y21 < y12)
+  then x21 - x12
+  else (- infinity)
 
 
 restrictMovingObject :: Object -> Float -> Game -> Object
-restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
-  where
+restrictMovingObject object time game = -- object {objectVelocity = restrictedVelocity}
+ const (object {objectVelocity = restrictedVelocity}) $! unsafePerformIO (print (tileToPicture $ tiles !! 0) >> return "")
+ where
     restrictedVelocity =
       foldr (\tile vel ->
                 foldr (restrictVelocity $ tileRect tile) vel boxes
@@ -323,8 +329,8 @@ moveObject time game obj =
 
 performMove :: Time -> Vector -> Position -> Position
 performMove time (Vector (vx, vy)) (Position (x, y)) =
-  Position ( x + vx * time * standardVelocity
-           , y + vy * time * standardVelocity
+  Position ( x + vx * time
+           , y + vy * time
            )
 
 

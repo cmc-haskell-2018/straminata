@@ -9,4 +9,4 @@ epsilon = 0.001
 
 
 g :: Float
-g = 9.8
+g = 98
