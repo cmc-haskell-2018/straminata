@@ -40,7 +40,7 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "mario"
-    , objectPosition = Position (0, 100)
+    , objectPosition = Position (0, 1500)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
@@ -54,10 +54,10 @@ playerInitialState = Player
     , objectAcceleration = zeroVector
     }
   , playerControls =
-      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (50, 0))) (movePlayer (Vector (-50, 0)))
-      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-50, 0))) (movePlayer (Vector (50, 0)))
-      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 200))) (zeroAction)
-      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
+      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
+      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
+      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 500))) (zeroAction)
+--      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
       ]
   , playerControlVector = zeroVector
   }
@@ -80,12 +80,12 @@ player2InitialState = Player
     , objectAcceleration = zeroVector
     }
   , playerControls =
-    [ bindAction (Char 'd') (movePlayer (Vector (20, 0))) (movePlayer (Vector (-20, 0)))
-    , bindAction (Char 'a') (movePlayer (Vector (-20, 0))) (movePlayer (Vector (20, 0)))
-    , bindAction (Char 'w') (movePlayer (Vector (0, 20))) (movePlayer (Vector (0, -20)))
-    , bindAction (Char 's') (movePlayer (Vector (0, -20))) (movePlayer (Vector (0, 20)))
-    , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
-    ]
+      [ bindAction (Char 'd') (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
+      , bindAction (Char 'a') (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
+      , bindAction (Char 'w') (jumpPlayer (Vector (0, 500))) (zeroAction)
+--      , bindAction (Char 's') (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
+      , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
+      ]
   , playerControlVector = zeroVector
   }
 

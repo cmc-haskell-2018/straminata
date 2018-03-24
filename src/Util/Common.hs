@@ -8,12 +8,6 @@ import Util.Constants
 frameWidth :: Float
 frameWidth = 25
 
-gravitationalVector :: Vector
-gravitationalVector = Vector (0, - g)
-
-frictionCoef :: Float
-frictionCoef = 100
-
 cosToSin :: Float -> Float
 cosToSin = sin . acos
 
@@ -53,8 +47,8 @@ collide (Position (x11, y11), Position (x12, y12))
         (Position (x21, y21), Position (x22, y22)) = x11 < x22 && x12 > x21 && y11 < y22 && y12 > y21
 
 
-isOnSameSide :: Line -> Position -> Position -> Bool
-isOnSameSide (start, end) point1 point2 =
+isOnSameSide :: Line -> (Position, Position) -> Bool
+isOnSameSide (start, end) (point1, point2) =
   let line = positionToVector end `subtractVector` positionToVector start
       vector1 = positionToVector point1
       vector2 = positionToVector point2
@@ -64,7 +58,7 @@ isOnSameSide (start, end) point1 point2 =
 
 -- | Checks if line collides with another line.
 linesCollide :: Line -> Line -> Bool
-linesCollide line (p1, p2) = (collide line (p1, p2)) && (not $ isOnSameSide line p1 p2)
+linesCollide line1 line2 = (collide line1 line2) && (not $ isOnSameSide line1 line2)
 
 
 -- | Checks if object collide with map tile.
@@ -83,38 +77,42 @@ objectsThatCollideWithObject object game = filter (objectsCollide object) (level
 
 rectanglesDistanceDown :: Rectangle -> Rectangle -> Float
 rectanglesDistanceDown ((Position(x11, y11)), (Position(x12, _))) ((Position(x21, _)), (Position(x22, y22))) =
-  if (x11 < x22 && x22 < x12) || (x11 < x21 && x21 < x12)
+  if (x11 <= x22 && x22 <= x12) || (x11 <= x21 && x21 <= x12) || (x21 <= x11 && x11 <= x22)
   then y11 - y22
   else (- infinity)
 
 
 rectanglesDistanceUp :: Rectangle -> Rectangle -> Float
-rectanglesDistanceUp ((Position(x11, _)), (Position(x12, y12))) ((Position(x21, y21)), (Position(x22, _))) =
-  if (x11 < x22 && x22 < x12) || (x11 < x21 && x21 < x12)
-  then y21 - y12
-  else (- infinity)
+rectanglesDistanceUp r1 r2 = rectanglesDistanceDown r2 r1
+--((Position(x11, _)), (Position(x12, y12))) ((Position(x21, y21)), (Position(x22, _))) =
+--  if (x11 <= x22 && x22 <= x12) || (x11 <= x21 && x21 <= x12) || (x21 <= x11 && x11 <= x22)
+--  then y21 - y12
+--  else (- infinity)
 
 
 rectanglesDistanceLeft :: Rectangle -> Rectangle -> Float
 rectanglesDistanceLeft ((Position(x11, y11)), (Position(_, y12))) ((Position(_, y21)), (Position(x22, y22))) =
-  if (y11 < y22 && y22 < y12) || (y11 < y21 && y21 < y12)
+  if (y11 <= y22 && y22 <= y12) || (y11 <= y21 && y21 <= y12) || (y21 <= y11 && y11 <= y22)
   then x11 - x22
   else (- infinity)
 
 
 rectanglesDistanceRight :: Rectangle -> Rectangle -> Float
-rectanglesDistanceRight ((Position(_, y11)), (Position(x12, y12))) ((Position(x21, y21)), (Position(_, y22))) =
-  if (y11 < y22 && y22 < y12) || (y11 < y21 && y21 < y12)
-  then x21 - x12
-  else (- infinity)
+rectanglesDistanceRight r1 r2 = rectanglesDistanceLeft r2 r1
+--((Position(_, y11)), (Position(x12, y12))) ((Position(x21, y21)), (Position(_, y22))) =
+--  if (y11 <= y22 && y22 <= y12) || (y11 <= y21 && y21 <= y12) || (y21 <= y11 && y11 <= y22)
+--  then x21 - x12
+--  else (- infinity)
 
 
 restrictMovingObject :: Object -> Float -> Game -> Object
-restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
+restrictMovingObject object time game = object {objectVelocity = restrictedVelocity
+                                               }
  where
     restrictedVelocity =
-      foldr (\tile vel ->
-                foldr (restrictVelocity $ tileRect tile) vel boxes
+      foldr (\tile vel -> if isSolid tile
+                          then foldr (restrictVelocity $ tileRect tile) vel boxes
+                          else vel
             ) velocity tiles
     boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
     offset = objectPosition object
@@ -135,50 +133,50 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
           y2 = snd . unwrap . snd $ objBox
       in case defineDescartesFourth newVelocity of
            1 ->
-             if (dUp > 0) && (dUp <= (vy + epsilon))
+             if (dUp >= 0) && (dUp <= (vy + epsilon))
              then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
-                  in if (dUp' > 0) && (dUp' <= (vy + epsilon))
+                  in if (dUp' >= 0) && (dUp' <= (vy + epsilon))
                      then restrictUp newVelocity dUp
                      else newVelocity
-             else if (dRight > 0) && (dRight <= (vx + epsilon))
+             else if (dRight >= 0) && (dRight <= (vx + epsilon))
                   then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
-                       in if (dRight' > 0) && (dRight' <= (vx + epsilon))
+                       in if (dRight' >= 0) && (dRight' <= (vx + epsilon))
                           then restrictRight newVelocity dRight
                           else newVelocity
                   else restrictRightOrUp (Position (x2, y2), Position (x2 + vx, y2 + vy)) newVelocity tileBox
            2 ->
-             if (dUp > 0) && (dUp <= (vy + epsilon))
+             if (dUp >= 0) && (dUp <= (vy + epsilon))
              then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
-                  in if (dUp' > 0) && (dUp' <= (vy + epsilon))
+                  in if (dUp' >= 0) && (dUp' <= (vy + epsilon))
                      then restrictUp newVelocity dUp
                      else newVelocity
-             else if (dLeft > 0) && (dLeft <= (- vx + epsilon))
+             else if (dLeft >= 0) && (dLeft <= (- vx + epsilon))
                   then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
-                       in if (dLeft' > 0) && (dLeft' <= (- vx + epsilon))
+                       in if (dLeft' >= 0) && (dLeft' <= (- vx + epsilon))
                           then restrictLeft newVelocity dLeft
                           else newVelocity
                   else restrictLeftOrUp (Position (x1, y2), Position (x1 + vx, y2 + vy)) newVelocity tileBox
            3 ->
-             if (dDown > 0) && (dDown <= (- vy + epsilon))
+             if (dDown >= 0) && (dDown <= (- vy + epsilon))
              then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
-                  in if (dDown' > 0) && (dDown' <= (- vy + epsilon))
+                  in if (dDown' >= 0) && (dDown' <= (- vy + epsilon))
                      then restrictDown newVelocity dDown
                      else newVelocity
-             else if (dLeft > 0) && (dLeft <= (- vx + epsilon))
+             else if (dLeft >= 0) && (dLeft <= (- vx + epsilon))
                   then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
-                       in if (dLeft' > 0) && (dLeft' <= (- vx + epsilon))
+                       in if (dLeft' >= 0) && (dLeft' <= (- vx + epsilon))
                           then restrictLeft newVelocity dLeft
                           else newVelocity
                   else restrictLeftOrDown (Position (x1, y1), Position (x1 + vx, y1 + vy)) newVelocity tileBox
            _ ->
-             if (dDown > 0) && (dDown <= (- vy + epsilon))
+             if (dDown >= 0) && (dDown <= (- vy + epsilon))
              then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
-                  in if (dDown' > 0) && (dDown' <= (- vy + epsilon))
+                  in if (dDown' >= 0) && (dDown' <= (- vy + epsilon))
                      then restrictDown newVelocity dDown
                      else newVelocity
-             else if (dRight > 0) && (dRight <= (vx + epsilon))
+             else if (dRight >= 0) && (dRight <= (vx + epsilon))
                   then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
-                       in if (dRight' > 0) && (dRight' <= (vx + epsilon))
+                       in if (dRight' >= 0) && (dRight' <= (vx + epsilon))
                           then restrictRight newVelocity dRight
                           else newVelocity
                   else restrictRightOrDown (Position (x2, y1), Position (x2 + vx, y1 + vy)) newVelocity tileBox
@@ -255,7 +253,7 @@ updatePhysics time game =
     updatePlayer = updatePlayerPosition . updatePlayerVelocity time . acceleratePlayer
     updateObject = moveObject time game . updateObjectVelocity time . accelerateObject
     acceleratePlayer player = player { playerObject = accelerateObject (playerObject player) }
-    accelerateObject = updateAcceleration game . nullifyAcceleration
+    accelerateObject = updateAcceleration time game . nullifyAcceleration
     updatePlayerPosition player = player { playerObject = moveObject time game (playerObject player) }
 
 
@@ -286,14 +284,14 @@ objectOnGround object tiles =
       in (dist < epsilon) && (dist > (- epsilon))
 
 
-frictionVector :: Object -> Vector
-frictionVector obj = takeShortest newVector (invertVector . objectVelocity $ obj)
+frictionVector :: Float -> Object -> Vector
+frictionVector time obj = takeShortest newVector ((invertVector . objectVelocity $ obj) `divByNumber` time)
   where velDir = normalizeVector . objectVelocity $ obj
-        newVector = invertVector velDir `mulByNumber` frictionCoef
+        newVector = invertVector velDir `mulByNumber` (frictionCoef * g)
 
 
-reactVector :: Object -> Vector
-reactVector obj = frictionVector obj `plus` invertVector gravitationalVector
+reactVector :: Float -> Object -> Vector
+reactVector time obj = frictionVector time obj `plus` invertVector gravitationalVector
 
 
 updatePlayerVelocity :: Float -> Player -> Player
@@ -324,15 +322,15 @@ addControlVector obj con =
          }
 
 
-updateAcceleration :: Game -> Object -> Object
-updateAcceleration game object = addReactElement . addGravitationalElement $ object
+updateAcceleration :: Float -> Game -> Object -> Object
+updateAcceleration time game object = addReactElement . addGravitationalElement $ object
   where
     addGravitationalElement obj =
       obj { objectAcceleration = objectAcceleration obj `plus` gravitationalVector
           }
     addReactElement obj =
       if objectOnGround obj (levelMap . gameLevel $ game)
-      then obj { objectAcceleration = objectAcceleration obj `plus` reactVector obj
+      then obj { objectAcceleration = objectAcceleration obj `plus` reactVector time obj
                }
       else obj
 
@@ -367,8 +365,28 @@ jumpPlayer vector =
   )
 
 
+flightPlayer :: Vector -> Action
+flightPlayer vector =
+  PlayerAction (\player _ ->
+    let currentControlVector = playerControlVector player
+        in player { playerControlVector = vector `plus` currentControlVector }
+  )
+
+
 zeroAction :: Action
 zeroAction = PlayerAction (\p _ -> p)
+
+
+stopPlayer :: Action
+stopPlayer =
+ PlayerAction (\player _ ->
+   let
+     obj = playerObject player
+   in player
+        { playerObject = obj { objectVelocity = zeroVector
+                             }
+        }
+ )
 
 
 setTextureByName :: String -> Texture -> Action

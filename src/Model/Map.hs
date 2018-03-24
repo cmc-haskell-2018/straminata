@@ -28,9 +28,9 @@ initialMap :: Map
 initialMap = foldr (\index acc -> addMapRow index acc) [] [0..(levelRowNumber initialLevel - 1)]
 
 addMapRow :: Int -> Map -> Map
-addMapRow row list = foldr (\index acc -> if even index
-                                          then addBasicMapTile (True, floorTexture) row index acc
-                                          else addBasicMapTile (False, backgroundTexture) row index acc)
+addMapRow row list = foldr (\col acc -> if row + col < 30
+                                        then addBasicMapTile (True, floorTexture) row col acc
+                                        else addBasicMapTile (False, transparentTexture) row col acc)
                            []
                            [0..(levelColNumber initialLevel - 1)] : list
 
@@ -40,8 +40,8 @@ addBasicMapTile :: (Bool, Texture)
                 -> Int
                 -> MapRow
                 -> MapRow
-addBasicMapTile (isSolid, texture) row col list =
-  ( if isSolid
+addBasicMapTile (isSolidTile, texture) row col list =
+  ( if isSolidTile
     then Solid appearance
     else Transparent appearance
   ) : list
@@ -50,8 +50,8 @@ addBasicMapTile (isSolid, texture) row col list =
         appearance =
           Appearance
             { appearanceBox =
-                ( Position (tileSize * (fi row), tileSize * (fi col))
-                , Position (tileSize * (fi row) + tileSize, tileSize * (fi col) + tileSize)
+                ( Position (tileSize * (fi col), tileSize * (fi row))
+                , Position (tileSize * (fi col) + tileSize, tileSize * (fi row) + tileSize)
                 )
             , appearanceActualSize = fst texture
             , appearancePicture = snd texture

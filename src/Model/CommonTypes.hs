@@ -4,8 +4,6 @@ module Model.CommonTypes where
 import Graphics.Gloss (Picture)
 import Graphics.Gloss.Interface.IO.Game (Key)
 
-import Util.Constants
-
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
 
@@ -28,9 +26,6 @@ instance (UnwrapablePair Dimensions) where
   unwrap (Dimensions t) = t
 
 type Rectangle = (Position, Position)
-
-infiniteRectangle :: Rectangle
-infiniteRectangle = (Position (-infinity, -infinity), Position(infinity, infinity))
 
 getDimensions :: Rectangle -> Dimensions
 getDimensions (Position (x1, y1), Position(x2, y2)) = Dimensions (x2 - x1, y2 - y1)
@@ -207,6 +202,9 @@ instance Eq Tile where
   (==) (Transparent _) (Solid _) = False
   (==) (Solid a1) (Solid a2) = appearanceBox a1 == appearanceBox a2
   (==) (Transparent a1) (Transparent a2) = appearanceBox a1 == appearanceBox a2
+
+isSolid (Solid _) = True
+isSolid (Transparent _) = False
 
 getAppearance :: Tile -> Appearance
 getAppearance (Solid app) = app
