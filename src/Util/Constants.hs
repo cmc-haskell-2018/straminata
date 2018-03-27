@@ -9,7 +9,7 @@ epsilon :: Float
 epsilon = 0.001
 
 g :: Float
-g = 980
+g = 1500
 
 gravitationalVector :: Vector
 gravitationalVector = Vector (0, - g)

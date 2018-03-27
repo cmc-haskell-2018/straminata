@@ -84,10 +84,6 @@ rectanglesDistanceDown ((Position(x11, y11)), (Position(x12, _))) ((Position(x21
 
 rectanglesDistanceUp :: Rectangle -> Rectangle -> Float
 rectanglesDistanceUp r1 r2 = rectanglesDistanceDown r2 r1
---((Position(x11, _)), (Position(x12, y12))) ((Position(x21, y21)), (Position(x22, _))) =
---  if (x11 <= x22 && x22 <= x12) || (x11 <= x21 && x21 <= x12) || (x21 <= x11 && x11 <= x22)
---  then y21 - y12
---  else (- infinity)
 
 
 rectanglesDistanceLeft :: Rectangle -> Rectangle -> Float
@@ -99,10 +95,6 @@ rectanglesDistanceLeft ((Position(x11, y11)), (Position(_, y12))) ((Position(_, 
 
 rectanglesDistanceRight :: Rectangle -> Rectangle -> Float
 rectanglesDistanceRight r1 r2 = rectanglesDistanceLeft r2 r1
---((Position(_, y11)), (Position(x12, y12))) ((Position(x21, y21)), (Position(_, y22))) =
---  if (y11 <= y22 && y22 <= y12) || (y11 <= y21 && y21 <= y12) || (y21 <= y11 && y11 <= y22)
---  then x21 - x12
---  else (- infinity)
 
 
 restrictMovingObject :: Object -> Float -> Game -> Object
@@ -131,7 +123,7 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
           y1 = snd . unwrap . fst $ objBox
           x2 = fst . unwrap . snd $ objBox
           y2 = snd . unwrap . snd $ objBox
-      in case defineDescartesFourth newVelocity of
+      in case defineDescartesQuadrant newVelocity of
            1 ->
              if (dUp >= 0) && (dUp <= (vy + epsilon))
              then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox

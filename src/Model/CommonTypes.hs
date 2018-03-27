@@ -87,8 +87,8 @@ angleCosBetweenVectors v1 v2 = (v1 `dotProduct` v2) / (vectorLength v1 * vectorL
 perpendicularVector :: Vector -> Vector
 perpendicularVector (Vector (x, y)) = Vector (y, -x)
 
-defineDescartesFourth :: Vector -> Int
-defineDescartesFourth (Vector (x, y)) =
+defineDescartesQuadrant :: Vector -> Int
+defineDescartesQuadrant (Vector (x, y)) =
   if x >= 0
   then if y >= 0 then 1 else 4
   else if y >= 0 then 2 else 3
@@ -203,8 +203,9 @@ instance Eq Tile where
   (==) (Solid a1) (Solid a2) = appearanceBox a1 == appearanceBox a2
   (==) (Transparent a1) (Transparent a2) = appearanceBox a1 == appearanceBox a2
 
+isSolid :: Tile -> Bool
 isSolid (Solid _) = True
-isSolid (Transparent _) = False
+isSolid _ = False
 
 getAppearance :: Tile -> Appearance
 getAppearance (Solid app) = app
