@@ -28,35 +28,33 @@ initialMap :: Map
 initialMap = foldr (\index acc -> addMapRow index acc) [] [0..(levelRowNumber initialLevel - 1)]
 
 addMapRow :: Int -> Map -> Map
-addMapRow row list = foldr (\index acc -> if even index
-                                          then addBasicMapTile (Solid, floorTexture) row index acc
-                                          else addBasicMapTile (Transparent, backgroundTexture) row index acc)
+addMapRow row list = foldr (\col acc -> if row + col < 30
+                                        then addBasicMapTile (True, floorTexture) row col acc
+                                        else addBasicMapTile (False, transparentTexture) row col acc)
                            []
                            [0..(levelColNumber initialLevel - 1)] : list
 
 -- | Adds basic map tile to map tile row. Basic map tile has a single rectangle as a collision box.
-addBasicMapTile :: (TileType, Texture)
-           -> Int
-           -> Int
-           -> MapRow
-           -> MapRow
-addBasicMapTile (typ, texture) row col list = let tileSize = levelTileSize initialLevel in
-  Tile
-  { tileType = typ
-  , tileObject = Object
-    { objectName = show (row, col) -- Should be unique
-    , objectVelocity = Vector (0, 0)
-    , objectPosition = Position (tileSize * (fi row), tileSize * (fi col))
-    , objectCollisionBoxes = [(Position (0, 0), Position (tileSize, tileSize))]
-    , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (tileSize, tileSize))
-      , appearanceActualSize = fst texture
-      , appearancePicture = snd texture
-      }
-    , objectOnUpdate = \_ -> id
-    , objectOnActivate = \_ _ -> id
-    }
-  } : list
-  where fi = fromIntegral
+addBasicMapTile :: (Bool, Texture)
+                -> Int
+                -> Int
+                -> MapRow
+                -> MapRow
+addBasicMapTile (isSolidTile, texture) row col list =
+  ( if isSolidTile
+    then Solid appearance
+    else Transparent appearance
+  ) : list
+  where tileSize = levelTileSize initialLevel
+        fi = fromIntegral
+        appearance =
+          Appearance
+            { appearanceBox =
+                ( Position (tileSize * (fi col), tileSize * (fi row))
+                , Position (tileSize * (fi col) + tileSize, tileSize * (fi row) + tileSize)
+                )
+            , appearanceActualSize = fst texture
+            , appearancePicture = snd texture
+            }
 
 

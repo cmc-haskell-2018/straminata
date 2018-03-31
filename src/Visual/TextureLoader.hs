@@ -16,3 +16,6 @@ luigiTexture = ((Dimensions (30, 40)), ) $! png "img/luigi.png"
 
 backgroundTexture :: Texture
 backgroundTexture = ((Dimensions (1920, 1080)), ) $! png "img/background.png"
+
+transparentTexture :: Texture
+transparentTexture = ((Dimensions (50, 50)), ) $! png "img/transparent.png"

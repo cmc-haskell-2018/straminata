@@ -11,7 +11,7 @@ import Visual.WindowConstants
 import Visual.Renderer
 import Visual.TextureLoader
 import Util.Common
-import Controls
+import Util.Controls
 
 -- | Starts game main loop.
 run :: IO ()
@@ -40,7 +40,7 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "mario"
-    , objectPosition = Position (0, 0)
+    , objectPosition = Position (0, 1500)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
@@ -50,20 +50,23 @@ playerInitialState = Player
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = activatePlayer "luigi"
     , objectOnActivate = \_ _ -> id
+    , objectMass = 0
+    , objectAcceleration = zeroVector
     }
   , playerControls =
-      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (10, 0))) (movePlayer (Vector (-10, 0)))
-      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-10, 0))) (movePlayer (Vector (10, 0)))
-      , bindAction (SpecialKey KeyUp) (movePlayer (Vector (0, 10))) (movePlayer (Vector (0, -10)))
-      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -10))) (movePlayer (Vector (0, 10)))
+      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
+      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
+      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 500))) (zeroAction)
+--      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
       ]
+  , playerControlVector = zeroVector
   }
 
 player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
     { objectName = "luigi"
-    , objectPosition = Position (0, 0)
+    , objectPosition = Position (200, 200)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
@@ -73,21 +76,24 @@ player2InitialState = Player
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = \_ -> id
     , objectOnActivate = resizeSelf
+    , objectMass = 0
+    , objectAcceleration = zeroVector
     }
   , playerControls =
-    [ bindAction (Char 'd') (movePlayer (Vector (20, 0))) (movePlayer (Vector (-20, 0)))
-    , bindAction (Char 'a') (movePlayer (Vector (-20, 0))) (movePlayer (Vector (20, 0)))
-    , bindAction (Char 'w') (movePlayer (Vector (0, 20))) (movePlayer (Vector (0, -20)))
-    , bindAction (Char 's') (movePlayer (Vector (0, -20))) (movePlayer (Vector (0, 20)))
-    , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
-    ]
+      [ bindAction (Char 'd') (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
+      , bindAction (Char 'a') (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
+      , bindAction (Char 'w') (jumpPlayer (Vector (0, 500))) (zeroAction)
+--      , bindAction (Char 's') (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
+      , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
+      ]
+  , playerControlVector = zeroVector
   }
 
 -- | Advances game state one step further.
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame time = updateCamera . moveObjects time . movePlayers time . updateObjects
+advanceGame time = updateCamera . updatePhysics time . updateObjects
 
 
 activatePlayer :: String -> Object -> Game -> Game
@@ -121,27 +127,3 @@ resizeSelf state self game = game
             , objectCollisionBoxes = [rect]
             }
           }
-
-
--- temporary
-updatePlayers :: Game -> Game
-updatePlayers game = let playerList = gamePlayers game
-                         player1 = (playerList !! 0)
-                         player2 = (playerList !! 1)
-                         object1 = playerObject player1
-                         object2 = playerObject player2
-                         playersColliding = objectsCollide object1 object2
-                         recolorPlayer player = player
-                                                { playerObject = (playerObject player)
-                                                  { objectAppearance = (objectAppearance . playerObject $ player)
-                                                    { appearancePicture =
-                                                      (if playersColliding
-                                                      then Color red
-                                                      else Color blue)
-                                                        (Polygon $ formPath
-                                                          (appearanceBox . objectAppearance . playerObject $ player)
-                                                        )
-                                                    }
-                                                  }
-                                                }
-                     in game { gamePlayers = map recolorPlayer playerList }

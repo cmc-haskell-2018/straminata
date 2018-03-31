@@ -21,7 +21,7 @@ picture game = let translate' = uncurry Translate . unwrap . objectPosition
                    picture' = \o -> translate' o $ objectToPicture o
                in Pictures
                  $ (Scale 5 5 . appearancePicture . levelBackground . gameLevel $ game)
-                   : map (picture' . tileObject) (concat . levelMap . gameLevel $ game)
+                   : map (tileToPicture) (concat . levelMap . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)
                    ++ map picture' (levelObjects . gameLevel $ game)
 
@@ -45,12 +45,22 @@ positionPicture camera pic = Scale ratio ratio (Translate x y pic)
         y = snd offset
 
 
+appearanceToPicture :: Appearance -> Picture
+appearanceToPicture app = (uncurry Scale $ computeScale (appearanceBox app) (appearanceActualSize app))
+                          (appearancePicture app)
+
 
 objectToPicture :: Object -> Picture
-objectToPicture obj = translate' obj $ scale' obj $ appearancePicture . objectAppearance $ obj
-  where scale' o = uncurry Scale $ computeScale (appearanceBox . objectAppearance $ o)
-                                                (appearanceActualSize . objectAppearance $ o)
-        getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
+objectToPicture obj = translate' obj $ appearanceToPicture . objectAppearance $ obj
+  where getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
                             (positionToVector . snd . appearanceBox . objectAppearance $ o)
                       ) `divByNumber` 2
+        translate' = uncurry Translate . unwrap . getOffset
+
+
+tileToPicture :: Tile -> Picture
+tileToPicture tile = (translate' $ getAppearance tile) $ appearanceToPicture . getAppearance $ tile
+  where getOffset app = (plus (positionToVector . fst . appearanceBox $ app)
+                              (positionToVector . snd . appearanceBox $ app)
+                        ) `divByNumber` 2
         translate' = uncurry Translate . unwrap . getOffset

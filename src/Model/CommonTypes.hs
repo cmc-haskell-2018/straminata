@@ -2,7 +2,7 @@
 module Model.CommonTypes where
 
 import Graphics.Gloss (Picture)
-import Graphics.Gloss.Interface.IO.Game (Key, KeyState(..))
+import Graphics.Gloss.Interface.IO.Game (Key)
 
 class UnwrapablePair a where
   unwrap :: a -> (Float, Float)
@@ -27,6 +27,11 @@ instance (UnwrapablePair Dimensions) where
 
 type Rectangle = (Position, Position)
 
+getDimensions :: Rectangle -> Dimensions
+getDimensions (Position (x1, y1), Position(x2, y2)) = Dimensions (x2 - x1, y2 - y1)
+
+type Line = (Position, Position)
+
 type Bounds = Rectangle
 
 newtype Vector = Vector (Float, Float)
@@ -35,8 +40,17 @@ newtype Vector = Vector (Float, Float)
 instance (UnwrapablePair Vector) where
   unwrap (Vector t) = t
 
+getY :: Vector -> Float
+getY (Vector (_, y)) = y
+
+getX :: Vector -> Float
+getX (Vector (x, _)) = x
+
 plus :: Vector -> Vector -> Vector
 plus (Vector (x1, y1)) (Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
+
+subtractVector :: Vector -> Vector -> Vector
+subtractVector v1 v2 = v1 `plus` invertVector v2
 
 divByNumber :: Vector -> Float -> Vector
 divByNumber _ 0 = Vector (0, 0)
@@ -48,6 +62,39 @@ mulByNumber (Vector (x, y)) number = Vector (x * number, y * number)
 
 invertVector :: Vector -> Vector
 invertVector (Vector (x, y)) = Vector ((- x), (- y))
+
+vectorLength :: Vector -> Float
+vectorLength (Vector (x, y)) = sqrt (x * x + y * y)
+
+normalizeVector :: Vector -> Vector
+normalizeVector vector = vector `divByNumber` vectorLength vector
+
+takeShortest :: Vector -> Vector -> Vector
+takeShortest v1 v2 = if (vectorLength v1) > (vectorLength v2)
+                     then v2
+                     else v1
+
+projectVector :: Vector -> Vector -> Vector
+projectVector _ (Vector (0, 0)) = zeroVector
+projectVector v1 v2 = v2 `mulByNumber` ((v1 `dotProduct` v2) / (v2 `dotProduct` v2))
+
+dotProduct :: Vector -> Vector -> Float
+dotProduct (Vector (x1, y1)) (Vector (x2, y2)) = x1 * x2 + y1 * y2
+
+angleCosBetweenVectors :: Vector -> Vector -> Float
+angleCosBetweenVectors v1 v2 = (v1 `dotProduct` v2) / (vectorLength v1 * vectorLength v2)
+
+perpendicularVector :: Vector -> Vector
+perpendicularVector (Vector (x, y)) = Vector (y, -x)
+
+defineDescartesQuadrant :: Vector -> Int
+defineDescartesQuadrant (Vector (x, y)) =
+  if x >= 0
+  then if y >= 0 then 1 else 4
+  else if y >= 0 then 2 else 3
+
+zeroVector :: Vector
+zeroVector = Vector (0, 0)
 
 type Time = Float
 
@@ -72,7 +119,12 @@ data Object = Object
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   , objectOnUpdate :: Object -> Game -> Game
   , objectOnActivate :: Bool -> Object -> Game -> Game
+  , objectMass :: Float -- ^ Mass. Can be infinite (1/0)
+  , objectAcceleration :: Vector
   }
+
+instance Eq Object where
+  (==) o1 o2 = objectName o1 == objectName o2
 
 instance Show Object where
   show object = "Object { objectName = " ++ show (objectName object)
@@ -83,12 +135,12 @@ instance Show Object where
                 ++ "}"
 
 
-data Action = PlayerAction (Player -> Player)
+data Action = PlayerAction (Player -> Game -> Player)
             | GameAction (Player -> Game -> Game)
 
-performOnPlayer :: Action -> Player -> Player
-performOnPlayer (PlayerAction f) player = f player
-performOnPlayer _ player = player
+performOnPlayer :: Action -> Player -> Game -> Player
+performOnPlayer (PlayerAction f) player game = f player game
+performOnPlayer _ player _ = player
 
 performOnGame :: Action -> Player -> Game -> Game
 performOnGame (GameAction f) player game = f player game
@@ -103,6 +155,7 @@ type PlayerControls = [KeyPress]
 data Player = Player
   { playerObject :: Object
   , playerControls :: PlayerControls
+  , playerControlVector :: Vector
   }
 
 instance Show Player where
@@ -141,12 +194,21 @@ type Map = [MapRow]
 
 type MapRow = [Tile]
 
-data TileType = Solid | Transparent
+data Tile = Solid Appearance | Transparent Appearance
   deriving (Show)
 
-data Tile = Tile
-  { tileType :: TileType
-  , tileObject :: Object
-  } deriving (Show)
+instance Eq Tile where
+  (==) (Solid _) (Transparent _) = False
+  (==) (Transparent _) (Solid _) = False
+  (==) (Solid a1) (Solid a2) = appearanceBox a1 == appearanceBox a2
+  (==) (Transparent a1) (Transparent a2) = appearanceBox a1 == appearanceBox a2
+
+isSolid :: Tile -> Bool
+isSolid (Solid _) = True
+isSolid _ = False
+
+getAppearance :: Tile -> Appearance
+getAppearance (Solid app) = app
+getAppearance (Transparent app) = app
 
 type Texture = (Dimensions, Picture)
