@@ -6,7 +6,7 @@ import Visual.WindowConstants
 import Util.Constants
 
 frameWidth :: Float
-frameWidth = 300
+frameWidth = 5 * level1TileSize
 
 cosToSin :: Float -> Float
 cosToSin = sin . acos
@@ -220,7 +220,7 @@ updateCamera game = game
     boundaryDimensions = (rect !! 2 - rect !! 0, rect !! 3 - rect !! 1)
     ratio = minimum [ (fromIntegral . fst $ initialWindowDimensions) / (fst boundaryDimensions)
                     , (fromIntegral . snd $ initialWindowDimensions) / (snd boundaryDimensions)
-                    , 1
+                    , 6 - level1TileSize / 10
                     ]
 
 

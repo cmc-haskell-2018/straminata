@@ -5,19 +5,17 @@ import Control.Arrow ((***))
 
 import Model.CommonTypes
 import Model.Levels
+import Util.Constants
 import Visual.TextureLoader
 import Visual.WindowConstants
-
-initialObjects :: [Object]
-initialObjects = objects1
 
 initialLevel :: Level
 initialLevel = Level
   { levelMap = level1
   , levelColNumber = length level1
   , levelRowNumber = length (head level1)
-  , levelTileSize = 50
-  , levelObjects = initialObjects
+  , levelTileSize = level1TileSize
+  , levelObjects = objects1
   , levelBackground = Appearance
     { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
     , appearancePicture = snd backgroundTexture

@@ -6,6 +6,7 @@ import Data.Tuple(swap)
 
 import Model.CommonTypes
 import Model.Objects
+import Util.Constants
 import Visual.TextureLoader
 
 level1Pattern :: [String]
@@ -36,7 +37,7 @@ level1Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t w t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t b1 t d1 t t t t t t t t w t t t t t w"
-  , "w w t t t w t t t t t t w t w t t t t t t t t w t t t t t w"
+  , "w w t t t w t t t t t t w t w t t t t t t t w t t t t t t w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
@@ -75,7 +76,7 @@ tableIndex e es = swap . withIndex $ filter (\xs -> any (== e) . words $ snd xs)
   where withIndex [(index, xs)] = (index, (fromJust $ elemIndex e $ words xs) + 1)
 
 level1 :: Map
-level1 = generate 50 $ reverse level1Pattern
+level1 = generate level1TileSize $ reverse level1Pattern
 
 objects1 :: [Object]
-objects1 = generateObjects 50 $ reverse level1Pattern
+objects1 = generateObjects level1TileSize $ reverse level1Pattern

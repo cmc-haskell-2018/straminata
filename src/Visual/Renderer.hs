@@ -2,8 +2,9 @@ module Visual.Renderer where
 
 import Graphics.Gloss
 
-import Visual.WindowConstants
 import Model.CommonTypes
+import Util.Constants
+import Visual.WindowConstants
 
 -- | Initial window state.
 newWindow :: Display
@@ -20,7 +21,7 @@ picture :: Game -> Picture
 picture game = let translate' = uncurry Translate . unwrap . objectPosition
                    picture' = \o -> translate' o $ objectToPicture o
                in Pictures
-                 $ (Scale 5 5 . appearancePicture . levelBackground . gameLevel $ game)
+                 $ (Scale (level1TileSize / 10) (level1TileSize / 10) . appearancePicture . levelBackground . gameLevel $ game)
                    : map (tileToPicture) (concat . levelMap . gameLevel $ game)
                    ++ map picture' (levelObjects . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)

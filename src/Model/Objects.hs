@@ -1,8 +1,9 @@
 module Model.Objects where
 
 import Model.CommonTypes
-import Visual.TextureLoader
 import Util.Common
+import Util.Constants
+import Visual.TextureLoader
 
 
 defaultObject :: Object
@@ -26,9 +27,9 @@ defaultObject = Object
 
 finishButton :: Object
 finishButton = defaultObject
-  { objectCollisionBoxes = [(Position (0, 0), Position (50, 10))]
+  { objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, 0), Position (50, 10))
+    { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
     , appearanceActualSize = fst doorOpenTexture
     , appearancePicture = snd doorOpenTexture
     }
@@ -42,9 +43,9 @@ quit = undefined
 
 buttonObject :: Object
 buttonObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, 0), Position (50, 10))]
+  { objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, 0), Position (50, 10))
+    { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
     , appearanceActualSize = fst buttonTexture
     , appearancePicture = snd buttonTexture
     }
@@ -54,9 +55,9 @@ buttonObject = defaultObject
 
 doorObject :: Object
 doorObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, -50), Position (50, 150))]
+  { objectCollisionBoxes = [(Position (0, -level1TileSize), Position (level1TileSize, 3 * level1TileSize))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, -50), Position (50, 150))
+    { appearanceBox = (Position (0, -level1TileSize), Position (level1TileSize, 3 * level1TileSize))
     , appearanceActualSize = fst doorCloseTexture
     , appearancePicture = snd doorCloseTexture
     }
