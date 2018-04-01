@@ -6,7 +6,7 @@ import Visual.WindowConstants
 import Util.Constants
 
 frameWidth :: Float
-frameWidth = 25
+frameWidth = 100
 
 cosToSin :: Float -> Float
 cosToSin = sin . acos

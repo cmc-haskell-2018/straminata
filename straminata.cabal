@@ -18,7 +18,7 @@ library
   exposed-modules:     Straminata
                      , Model.CommonTypes
                      , Model.Map
-                     , Model.Objects
+                     , Model.Levels
                      , Util.Common
                      , Util.Constants
                      , Util.Controls

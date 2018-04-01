@@ -82,9 +82,9 @@ player2InitialState = Player
   { playerObject = Object
     { objectName = "luigi"
     , objectPosition = Position (0, 1500)
-    , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
+    , objectCollisionBoxes = [(Position (40, 0), Position (60, 80))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (60, 80))
+      { appearanceBox = (Position (40, 0), Position (60, 80))
       , appearanceActualSize = fst luigiTexture
       , appearancePicture = snd luigiTexture
       }
@@ -133,7 +133,7 @@ resizeSelf state self game = game
   }
   where isSelf player = (objectName . playerObject $ player) == (objectName self)
         enlarge = changeSize (Position (-30, -40), Position (90, 120))
-        reduce = changeSize (Position (0, 0), Position (60, 80))
+        reduce = changeSize (Position (40, 0), Position (60, 80))
         changeSize rect player = player
           { playerObject = (playerObject player)
             { objectAppearance = (objectAppearance . playerObject $ player)

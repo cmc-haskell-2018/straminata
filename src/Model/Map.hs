@@ -4,6 +4,7 @@ import Control.Monad (join)
 import Control.Arrow ((***))
 
 import Model.CommonTypes
+import Model.Levels
 import Visual.TextureLoader
 import Visual.WindowConstants
 
@@ -12,9 +13,9 @@ initialObjects = []
 
 initialLevel :: Level
 initialLevel = Level
-  { levelMap = initialMap
-  , levelColNumber = 30
-  , levelRowNumber = 40
+  { levelMap = level1
+  , levelColNumber = length level1
+  , levelRowNumber = length (head level1)
   , levelTileSize = 50
   , levelObjects = initialObjects
   , levelBackground = Appearance
