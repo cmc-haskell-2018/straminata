@@ -100,6 +100,7 @@ player2InitialState = Player
       , bindAction (Char 'a') (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
       , bindAction (Char 'w') (jumpPlayer (Vector (0, 500))) (zeroAction)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
+      , bindAction (Char 'q') (activateObject False) (zeroAction)
       ]
   , playerControlVector = zeroVector
   }
