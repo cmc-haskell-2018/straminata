@@ -35,37 +35,38 @@ buttonObject = defaultObject
   , objectAffectedByGravity = False
   }
 
--- objectOnActivate :: Bool -> Object -> Game -> Game
 
 doorObject :: Object
 doorObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, 0), Position (32, 128))]
+  { objectCollisionBoxes = [(Position (0, -32), Position (32, 96))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, 0), Position (32, 128))
-    , appearanceActualSize = fst buttonTexture
-    , appearancePicture = snd buttonTexture
+    { appearanceBox = (Position (0, -32), Position (32, 96))
+    , appearanceActualSize = fst doorCloseTexture
+    , appearancePicture = snd doorCloseTexture
     }
   , objectAffectedByGravity = False
   }
 
 
 openDoorFn :: String -> Bool -> Object -> Game -> Game
-openDoorFn doorName state self game = activateDoor
-  ( game { gameLevel = level
-             { levelObjects =
-                 map (\object ->
-                       if objectName object == objectName self
-                       then if state
-                            then changeTexture buttonPressTexture object
-                            else changeTexture buttonTexture object
-                       else object
-                     ) objects
-             }
-         }
-  )
+openDoorFn doorName state self game =
+  game { gameLevel = level
+           { levelObjects =
+               map (\object ->
+                     if objectName object == objectName self
+                     then if state
+                          then changeTexture buttonPressTexture object
+                          else changeTexture buttonTexture object
+                     else if objectName object == doorName
+                          then if state
+                               then changeTexture doorOpenTexture object
+                               else changeTexture doorCloseTexture object
+                          else object
+                   ) objects
+           }
+       }
   where level = gameLevel game
         objects = levelObjects level
-        activateDoor game' = foldr (\obj -> (objectOnActivate obj) state obj) game' (filter ((== doorName) . objectName) objects)
 
 
 bindButtonAndDoor :: String -> Object -> Object -> [Object]

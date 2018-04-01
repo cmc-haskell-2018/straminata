@@ -27,7 +27,7 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game
-  { gamePlayers = [playerInitialState, player2InitialState]
+  { gamePlayers = [{-playerInitialState, -}player2InitialState]
   , gameLevel = initialLevel
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
@@ -99,6 +99,7 @@ player2InitialState = Player
       [ bindAction (Char 'd') (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
       , bindAction (Char 'a') (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
       , bindAction (Char 'w') (jumpPlayer (Vector (0, 500))) (zeroAction)
+      , bindAction (Char 'e') (activateObject True) (zeroAction)
       ]
   , playerControlVector = zeroVector
   }

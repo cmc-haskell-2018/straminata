@@ -5,11 +5,14 @@ import Control.Arrow ((***))
 
 import Model.CommonTypes
 import Model.Levels
+import Model.Objects
 import Visual.TextureLoader
 import Visual.WindowConstants
 
 initialObjects :: [Object]
-initialObjects = []
+initialObjects = [] ++ bindButtonAndDoor "1"
+                                         (buttonObject {objectPosition = Position (100, 100)})
+                                         (doorObject {objectPosition = Position (300, 100)})
 
 initialLevel :: Level
 initialLevel = Level
