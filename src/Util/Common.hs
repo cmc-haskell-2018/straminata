@@ -8,9 +8,6 @@ import Util.Constants
 frameWidth :: Float
 frameWidth = 5 * level1TileSize
 
-cosToSin :: Float -> Float
-cosToSin = sin . acos
-
 
 -- | Check if two objects collide.
 objectsCollide :: Object -> Object -> Bool
@@ -47,18 +44,14 @@ collide (Position (x11, y11), Position (x12, y12))
         (Position (x21, y21), Position (x22, y22)) = x11 <= x22 && x12 >= x21 && y11 <= y22 && y12 >= y21
 
 
-isOnSameSide :: Line -> (Position, Position) -> Bool
-isOnSameSide (start, end) (point1, point2) =
-  let line = positionToVector end `subtractVector` positionToVector start
-      vector1 = positionToVector point1
-      vector2 = positionToVector point2
-  in (cosToSin $ angleCosBetweenVectors line vector1) `sameSign` (cosToSin $ angleCosBetweenVectors line vector2)
-  where sameSign f1 f2 = (f1 >= 0 && f2 >= 0) || (f1 <= 0 && f2 <= 0)
-
-
 -- | Checks if line collides with another line.
 linesCollide :: Line -> Line -> Bool
-linesCollide line1 line2 = (collide line1 line2) && (not $ isOnSameSide line1 line2)
+linesCollide (Position (x11, y11), Position (x12, y12)) (Position (x21, y21), Position (x22, y22)) =
+  let a = (x22 - x21) * (y11 - y21) - (y22 - y21) * (x11 - x21) > 0
+      b = (x22 - x21) * (y12 - y21) - (y22 - y21) * (x12 - x21) > 0
+      c = (x12 - x11) * (y21 - y11) - (y12 - y11) * (x21 - x11) > 0
+      d = (x12 - x11) * (y22 - y11) - (y12 - y11) * (x22 - x11) > 0
+  in a /= b && c /= d
 
 
 -- | Checks if object collide with map tile.
