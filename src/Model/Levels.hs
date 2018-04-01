@@ -30,7 +30,7 @@ level1Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t w w w t t t w"
+  , "w q t t t t t t t t t t t t t t t t t t t t t w w w t t t w"
   , "w w t w t w t w t w t w t w t w t w t w t w t t t t t t w w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t w t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t w t t w"
@@ -56,8 +56,8 @@ generate size pattern = map transferLine $ zip [1..] pattern
           , appearancePicture = snd transparentTexture
           }
 
-generateDoors :: Float -> [String] -> [Object]
-generateDoors size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1..] pattern
+generateObjects :: Float -> [String] -> [Object]
+generateObjects size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1..] pattern
   where transferLine (y, line) = foldr (
           \x acc -> let t = transferSymbol y x in if isJust t then acc ++ fromJust t else acc)
           [] $ zip [1..] (words line)
@@ -66,6 +66,7 @@ generateDoors size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1
           in Just $ bindButtonAndDoor n
                                       (buttonObject {objectPosition = Position (x * size, y * size)})
                                       (doorObject {objectPosition = Position ( fromIntegral (fst coord) * size, fromIntegral (snd coord) * size)})
+        transferSymbol y (x, "q") = Just $ [finishButton {objectPosition = Position (x * size, y * size)}]
         transferSymbol _ _ = Nothing
 
 
@@ -77,4 +78,4 @@ level1 :: Map
 level1 = generate 50 $ reverse level1Pattern
 
 objects1 :: [Object]
-objects1 = generateDoors 50 $ reverse level1Pattern
+objects1 = generateObjects 50 $ reverse level1Pattern

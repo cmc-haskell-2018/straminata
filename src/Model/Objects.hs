@@ -24,6 +24,22 @@ defaultObject = Object
   }
 
 
+finishButton :: Object
+finishButton = defaultObject
+  { objectCollisionBoxes = [(Position (0, 0), Position (50, 10))]
+  , objectAppearance = Appearance
+    { appearanceBox = (Position (0, 0), Position (50, 10))
+    , appearanceActualSize = fst doorOpenTexture
+    , appearancePicture = snd doorOpenTexture
+    }
+  , objectAffectedByGravity = False
+  , objectOnActivate = quit
+  }
+
+quit :: Bool -> Object -> Game -> Game
+quit = undefined
+
+
 buttonObject :: Object
 buttonObject = defaultObject
   { objectCollisionBoxes = [(Position (0, 0), Position (50, 10))]
