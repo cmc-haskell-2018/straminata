@@ -59,10 +59,10 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "mario"
-    , objectPosition = Position (0, 900)
-    , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
+    , objectPosition = Position (100, 400)
+    , objectCollisionBoxes = [(Position (40, 0), Position (60, 80))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (60, 80))
+      { appearanceBox = (Position (40, 0), Position (60, 80))
       , appearanceActualSize = fst marioTexture
       , appearancePicture = snd marioTexture
       }
@@ -81,7 +81,7 @@ player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
     { objectName = "luigi"
-    , objectPosition = Position (0, 900)
+    , objectPosition = Position (200, 400)
     , objectCollisionBoxes = [(Position (40, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (40, 0), Position (60, 80))
@@ -90,7 +90,7 @@ player2InitialState = Player
       }
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = \_ -> id
-    , objectOnActivate = \_ _ -> id -- resizeSelf
+    , objectOnActivate = resizeSelf
     , objectMass = 0
     , objectAcceleration = zeroVector
     , objectAffectedByGravity = True
