@@ -315,7 +315,10 @@ addControlVector obj con =
 
 
 updateAcceleration :: Float -> Game -> Object -> Object
-updateAcceleration time game object = addReactElement . addGravitationalElement $ object
+updateAcceleration time game object =
+  if objectAffectedByGravity object
+  then addReactElement . addGravitationalElement $ object
+  else object
   where
     addGravitationalElement obj =
       obj { objectAcceleration = objectAcceleration obj `plus` gravitationalVector
@@ -360,13 +363,52 @@ jumpPlayer vector =
 flightPlayer :: Vector -> Action
 flightPlayer vector =
   PlayerAction (\player _ ->
-    let currentControlVector = playerControlVector player
-        in player { playerControlVector = vector `plus` currentControlVector }
+    let obj = playerObject player
+        vel = objectVelocity obj
+        projVel = projectVector vel vector
+    in player { playerObject =
+         obj {
+           objectVelocity =
+             if vectorLength vector < vectorLength projVel
+             then vel
+             else vel `subtractVector` projVel `plus` vector
+         }
+       }
+  )
+
+
+stopFlightPlayer :: Vector -> Action
+stopFlightPlayer vector =
+  PlayerAction (\player _ ->
+    let obj = playerObject player
+        vel = objectVelocity obj
+        projVel = projectVector vel vector
+    in player { playerObject =
+         obj {
+           objectVelocity =
+             if vectorLength vector > vectorLength projVel
+             then vel
+             else vel `subtractVector` vector
+         }
+       }
   )
 
 
 zeroAction :: Action
 zeroAction = PlayerAction (\p _ -> p)
+
+
+switchControlsAction :: PlayerControls -> Action
+switchControlsAction controls = PlayerAction (\player _ -> player { playerControls = controls })
+
+
+setAffectionByGravity :: Bool -> Action
+setAffectionByGravity val =
+  PlayerAction (\player _ ->
+    player { playerObject =
+      (playerObject player) { objectAffectedByGravity = val }
+    }
+  )
 
 
 stopPlayer :: Action

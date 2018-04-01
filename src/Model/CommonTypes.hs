@@ -121,6 +121,7 @@ data Object = Object
   , objectOnActivate :: Bool -> Object -> Game -> Game
   , objectMass :: Float -- ^ Mass. Can be infinite (1/0)
   , objectAcceleration :: Vector
+  , objectAffectedByGravity :: Bool
   }
 
 instance Eq Object where

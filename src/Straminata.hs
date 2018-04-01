@@ -35,6 +35,25 @@ initialWorld = Game
     }
   }
 
+marioControls1 :: PlayerControls
+marioControls1 =
+  [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
+  , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
+  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 500))) (zeroAction)
+  , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
+  ]
+
+marioControls2 :: PlayerControls
+marioControls2 =
+  [ bindAction (SpecialKey KeyRight) (flightPlayer (Vector (500, 0))) (stopFlightPlayer (Vector (500, 0)))
+  , bindAction (SpecialKey KeyLeft) (flightPlayer (Vector (-500, 0))) (stopFlightPlayer (Vector (-500, 0)))
+  , bindAction (SpecialKey KeyUp) (flightPlayer (Vector (0, 500))) (stopFlightPlayer (Vector (0, 500)))
+  , bindAction (SpecialKey KeyDown) (flightPlayer (Vector (0, -500))) (stopFlightPlayer (Vector (0, -500)))
+  , bindAction (SpecialKey KeySpace) (stopPlayer) (zeroAction)
+  , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction marioControls1)
+  ]
+
+
 -- todo: get from file
 playerInitialState :: Player
 playerInitialState = Player
@@ -52,13 +71,9 @@ playerInitialState = Player
     , objectOnActivate = \_ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
+    , objectAffectedByGravity = True
     }
-  , playerControls =
-      [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
-      , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
-      , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 500))) (zeroAction)
---      , bindAction (SpecialKey KeyDown) (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
-      ]
+  , playerControls = marioControls1
   , playerControlVector = zeroVector
   }
 
@@ -66,7 +81,7 @@ player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
     { objectName = "luigi"
-    , objectPosition = Position (200, 200)
+    , objectPosition = Position (0, 1500)
     , objectCollisionBoxes = [(Position (0, 0), Position (60, 80))]
     , objectAppearance = Appearance
       { appearanceBox = (Position (0, 0), Position (60, 80))
@@ -78,12 +93,12 @@ player2InitialState = Player
     , objectOnActivate = resizeSelf
     , objectMass = 0
     , objectAcceleration = zeroVector
+    , objectAffectedByGravity = True
     }
   , playerControls =
       [ bindAction (Char 'd') (movePlayer (Vector (200, 0))) (movePlayer (Vector (-200, 0)))
       , bindAction (Char 'a') (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
       , bindAction (Char 'w') (jumpPlayer (Vector (0, 500))) (zeroAction)
---      , bindAction (Char 's') (movePlayer (Vector (0, -50))) (movePlayer (Vector (0, 50)))
       , bindAction (Char 'e') (setTextureByName "luigi" marioTexture) (setTextureByName "luigi" luigiTexture)
       ]
   , playerControlVector = zeroVector
