@@ -27,7 +27,7 @@ run = play
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game
-  { gamePlayers = [{-playerInitialState, -}player2InitialState]
+  { gamePlayers = [playerInitialState, player2InitialState]
   , gameLevel = initialLevel
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
@@ -41,6 +41,8 @@ marioControls1 =
   , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-200, 0))) (movePlayer (Vector (200, 0)))
   , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, 500))) (zeroAction)
   , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
+  , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
+  , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
 
 marioControls2 :: PlayerControls
@@ -51,6 +53,8 @@ marioControls2 =
   , bindAction (SpecialKey KeyDown) (flightPlayer (Vector (0, -500))) (stopFlightPlayer (Vector (0, -500)))
   , bindAction (SpecialKey KeySpace) (stopPlayer) (zeroAction)
   , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction marioControls1)
+  , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
+  , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
 
 
