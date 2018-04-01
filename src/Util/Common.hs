@@ -440,3 +440,12 @@ setTextureByName name texture =
          }
   )
   where isTarget player = (objectName . playerObject $ player) == name
+
+
+changeTexture :: Texture -> Object -> Object
+changeTexture texture object = object
+  { objectAppearance = (objectAppearance object)
+      { appearanceActualSize = fst texture
+      , appearancePicture = snd texture
+      }
+  }

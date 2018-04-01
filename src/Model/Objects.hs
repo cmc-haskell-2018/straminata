@@ -34,7 +34,7 @@ buttonObject = defaultObject
   , objectAffectedByGravity = False
   }
 
-objectOnActivate :: Bool -> Object -> Game -> Game
+-- objectOnActivate :: Bool -> Object -> Game -> Game
 
 doorObject :: Object
 doorObject = defaultObject
@@ -45,29 +45,25 @@ doorObject = defaultObject
     , appearancePicture = snd buttonTexture
     }
   , objectAffectedByGravity = False
-  , objectOnActivate =
   }
 
-  openDoorFn :: Bool -> Object -> Game -> Game
-  openDoorFn state self game = game
-    { gamePlayers = map (\player -> if isSelf player
-                                    then if state
-                                         then enlarge player
-                                         else reduce player
-                                    else player
-                        ) (gamePlayers game)
-    }
-    where isSelf player = (objectName . playerObject $ player) == (objectName self)
-          enlarge = changeSize (Position (-30, -40), Position (90, 120))
-          reduce = changeSize (Position (40, 0), Position (60, 80))
-          changeSize rect player = player
-            { playerObject = (playerObject player)
-              { objectAppearance = (objectAppearance . playerObject $ player)
-                { appearanceBox = rect
-                }
-              , objectCollisionBoxes = [rect]
-              }
-            }
+
+openDoorFn :: String -> Bool -> Object -> Game -> Game
+openDoorFn doorName state self game = activateDoor
+  ( game { gameLevel = level
+             { levelObjects =
+                 map (\object ->
+                       if objectName object == objectName self
+                       then if state changeTexture buttonPressTexture object
+                            then changeTexture buttonPressTexture object
+                            else changeTexture buttonTexture object
+                     ) objects
+             }
+         }
+  )
+  where level = gameLevel game
+        objects = levelObjects level
+        activateDoor game' = foldr (\obj -> objectOnActivate state obj $ obj) game' (filter ((== doorName) . objectName) objects)
 
 
 bindButtonAndDoor :: String -> Object -> Object -> [Object]

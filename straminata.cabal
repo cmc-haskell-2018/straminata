@@ -19,6 +19,7 @@ library
                      , Model.CommonTypes
                      , Model.Map
                      , Model.Levels
+                     , Model.Objects
                      , Util.Common
                      , Util.Constants
                      , Util.Controls
