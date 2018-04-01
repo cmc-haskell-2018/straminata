@@ -30,15 +30,15 @@ level1Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t w w w t t t w"
+  , "w w t w t w t w t w t w t w t w t w t w t w t t t t t t w w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t w t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t w t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t d3 t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t b3 t t t d2 t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w b1 t t t d1 b2 t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t b1 t d1 t t t t t t t t w t t t t t w"
+  , "w w t t t w t t t t t t w t w t t t t t t t t w t t t t t w"
+  , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
+  , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   ]
 
@@ -71,7 +71,7 @@ generateDoors size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1
 
 tableIndex :: String -> [String] -> (Int, Int)
 tableIndex e es = swap . withIndex $ filter (\xs -> any (== e) . words $ snd xs) $ zip [1 :: Int ..] es
-  where withIndex [(index, xs)] = (index, fromJust $ elemIndex e $ words xs)
+  where withIndex [(index, xs)] = (index, (fromJust $ elemIndex e $ words xs) + 1)
 
 level1 :: Map
 level1 = generate 50 $ reverse level1Pattern

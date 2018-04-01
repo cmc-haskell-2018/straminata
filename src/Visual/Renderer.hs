@@ -22,8 +22,8 @@ picture game = let translate' = uncurry Translate . unwrap . objectPosition
                in Pictures
                  $ (Scale 5 5 . appearancePicture . levelBackground . gameLevel $ game)
                    : map (tileToPicture) (concat . levelMap . gameLevel $ game)
-                   ++ map (picture' . playerObject) (gamePlayers game)
                    ++ map picture' (levelObjects . gameLevel $ game)
+                   ++ map (picture' . playerObject) (gamePlayers game)
 
 
 -- | Creates a path – a sequential list of polygon vertices.

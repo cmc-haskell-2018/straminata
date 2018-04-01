@@ -26,9 +26,9 @@ defaultObject = Object
 
 buttonObject :: Object
 buttonObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, 0), Position (48, 10))]
+  { objectCollisionBoxes = [(Position (0, 0), Position (50, 10))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, 0), Position (48, 10))
+    { appearanceBox = (Position (0, 0), Position (50, 10))
     , appearanceActualSize = fst buttonTexture
     , appearancePicture = snd buttonTexture
     }
@@ -38,9 +38,9 @@ buttonObject = defaultObject
 
 doorObject :: Object
 doorObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, -32), Position (32, 96))]
+  { objectCollisionBoxes = [(Position (0, -50), Position (50, 150))]
   , objectAppearance = Appearance
-    { appearanceBox = (Position (0, -32), Position (32, 96))
+    { appearanceBox = (Position (0, -50), Position (50, 150))
     , appearanceActualSize = fst doorCloseTexture
     , appearancePicture = snd doorCloseTexture
     }
