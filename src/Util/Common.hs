@@ -78,16 +78,18 @@ namedUpdateFunctions = [("onUpdateMario", activatePlayer "luigi")]
 namedActivateFunctions :: [NamedActivateFunction]
 namedActivateFunctions = [("resizeSelf", resizeSelf)]
 
-lookUpWithDefaultFunction :: v -> [(k, v)] -> v
-lookUpWithDefaultFunction x [] = x
-lookUpWithDefaultFunction _ (x:_) = snd x
+lookUpWithDefaultFunction :: (Eq k) => v -> k -> [(k, v)] -> v
+lookUpWithDefaultFunction  defaultFunction name list= let namedFunction = find (\(x,_) -> x == name) list
+                              in if isJust namedFunction
+                                 then snd (fromJust namedFunction) 
+                                else defaultFunction
 
 stringToUpdateFunction :: String -> Object -> Game -> Game
-stringToUpdateFunction name = lookUpWithDefaultFunction (\_ -> id) (filter (\(x,_) -> x == name) namedUpdateFunctions)
+stringToUpdateFunction name = lookUpWithDefaultFunction (\_ -> id) name namedUpdateFunctions
 
 
 stringToActivateFunction :: String -> Bool -> Object -> Game -> Game
-stringToActivateFunction name = lookUpWithDefaultFunction (\_ _ -> id) (filter (\(x,_) -> x == name) namedActivateFunctions)
+stringToActivateFunction name = lookUpWithDefaultFunction (\_ _ -> id) name namedActivateFunctions
   
 
 resizeSelf :: Bool -> Object -> Game -> Game
