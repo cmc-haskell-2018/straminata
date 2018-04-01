@@ -2,6 +2,7 @@ module Model.Objects where
 
 import Model.CommonTypes
 import Visual.TextureLoader
+import Util.Common
 
 
 defaultObject :: Object
@@ -54,16 +55,17 @@ openDoorFn doorName state self game = activateDoor
              { levelObjects =
                  map (\object ->
                        if objectName object == objectName self
-                       then if state changeTexture buttonPressTexture object
+                       then if state
                             then changeTexture buttonPressTexture object
                             else changeTexture buttonTexture object
+                       else object
                      ) objects
              }
          }
   )
   where level = gameLevel game
         objects = levelObjects level
-        activateDoor game' = foldr (\obj -> objectOnActivate state obj $ obj) game' (filter ((== doorName) . objectName) objects)
+        activateDoor game' = foldr (\obj -> (objectOnActivate obj) state obj) game' (filter ((== doorName) . objectName) objects)
 
 
 bindButtonAndDoor :: String -> Object -> Object -> [Object]
