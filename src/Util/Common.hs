@@ -323,17 +323,32 @@ updateAcceleration time game object =
 
 
 nullifyAcceleration :: Object -> Object
-nullifyAcceleration object =
+nullifyAcceleration object  =
   object { objectAcceleration = zeroVector }
 
 
-movePlayer :: Vector -> Action
-movePlayer vector =
-  PlayerAction (\player _ ->
-    let currentControlVector = playerControlVector player
-    in player { playerControlVector = vector `plus` currentControlVector }
+movePlayer :: Vector -> Animation -> Action
+movePlayer vector moveAnimation =
+  PlayerAction (\player game ->
+    let
+      lvlMap = levelMap . gameLevel $ game
+      objects = levelObjects . gameLevel $ game
+      currentControlVector = playerControlVector player
+      changeAnimation player' = if objectOnGround (playerObject player') lvlMap objects
+                                then player' { playerObject = (playerObject player')
+                                                           { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = moveAnimation} } }
+                                else player'
+    in changeAnimation (player { playerControlVector = vector `plus` currentControlVector })
   )
 
+idlePlayer :: Animation -> Action
+idlePlayer idleAnimation =
+  PlayerAction (\player game ->
+    let
+      changeAnimation player' = player' { playerObject = (playerObject player')
+                                                                 { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = idleAnimation} } }
+    in changeAnimation (player)
+  )
 
 jumpPlayer :: Vector -> Animation -> Action
 jumpPlayer vector jumpAnimation =

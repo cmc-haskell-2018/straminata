@@ -32,7 +32,7 @@ picture :: Game -> Picture
 picture game = let translate' = uncurry Translate . unwrap . objectPosition
                    picture' = \o -> translate' o $ objectToPicture o
                in Pictures
-                 $ (Scale (level1TileSize / 10) (level1TileSize / 10) . head . appearanceAnimation . levelBackground . gameLevel $ game)
+                 $ (Scale (level1TileSize / 30) (level1TileSize / 30) . head . appearanceAnimation . levelBackground . gameLevel $ game)
                    : map (tileToPicture) (concat . levelMap . gameLevel $ game)
                    ++ map picture' (levelObjects . gameLevel $ game)
                    ++ map (picture' . playerObject) (gamePlayers game)

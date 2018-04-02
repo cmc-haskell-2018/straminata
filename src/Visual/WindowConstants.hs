@@ -4,16 +4,16 @@ module Visual.WindowConstants where
 import Graphics.Gloss
 
 windowName :: String
-windowName = "s t r a m i n a t a  p r o j e c t"
+windowName = "STRAMiiNATA PR0JECT"
 
 initialWindowDimensions :: (Int, Int)
-initialWindowDimensions = (800, 600)
+initialWindowDimensions = (1200, 800)
 
 initialWindowPosition :: (Int, Int)
-initialWindowPosition = (10, 10)
+initialWindowPosition = (250, 150)
 
 backgroundColor :: Color
-backgroundColor = white
+backgroundColor = blue
 
 fps :: Int
 fps = 60

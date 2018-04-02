@@ -46,8 +46,8 @@ level1 = Level
     }
   , levelCoinNumber = length coins1
   , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 6)
-                          , Position (level1TileSize * 4, level1TileSize * 6)]
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 5)
+                          , Position (level1TileSize * 4, level1TileSize * 4)]
   , levelPlayerAbilities = abilitiesWithResize
   }
 
@@ -98,8 +98,8 @@ level3 = Level
     }
   , levelCoinNumber = length coins3
   , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 8)
-                          , Position (level1TileSize * 4, level1TileSize * 8)]
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 4)
+                          , Position (level1TileSize * 4, level1TileSize * 4)]
   , levelPlayerAbilities = abilitiesWithoutResize
   }
 
@@ -327,9 +327,9 @@ initialWorld = Game
 
 marioControls1 :: PlayerControls
 marioControls1 =
-  [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
-  , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 5)) upAnimation) (zeroAction)
+  [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (-level1TileSize * 4, 0)) exaIdleAnimation)
+  , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (level1TileSize * 4, 0)) exaIdleAnimation)
+  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 5)) exaJumpAnimation) (idlePlayer exaIdleAnimation)
   , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
@@ -352,15 +352,15 @@ playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
     { objectName = "exa"
-    , objectPosition = Position (level1TileSize * 2, level1TileSize * 8)
-    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 6))]
+    , objectPosition = Position (level1TileSize * 2, level1TileSize * 4)
+    , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 5))
-      , appearanceActualSize = fst marioTexture
-      , appearanceAnimation = [snd marioTexture]
+      { appearanceBox = (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
+      , appearanceActualSize = fst exaIdle1
+      , appearanceAnimation = exaIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = \o game -> activatePlayer "luigi" o $ activateCoin o game
+    , objectOnUpdate = \o game -> activatePlayer "ine" o $ activateCoin o game
     , objectOnActivate = \_ _ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
@@ -374,13 +374,13 @@ playerInitialState = Player
 player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
-    { objectName = "luigi"
-    , objectPosition = Position (level1TileSize * 4, level1TileSize * 8)
-    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))]
+    { objectName = "ine"
+    , objectPosition = Position (level1TileSize * 4, level1TileSize * 6)
+    , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))
-      , appearanceActualSize = fst luigiTexture1
-      , appearanceAnimation = luigiStandingAnimation
+      { appearanceBox = (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
+      , appearanceActualSize = fst ineIdle1
+      , appearanceAnimation = ineIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = activateCoin
@@ -390,9 +390,9 @@ player2InitialState = Player
     , objectAffectedByGravity = True
     }
   , playerControls =
-      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
-      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5)) upAnimation) (zeroAction)
+      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0)) ineWalkAnimation) (movePlayer (Vector (-level1TileSize * 4, 0)) ineIdleAnimation)
+      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0)) ineWalkAnimation) (movePlayer (Vector (level1TileSize * 4, 0)) ineIdleAnimation)
+      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5)) ineJumpAnimation) (idlePlayer ineIdleAnimation)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
       , bindAction (Char ']') (resetAction) (zeroAction)
@@ -473,8 +473,8 @@ resizeSelf state _ self game = game
                       ) (gamePlayers game)
   }
   where isSelf player = (objectName . playerObject $ player) == (objectName self)
-        enlarge = changeSize (Position (-level1TileSize / 5 * 3, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 9, level1TileSize / 5 * 12))
-        reduce = changeSize (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))
+        enlarge = changeSize (Position (-level1TileSize / 5 * 4, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 12, level1TileSize / 5 * 12))
+        reduce = changeSize (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
         changeSize rect player = player
           { playerObject = (playerObject player)
             { objectAppearance = (objectAppearance . playerObject $ player)
