@@ -32,4 +32,7 @@ doorOpenTexture = ((Dimensions (32, 128)), ) $! png "img/door_open.png"
 doorCloseTexture :: Texture
 doorCloseTexture = ((Dimensions (32, 128)), ) $! png "img/door_close.png"
 
+coinTexture :: Texture
+coinTexture = ((Dimensions (256, 256)), ) $! png "img/coin.png"
+
 

@@ -30,7 +30,7 @@ level1Pattern =
   , "w w t w t w t w t w t w t w t w t w t w t w t t t t t t w w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t w t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t w t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t c t c c t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t b1 t d1 t t t t t t t t w t t t t t w"
   , "w w t t t w t t t t t t w t w t t t t t t t w t t t t t t w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
