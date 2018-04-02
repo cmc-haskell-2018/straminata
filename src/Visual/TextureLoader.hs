@@ -1,6 +1,8 @@
 {-# LANGUAGE TupleSections #-}
+
 module Visual.TextureLoader where
 
+import Graphics.Gloss (Picture)
 import Graphics.Gloss.Game (png)
 
 import Model.CommonTypes
@@ -11,8 +13,38 @@ floorTexture = ((Dimensions (400, 400)), ) $! png "img/floor.png"
 marioTexture :: Texture
 marioTexture = ((Dimensions (30, 40)), ) $! png "img/mario.png"
 
-luigiTexture :: Texture
-luigiTexture = ((Dimensions (30, 40)), ) $! png "img/luigi.png"
+luigiTexture1 :: Texture
+luigiTexture1 = ((Dimensions (30, 40)), ) $! png "img/m1.png"
+
+luigiTexture2 :: Texture
+luigiTexture2 = ((Dimensions (30, 40)), ) $! png "img/m2.png"
+
+jTexture1 :: Texture
+jTexture1 = ((Dimensions (50, 50)), ) $! png "img/j2.png"
+
+jTexture2 :: Texture
+jTexture2 = ((Dimensions (50, 50)), ) $! png "img/j3.png"
+
+upAnimation :: [Picture]
+upAnimation = timerAnimationControl2 1
+
+luigiStandingAnimation :: [Picture]
+luigiStandingAnimation = timerAnimationControl 1
+
+timerAnimationControl :: Int -> [Picture]
+timerAnimationControl  i = if i <  30
+                           then snd luigiTexture1 : timerAnimationControl ((i + 1) `mod` 60)
+                           else snd luigiTexture2 : timerAnimationControl ((i + 1) `mod` 60)
+
+timerAnimationControl2 :: Int -> [Picture]
+timerAnimationControl2  i = (if i <  15
+                            then snd luigiTexture1 -- : timerAnimationControl2 ((i + 1) `mod` 60)
+                            else if i < 30
+                                then snd jTexture2
+                                else if i < 45
+                                     then snd jTexture1 -- : timerAnimationControl2 ((i + 1) `mod` 60)
+                                     else snd luigiTexture2
+                            ) : timerAnimationControl2 ((i + 1) `mod` 60)
 
 backgroundTexture :: Texture
 backgroundTexture = ((Dimensions (1920, 1080)), ) $! png "img/background.png"
