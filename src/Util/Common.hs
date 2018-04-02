@@ -100,7 +100,7 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
     offset = objectPosition object
     velocity = objectVelocity object
     tiles = concat . levelMap . gameLevel $ game
-    objects = filter isActive . levelObjects . gameLevel $ game
+    objects = filter isNotActive . levelObjects . gameLevel $ game
     tileRect (Solid app) = appearanceBox app
     tileRect (Transparent _) = infiniteRectangle
     restrictedVelocity =
@@ -196,8 +196,8 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
            then restrictDown vel (ly1 - y2)
            else vel
 
-isActive :: Object -> Bool
-isActive obj = let name = objectName obj
+isNotActive :: Object -> Bool
+isNotActive obj = let name = objectName obj
                in not $ isInfixOf "button" name || isInfixOf "finish" name || isInfixOf "coin" name
 
 
