@@ -324,7 +324,7 @@ playerInitialState = Player
       , appearancePicture = snd marioTexture
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = activatePlayer "luigi"
+    , objectOnUpdate = \o game -> activatePlayer "luigi" o $ activateCoin o game
     , objectOnActivate = \_ _ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
@@ -347,7 +347,7 @@ player2InitialState = Player
       , appearancePicture = snd luigiTexture
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = \_ -> id
+    , objectOnUpdate = activateCoin
     , objectOnActivate = resizeSelf
     , objectMass = 0
     , objectAcceleration = zeroVector
@@ -367,8 +367,40 @@ player2InitialState = Player
 
 resetAction :: Action
 resetAction =
-  GameAction (\player game -> changeLevel (gameLevel game) True player stubObject game)
-  where stubObject = Object {}
+  GameAction (\_ game -> Game
+    { gamePlayers = [ playerInitialState {playerCoins = playerCoins (gamePlayers game !! 0)}
+                    , player2InitialState {playerCoins = playerCoins (gamePlayers game !! 1)}]
+    , gameLevel = (gameLevel game)
+    , gameCamera = Camera
+        { cameraPosition = Position (0, 0)
+        , cameraRatio = 1
+        }
+    })
+
+--activateCoin :: Object -> Game -> Game
+--activateCoin self game =
+--  foldr (\object acc ->
+--          if objectsCollide self object
+--          then takeCoin ((appearancePicture . objectAppearance $ object) /= snd transparentTexture) player object acc
+--          else acc
+--        )
+--        game
+--        (filter isCoin (levelObjects . gameLevel $ game))
+--  where isCoin o = "coin" `isInfixOf` (objectName o)
+--        player = head $ filter (\p -> name p == objectName self) (gamePlayers game)
+--        name = objectName . playerObject
+
+activateCoin ::  Object -> Game -> Game
+activateCoin object game =
+  foldr (\coin acc ->
+                   takeCoin (((appearancePicture . objectAppearance $ coin) /= snd transparentTexture)
+                             && (objectsCollide (playerObject player) coin))
+                             player coin acc
+        )
+        game coins
+  where player = head . filter isTarget $ gamePlayers game
+        isTarget player' = (playerObject $ player') == object
+        coins = filter (\coin -> isInfixOf "coin" (objectName coin)) (levelObjects . gameLevel $ game)
 
 activatePlayer :: String -> Object -> Game -> Game
 activatePlayer name object game =
