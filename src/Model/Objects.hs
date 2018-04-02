@@ -119,14 +119,16 @@ finishButton = defaultObject
   }
 
 changeLevel :: Level -> Bool -> Player -> Object -> Game -> Game
-changeLevel next True _ _ _ = Game
-  { gamePlayers = [playerInitialState, player2InitialState]
+changeLevel next True _ _ game = Game
+  { gamePlayers = [ playerInitialState {playerCoins = playerCoins (players !! 0)}
+                  , player2InitialState {playerCoins = playerCoins (players !! 1)}]
   , gameLevel = next
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
     , cameraRatio = 1
     }
   }
+  where players = gamePlayers game
 changeLevel _ False _ _ game = game
 
 coinObject :: Object
