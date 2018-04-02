@@ -1,6 +1,9 @@
 -- | Contains commonly used functions.
 module Util.Common where
 
+import Debug.Trace
+import Data.List(isInfixOf)
+
 import Model.CommonTypes
 import Visual.WindowConstants
 import Util.Constants
@@ -93,17 +96,17 @@ rectanglesDistanceRight r1 r2 = rectanglesDistanceLeft r2 r1
 restrictMovingObject :: Object -> Float -> Game -> Object
 restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
  where
-    restrictedVelocity =
-      foldr (\tile vel -> if isSolid tile
-                          then foldr (restrictVelocity $ tileRect tile) vel boxes
-                          else vel
-            ) velocity tiles
     boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
     offset = objectPosition object
     velocity = objectVelocity object
     tiles = concat . levelMap . gameLevel $ game
+    objects = filter isActive . levelObjects . gameLevel $ game
     tileRect (Solid app) = appearanceBox app
     tileRect (Transparent _) = infiniteRectangle
+    restrictedVelocity =
+      foldr (\rect vel -> foldr (restrictVelocity rect) vel boxes
+      ) velocity ((map tileRect . filter isSolid $ tiles)
+                   ++ (concat (map (\o -> map (offsetRectangle (objectPosition o)) $ objectCollisionBoxes o) objects)))
     restrictVelocity tileBox objBox newVelocity =
       let vx = getX newVelocity * time
           vy = getY newVelocity * time
@@ -193,6 +196,10 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
            then restrictDown vel (ly1 - y2)
            else vel
 
+isActive :: Object -> Bool
+isActive obj = let name = objectName obj
+               in not $ isInfixOf "button" name || isInfixOf "finish" name
+
 
 updateCamera :: Game -> Game
 updateCamera game = game
@@ -255,9 +262,10 @@ performMove time (Vector (vx, vy)) (Position (x, y)) =
            )
 
 
-objectOnGround :: Object -> Map -> Bool
-objectOnGround object tiles =
-  any (\tile -> any (onGround tile) boxes ) (map tileRect $ concat tiles)
+objectOnGround :: Object -> Map -> [Object] -> Bool
+objectOnGround object tiles objects =
+  any (\tile -> any (onGround tile) boxes ) ((map tileRect $ concat tiles)
+       ++ (concat (map (\o -> map (offsetRectangle (objectPosition o)) $ objectCollisionBoxes o) objects)))
   where
     boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
     offset = objectPosition object
@@ -316,7 +324,7 @@ updateAcceleration time game object =
       obj { objectAcceleration = objectAcceleration obj `plus` gravitationalVector
           }
     addReactElement obj =
-      if objectOnGround obj (levelMap . gameLevel $ game)
+      if objectOnGround obj (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
       then obj { objectAcceleration = objectAcceleration obj `plus` reactVector time obj
                }
       else obj
@@ -343,7 +351,7 @@ jumpPlayer vector =
     let
       obj = playerObject player
       currentVelocity = objectVelocity obj
-    in if objectOnGround (playerObject player) (levelMap . gameLevel $ game)
+    in if objectOnGround (playerObject player) (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
        then player
               { playerObject = obj { objectVelocity = currentVelocity `plus` vector
                                    }

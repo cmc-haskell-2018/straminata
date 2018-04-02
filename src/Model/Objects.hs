@@ -16,6 +16,7 @@ import Util.Constants
 import Visual.TextureLoader
 import Visual.WindowConstants
 
+
 level1 :: Level
 level1 = Level
   { levelMap = level1Map
@@ -30,6 +31,9 @@ level1 = Level
     }
   }
 
+objects1 :: [Object]
+objects1 = generateObjects level2 level1TileSize $ reverse level1Pattern
+
 level2 :: Level
 level2 = Level
   { levelMap = level2Map
@@ -43,9 +47,6 @@ level2 = Level
     , appearanceActualSize = fst backgroundTexture
     }
   }
-
-objects1 :: [Object]
-objects1 = generateObjects level2 level1TileSize $ reverse level1Pattern
 
 objects2 :: [Object]
 objects2 = generateObjects level1 level1TileSize $ reverse level2Pattern
@@ -68,6 +69,7 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
 tableIndex :: String -> [String] -> (Int, Int)
 tableIndex e es = swap . withIndex $ filter (\xs -> any (== e) . words $ snd xs) $ zip [1 :: Int ..] es
   where withIndex [(index, xs)] = (index, (fromJust $ elemIndex e $ words xs) + 1)
+        withIndex _ = undefined
 
 
 
@@ -92,7 +94,8 @@ defaultObject = Object
 
 finishButton :: Object
 finishButton = defaultObject
-  { objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
+  { objectName = "finish"
+  , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
   , objectAppearance = Appearance
     { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
     , appearanceActualSize = fst doorOpenTexture
@@ -125,10 +128,14 @@ buttonObject = defaultObject
   , objectAffectedByGravity = False
   }
 
+closedDoorBox = [(Position (0, 0), Position (level1TileSize, 2 * level1TileSize))]
+
+openedDoorBox = [(Position (0, -level1TileSize), Position (level1TileSize, 0)),
+                 (Position (0, 2 * level1TileSize), Position (level1TileSize, 3 * level1TileSize))]
 
 doorObject :: Object
 doorObject = defaultObject
-  { objectCollisionBoxes = [(Position (0, -level1TileSize), Position (level1TileSize, 3 * level1TileSize))]
+  { objectCollisionBoxes = closedDoorBox
   , objectAppearance = Appearance
     { appearanceBox = (Position (0, -level1TileSize), Position (level1TileSize, 3 * level1TileSize))
     , appearanceActualSize = fst doorCloseTexture
@@ -149,8 +156,8 @@ openDoorFn doorName state self game =
                           else changeTexture buttonTexture object
                      else if objectName object == doorName
                           then if state
-                               then changeTexture doorOpenTexture object
-                               else changeTexture doorCloseTexture object
+                               then changeTexture doorOpenTexture (object {objectCollisionBoxes = openedDoorBox})
+                               else changeTexture doorCloseTexture (object {objectCollisionBoxes = closedDoorBox})
                           else object
                    ) objects
            }
