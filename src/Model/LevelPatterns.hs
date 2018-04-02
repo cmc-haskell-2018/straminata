@@ -67,7 +67,7 @@ level2Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t c t c t c t c t c t c t c t c t c t c t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t q w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   ]

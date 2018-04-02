@@ -118,7 +118,7 @@ data Object = Object
   , objectAppearance :: Appearance -- ^ Visual representation.
   , objectVelocity :: Vector -- ^ X and Y velocity components.
   , objectOnUpdate :: Object -> Game -> Game
-  , objectOnActivate :: Bool -> Object -> Game -> Game
+  , objectOnActivate :: Bool -> Player -> Object -> Game -> Game
   , objectMass :: Float -- ^ Mass. Can be infinite (1/0)
   , objectAcceleration :: Vector
   , objectAffectedByGravity :: Bool
@@ -157,6 +157,7 @@ data Player = Player
   { playerObject :: Object
   , playerControls :: PlayerControls
   , playerControlVector :: Vector
+  , playerCoins :: Int
   }
 
 instance Show Player where
@@ -189,6 +190,7 @@ data Level = Level
   , levelTileSize :: Float
   , levelObjects :: [Object]
   , levelBackground :: Appearance
+  , levelCoinNumber :: Int
   } deriving (Show)
 
 type Map = [MapRow]

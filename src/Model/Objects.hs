@@ -5,7 +5,7 @@ import Graphics.Gloss.Interface.IO.Game hiding (Vector, line)
 import Control.Monad (join)
 import Control.Arrow ((***))
 import Data.Maybe(isJust, fromJust)
-import Data.List(elemIndex)
+import Data.List(elemIndex, isInfixOf)
 import Data.Tuple(swap)
 
 import Model.CommonTypes
@@ -29,10 +29,14 @@ level1 = Level
     , appearancePicture = snd backgroundTexture
     , appearanceActualSize = fst backgroundTexture
     }
+  , levelCoinNumber = length coins1
   }
 
 objects1 :: [Object]
 objects1 = generateObjects level2 level1TileSize $ reverse level1Pattern
+
+coins1 :: [Object]
+coins1 = filter (\o -> "coin" `isInfixOf` objectName o) objects1
 
 level2 :: Level
 level2 = Level
@@ -46,10 +50,14 @@ level2 = Level
     , appearancePicture = snd backgroundTexture
     , appearanceActualSize = fst backgroundTexture
     }
+  , levelCoinNumber = length coins2
   }
 
 objects2 :: [Object]
 objects2 = generateObjects level1 level1TileSize $ reverse level2Pattern
+
+coins2 :: [Object]
+coins2 = filter (\o -> "coin" `isInfixOf` objectName o) objects2
 
 generateObjects :: Level -> Float -> [String] -> [Object]
 generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1..] pattern
@@ -62,8 +70,13 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
             $ bindButtonAndDoor n
                                 (buttonObject {objectPosition = Position (x * size, y * size)})
                                 (doorObject {objectPosition = Position (fromIntegral (fst coord) * size, fromIntegral (snd coord) * size)})
-        transferSymbol y (x, "q") = Just $ [finishButton {objectPosition = Position (x * size, y * size), objectOnActivate = quit nextLevel}]
-        transferSymbol y (x, "c") = Just $ [coinObject {objectPosition = Position (x * size, y * size), objectOnActivate = quit nextLevel}]
+        transferSymbol y (x, "q") = Just $ [finishButton {objectPosition = Position (x * size, y * size), objectOnActivate = changeLevel nextLevel}]
+        transferSymbol y (x, "c") = Just $
+          [ coinObject
+            { objectPosition = Position (x * size, y * size)
+            , objectName = "coin_" ++ show y ++ "_" ++ show x
+            }
+          ]
         transferSymbol _ _ = Nothing
 
 
@@ -86,7 +99,7 @@ defaultObject = Object
     }
   , objectVelocity = Vector (0, 0)
   , objectOnUpdate = \_ -> id
-  , objectOnActivate = \_ _ -> id
+  , objectOnActivate = \_ _ _ -> id
   , objectMass = 0
   , objectAcceleration = zeroVector
   , objectAffectedByGravity = False
@@ -102,8 +115,19 @@ finishButton = defaultObject
     , appearanceActualSize = fst doorOpenTexture
     , appearancePicture = snd doorOpenTexture
     }
-  , objectOnActivate = quit level1
+  , objectOnActivate = changeLevel level1
   }
+
+changeLevel :: Level -> Bool -> Player -> Object -> Game -> Game
+changeLevel next True _ _ _ = Game
+  { gamePlayers = [playerInitialState, player2InitialState]
+  , gameLevel = next
+  , gameCamera = Camera
+    { cameraPosition = Position (0, 0)
+    , cameraRatio = 1
+    }
+  }
+changeLevel _ False _ _ game = game
 
 coinObject :: Object
 coinObject = defaultObject
@@ -114,18 +138,26 @@ coinObject = defaultObject
       , appearanceActualSize = fst coinTexture
       , appearancePicture = snd coinTexture
       }
+  , objectOnActivate = takeCoin
   }
 
-quit :: Level -> Bool -> Object -> Game -> Game
-quit next True _ _ = Game
-  { gamePlayers = [playerInitialState, player2InitialState]
-  , gameLevel = next
-  , gameCamera = Camera
-    { cameraPosition = Position (0, 0)
-    , cameraRatio = 1
+takeCoin :: Bool -> Player -> Object -> Game -> Game
+takeCoin False _ _ game = game
+takeCoin True player self game = game
+  { gameLevel = level
+    { levelObjects = map (\o -> if objectName self == objectName o
+                                then changeTexture transparentTexture (o {objectOnActivate = \_ _ _ -> id})
+                                else o
+                         ) $ objects
     }
+  , gamePlayers = map (\p -> if name player == name p
+                             then p {playerCoins = (playerCoins p) + 1}
+                             else p
+                      ) (gamePlayers game)
   }
-quit _ False _ game = game
+  where level = gameLevel game
+        objects = levelObjects level
+        name = objectName . playerObject
 
 
 buttonObject :: Object
@@ -139,8 +171,11 @@ buttonObject = defaultObject
   , objectAffectedByGravity = False
   }
 
+
+closedDoorBox :: [(Position, Position)]
 closedDoorBox = [(Position (0, 0), Position (level1TileSize, 2 * level1TileSize))]
 
+openedDoorBox :: [(Position, Position)]
 openedDoorBox = [(Position (0, -level1TileSize), Position (level1TileSize, 0)),
                  (Position (0, 2 * level1TileSize), Position (level1TileSize, 3 * level1TileSize))]
 
@@ -156,8 +191,8 @@ doorObject = defaultObject
   }
 
 
-openDoorFn :: String -> Bool -> Object -> Game -> Game
-openDoorFn doorName state self game =
+openDoorFn :: String -> Bool -> Player -> Object -> Game -> Game
+openDoorFn doorName state _ self game =
   game { gameLevel = level
            { levelObjects =
                map (\object ->
@@ -238,13 +273,14 @@ playerInitialState = Player
       }
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = activatePlayer "luigi"
-    , objectOnActivate = \_ _ -> id
+    , objectOnActivate = \_ _ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
     , objectAffectedByGravity = True
     }
   , playerControls = marioControls1
   , playerControlVector = zeroVector
+  , playerCoins = 0
   }
 
 player2InitialState :: Player
@@ -273,21 +309,25 @@ player2InitialState = Player
       , bindAction (Char 'q') (activateObject False) (zeroAction)
       ]
   , playerControlVector = zeroVector
+  , playerCoins = 0
   }
 
 activatePlayer :: String -> Object -> Game -> Game
 activatePlayer name object game =
-  foldr (\player -> (objectOnActivate . playerObject $ player)
+  foldr (\player acc ->
+                    objectOnActivate (playerObject player)
                     (objectsCollide object (playerObject player))
+                    player
                     (playerObject player)
+                    acc
         )
         game
         (filter isTarget (gamePlayers game))
   where isTarget player = (objectName . playerObject $ player) == name
 
 
-resizeSelf :: Bool -> Object -> Game -> Game
-resizeSelf state self game = game
+resizeSelf :: Bool -> Player -> Object -> Game -> Game
+resizeSelf state _ self game = game
   { gamePlayers = map (\player -> if isSelf player
                                   then if state
                                        then enlarge player

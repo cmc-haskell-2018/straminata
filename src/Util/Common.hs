@@ -426,7 +426,7 @@ stopPlayer =
 activateObject :: Bool -> Action
 activateObject state =
   GameAction (\player game ->
-    foldr (\obj -> (objectOnActivate obj) state obj) game (filter (\obj -> objectsCollide (playerObject player) obj) (objects game))
+    foldr (\obj acc -> (objectOnActivate obj) state player obj acc) game (filter (\obj -> objectsCollide (playerObject player) obj) (objects game))
   )
   where objects game = levelObjects . gameLevel $ game
 
