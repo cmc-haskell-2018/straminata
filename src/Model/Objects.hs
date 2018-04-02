@@ -230,9 +230,9 @@ playerInitialState = Player
   { playerObject = Object
     { objectName = "mario"
     , objectPosition = Position (level1TileSize * 2, level1TileSize * 8)
-    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))]
+    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 6))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))
+      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 5))
       , appearanceActualSize = fst marioTexture
       , appearancePicture = snd marioTexture
       }
