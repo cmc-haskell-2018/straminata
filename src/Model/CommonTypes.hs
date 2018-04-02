@@ -160,6 +160,10 @@ data Player = Player
   , playerCoins :: Int
   }
 
+instance Eq Player where
+  (==) player1 player2 = name player1 == name player2
+    where name = objectName . playerObject
+
 instance Show Player where
   show player = "Player {" ++ show (playerObject player) ++ "}"
 
@@ -191,6 +195,7 @@ data Level = Level
   , levelObjects :: [Object]
   , levelBackground :: Appearance
   , levelCoinNumber :: Int
+  , levelPlayersOut :: [Player]
   } deriving (Show)
 
 type Map = [MapRow]

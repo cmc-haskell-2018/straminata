@@ -5,8 +5,10 @@ import Graphics.Gloss.Interface.IO.Game hiding (Vector, line)
 import Control.Monad (join)
 import Control.Arrow ((***))
 import Data.Maybe(isJust, fromJust)
-import Data.List(elemIndex, isInfixOf)
+import Data.List(elemIndex, isInfixOf, isSuffixOf, union, (\\))
 import Data.Tuple(swap)
+
+import Debug.Trace
 
 import Model.CommonTypes
 import Model.LevelPatterns
@@ -32,6 +34,7 @@ level1 = Level
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins1
+  , levelPlayersOut = []
   }
 
 objects1 :: [Object]
@@ -54,6 +57,7 @@ level2 = Level
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins2
+  , levelPlayersOut = []
   }
 
 objects2 :: [Object]
@@ -76,6 +80,7 @@ level3 = Level
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins3
+  , levelPlayersOut = []
   }
 
 objects3 :: [Object]
@@ -97,8 +102,26 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
             $ bindButtonAndDoor n
                                 (buttonObject {objectPosition = Position (x * size, y * size)})
                                 (doorObject {objectPosition = Position (fromIntegral (fst coord) * size, fromIntegral (snd coord) * size)})
-        transferSymbol y (x, "q") = Just $ [finishButton {objectPosition = Position (x * size, y * size), objectOnActivate = changeLevel nextLevel}]
-        transferSymbol y (x, "c") = Just $
+        transferSymbol y (x, 'q' : n) = Just $ [finishButton
+            { objectPosition = Position (x * size, y * size)
+            , objectOnActivate = changeLevel nextLevel
+            , objectName = "finish_" ++ case n of
+                "1" -> "mario"
+                "2" -> "luigi"
+                _ -> undefined
+            , objectAppearance =
+                let tex = case n of
+                          "1" -> teleport1Texture
+                          "2" -> teleport2Texture
+                          _ -> undefined
+                in Appearance
+                { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
+                , appearanceActualSize = fst tex
+                , appearancePicture = snd tex
+                }
+            }
+          ]
+        transferSymbol y (x, 'c' : _) = Just $
           [ coinObject
             { objectPosition = Position (x * size, y * size)
             , objectName = "coin_" ++ show y ++ "_" ++ show x
@@ -135,27 +158,27 @@ defaultObject = Object
 
 finishButton :: Object
 finishButton = defaultObject
-  { objectName = "finish"
-  , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
-  , objectAppearance = Appearance
-    { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
-    , appearanceActualSize = fst doorOpenTexture
-    , appearancePicture = snd doorOpenTexture
-    }
-  , objectOnActivate = changeLevel level1
+  { objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize / 5))]
   }
 
 changeLevel :: Level -> Bool -> Player -> Object -> Game -> Game
-changeLevel next True _ _ game = Game
-  { gamePlayers = [ playerInitialState {playerCoins = playerCoins (players !! 0)}
-                  , player2InitialState {playerCoins = playerCoins (players !! 1)}]
-  , gameLevel = next
-  , gameCamera = Camera
-    { cameraPosition = Position (0, 0)
-    , cameraRatio = 1
-    }
-  }
+changeLevel next True player object game =
+  if (name player) `isSuffixOf` (objectName object)
+  then let playersOut = (levelPlayersOut . gameLevel $ game) `union` [player]
+       in if null (playersOut \\ (gamePlayers game)) && null ((gamePlayers game) \\ playersOut)
+          then Game
+            { gamePlayers = [ playerInitialState {playerCoins = playerCoins (players !! 0)}
+                            , player2InitialState {playerCoins = playerCoins (players !! 1)}]
+            , gameLevel = next
+            , gameCamera = Camera
+               { cameraPosition = Position (0, 0)
+               , cameraRatio = 1
+               }
+            }
+          else game {gameLevel = (gameLevel game) {levelPlayersOut = trace (show playersOut) playersOut}}
+  else game
   where players = gamePlayers game
+        name = objectName . playerObject
 changeLevel _ False _ _ game = game
 
 coinObject :: Object
