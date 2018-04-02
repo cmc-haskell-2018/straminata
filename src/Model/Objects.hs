@@ -294,8 +294,8 @@ bindButtonAndDoor identifier button door =
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game
-  { gamePlayers = [ playerInitialState {playerObject = (playerObject playerInitialState) {objectPosition = position1}}
-                  , player2InitialState {playerObject = (playerObject player2InitialState) {objectPosition = position2}}]
+  { gamePlayers = [ playerInitialState {playerObject = (playerObject playerInitialState) {objectPosition = position1}}{-
+                  , player2InitialState {playerObject = (playerObject player2InitialState) {objectPosition = position2}}-}]
   , gameLevel = level1
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
