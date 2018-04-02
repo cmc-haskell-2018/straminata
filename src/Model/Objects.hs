@@ -33,6 +33,8 @@ level1 = Level
     }
   , levelCoinNumber = length coins1
   , levelPlayersOut = []
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 6)
+                          , Position (level1TileSize * 4, level1TileSize * 6)]
   }
 
 objects1 :: [Object]
@@ -56,6 +58,8 @@ level2 = Level
     }
   , levelCoinNumber = length coins2
   , levelPlayersOut = []
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 8)
+                          , Position (level1TileSize * 4, level1TileSize * 8)]
   }
 
 objects2 :: [Object]
@@ -79,6 +83,8 @@ level3 = Level
     }
   , levelCoinNumber = length coins3
   , levelPlayersOut = []
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 8)
+                          , Position (level1TileSize * 4, level1TileSize * 8)]
   }
 
 objects3 :: [Object]
@@ -165,8 +171,13 @@ changeLevel next True player object game =
   then let playersOut = (levelPlayersOut . gameLevel $ game) `union` [player]
        in if null (playersOut \\ (gamePlayers game)) && null ((gamePlayers game) \\ playersOut)
           then Game
-            { gamePlayers = [ playerInitialState {playerCoins = playerCoins (players !! 0)}
-                            , player2InitialState {playerCoins = playerCoins (players !! 1)}]
+            { gamePlayers = [ playerInitialState { playerCoins = playerCoins player1
+                                                 , playerObject = (playerObject player1) {objectPosition = position1}
+                                                 }
+                            , player2InitialState { playerCoins = playerCoins player2
+                                                  , playerObject = (playerObject player2) {objectPosition = position2}
+                                                  }
+                            ]
             , gameLevel = next
             , gameCamera = Camera
                { cameraPosition = Position (0, 0)
@@ -176,6 +187,11 @@ changeLevel next True player object game =
           else game {gameLevel = (gameLevel game) {levelPlayersOut = playersOut}} -- todo: remove exited player
   else game
   where players = gamePlayers game
+        player1 = players !! 0
+        player2 = players !! 1
+        positions = levelStartPositions next
+        position1 = positions !! 0
+        position2 = positions !! 1
         name = objectName . playerObject
 changeLevel _ False _ _ game = game
 
@@ -278,13 +294,17 @@ bindButtonAndDoor identifier button door =
 -- | Initial game state.
 initialWorld :: Game
 initialWorld = Game
-  { gamePlayers = [playerInitialState, player2InitialState]
+  { gamePlayers = [ playerInitialState {playerObject = (playerObject playerInitialState) {objectPosition = position1}}
+                  , player2InitialState {playerObject = (playerObject player2InitialState) {objectPosition = position2}}]
   , gameLevel = level1
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
     , cameraRatio = 1
     }
   }
+  where positions = levelStartPositions level1
+        position1 = positions !! 0
+        position2 = positions !! 1
 
 
 marioControls1 :: PlayerControls
@@ -365,9 +385,20 @@ player2InitialState = Player
 
 resetAction :: Action
 resetAction =
-  GameAction (\_ game -> Game
-    { gamePlayers = [ playerInitialState {playerCoins = playerCoins (gamePlayers game !! 0)}
-                    , player2InitialState {playerCoins = playerCoins (gamePlayers game !! 1)}]
+  GameAction (\_ game ->
+    let players = gamePlayers game
+        player1 = players !! 0
+        player2 = players !! 1
+        positions = levelStartPositions (gameLevel game)
+        position1 = positions !! 0
+        position2 = positions !! 1
+    in Game { gamePlayers = [ playerInitialState { playerCoins = playerCoins player1
+                                         , playerObject = (playerObject player1) {objectPosition = position1}
+                                         }
+                    , player2InitialState { playerCoins = playerCoins player2
+                                          , playerObject = (playerObject player2) {objectPosition = position2}
+                                          }
+                    ]
     , gameLevel = (gameLevel game) {levelPlayersOut = []}
     , gameCamera = Camera
         { cameraPosition = Position (0, 0)

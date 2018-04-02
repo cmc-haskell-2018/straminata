@@ -196,6 +196,7 @@ data Level = Level
   , levelBackground :: Appearance
   , levelCoinNumber :: Int
   , levelPlayersOut :: [Player]
+  , levelStartPositions :: [Position]
   } deriving (Show)
 
 type Map = [MapRow]
