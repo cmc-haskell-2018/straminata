@@ -62,6 +62,7 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
                                 (buttonObject {objectPosition = Position (x * size, y * size)})
                                 (doorObject {objectPosition = Position (fromIntegral (fst coord) * size, fromIntegral (snd coord) * size)})
         transferSymbol y (x, "q") = Just $ [finishButton {objectPosition = Position (x * size, y * size), objectOnActivate = quit nextLevel}]
+        transferSymbol y (x, "c") = Just $ [coinObject {objectPosition = Position (x * size, y * size), objectOnActivate = quit nextLevel}]
         transferSymbol _ _ = Nothing
 
 
@@ -98,8 +99,18 @@ finishButton = defaultObject
     , appearanceActualSize = fst doorOpenTexture
     , appearancePicture = snd doorOpenTexture
     }
-  , objectAffectedByGravity = False
   , objectOnActivate = quit level1
+  }
+
+coinObject :: Object
+coinObject = defaultObject
+  { objectName = "coin"
+  , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize))]
+  , objectAppearance = Appearance
+      { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize))
+      , appearanceActualSize = fst coinTexture
+      , appearancePicture = snd coinTexture
+      }
   }
 
 quit :: Level -> Bool -> Object -> Game -> Game
