@@ -8,8 +8,6 @@ import Data.Maybe(isJust, fromJust)
 import Data.List(elemIndex, isInfixOf, isSuffixOf, union, (\\))
 import Data.Tuple(swap)
 
-import Debug.Trace
-
 import Model.CommonTypes
 import Model.LevelPatterns
 import Util.Controls
@@ -175,7 +173,7 @@ changeLevel next True player object game =
                , cameraRatio = 1
                }
             }
-          else game {gameLevel = (gameLevel game) {levelPlayersOut = trace (show playersOut) playersOut}}
+          else game {gameLevel = (gameLevel game) {levelPlayersOut = playersOut}} -- todo: remove exited player
   else game
   where players = gamePlayers game
         name = objectName . playerObject
@@ -370,7 +368,7 @@ resetAction =
   GameAction (\_ game -> Game
     { gamePlayers = [ playerInitialState {playerCoins = playerCoins (gamePlayers game !! 0)}
                     , player2InitialState {playerCoins = playerCoins (gamePlayers game !! 1)}]
-    , gameLevel = (gameLevel game)
+    , gameLevel = (gameLevel game) {levelPlayersOut = []}
     , gameCamera = Camera
         { cameraPosition = Position (0, 0)
         , cameraRatio = 1
