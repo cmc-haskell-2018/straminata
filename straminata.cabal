@@ -17,8 +17,7 @@ library
   ghc-options:         -Wall -fno-warn-type-defaults
   exposed-modules:     Straminata
                      , Model.CommonTypes
-                     , Model.Map
-                     , Model.Levels
+                     , Model.LevelPatterns
                      , Model.Objects
                      , Util.Common
                      , Util.Constants
