@@ -309,10 +309,15 @@ player2InitialState = Player
       , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 10))) (zeroAction)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
+      , bindAction (Char ']') (resetAction level1) (zeroAction)
       ]
   , playerControlVector = zeroVector
   , playerCoins = 0
   }
+
+resetAction :: Level -> Action
+resetAction level =
+  GameAction (\player game -> changeLevel level True player (Object {}) game)
 
 activatePlayer :: String -> Object -> Game -> Game
 activatePlayer name object game =
