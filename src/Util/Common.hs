@@ -198,7 +198,7 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
 
 isActive :: Object -> Bool
 isActive obj = let name = objectName obj
-               in not $ isInfixOf "button" name || isInfixOf "finish" name
+               in not $ isInfixOf "button" name || isInfixOf "finish" name || isInfixOf "coin" name
 
 
 updateCamera :: Game -> Game
