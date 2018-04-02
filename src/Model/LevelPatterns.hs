@@ -112,12 +112,12 @@ generate size pattern = map transferLine $ zip [1..] pattern
         transferSymbol y (x, 'w' : _) = Solid Appearance
           { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
           , appearanceActualSize = fst floorTexture
-          , appearancePicture = snd floorTexture
+          , appearanceAnimation = [snd floorTexture]
           }
         transferSymbol y (x, _) = Transparent Appearance
           { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
           , appearanceActualSize = fst transparentTexture
-          , appearancePicture = snd transparentTexture
+          , appearanceAnimation = [snd transparentTexture]
           }
 
 level1Map :: Map

@@ -345,18 +345,20 @@ movePlayer vector =
   )
 
 
-jumpPlayer :: Vector -> Action
-jumpPlayer vector =
+jumpPlayer :: Vector -> Animation -> Action
+jumpPlayer vector jumpAnimation =
   PlayerAction (\player game ->
     let
       obj = playerObject player
       currentVelocity = objectVelocity obj
-    in if objectOnGround (playerObject player) (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
+      changeAnimation player' = player' { playerObject = (playerObject player')
+                                                           { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = jumpAnimation} } }
+    in changeAnimation (if objectOnGround (playerObject player) (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
        then player
               { playerObject = obj { objectVelocity = currentVelocity `plus` vector
                                    }
               }
-      else player
+      else player)
   )
 
 
@@ -440,7 +442,7 @@ setTextureByName name texture =
                                     playerObject = (playerObject player) {
                                       objectAppearance = (objectAppearance . playerObject $ player) {
                                         appearanceActualSize = fst texture
-                                      , appearancePicture = snd texture
+                                      , appearanceAnimation = [snd texture]
                                       }
                                     }
                                   }
@@ -451,10 +453,26 @@ setTextureByName name texture =
   where isTarget player = (objectName . playerObject $ player) == name
 
 
+updateAnimations :: Game -> Game
+updateAnimations game =
+  game { gamePlayers = map updatePlayer (gamePlayers game)
+       , gameLevel = (gameLevel game) {
+           levelObjects = map updateObject (levelObjects . gameLevel $ game)
+         }
+       }
+  where
+    updatePlayer player =
+      player { playerObject = updateObject (playerObject player) }
+    updateObject object =
+      object { objectAppearance = (objectAppearance object) { appearanceAnimation = cutHead . appearanceAnimation . objectAppearance $ object } }
+    cutHead [ x ] = [ x ]
+    cutHead (x : xs) = xs
+
+
 changeTexture :: Texture -> Object -> Object
 changeTexture texture object = object
   { objectAppearance = (objectAppearance object)
       { appearanceActualSize = fst texture
-      , appearancePicture = snd texture
+      , appearanceAnimation = [snd texture]
       }
   }

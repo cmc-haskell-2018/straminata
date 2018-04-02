@@ -10,8 +10,10 @@ import Model.CommonTypes
 floorTexture :: Texture
 floorTexture = ((Dimensions (400, 400)), ) $! png "img/floor.png"
 
+
+-- | exa idle
 marioTexture :: Texture
-marioTexture = ((Dimensions (30, 40)), ) $! png "img/mario.png"
+marioTexture = ((Dimensions (100, 100)), ) $! png "img/exa/idle/id1.png"
 
 luigiTexture1 :: Texture
 luigiTexture1 = ((Dimensions (30, 40)), ) $! png "img/m1.png"
