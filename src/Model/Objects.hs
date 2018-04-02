@@ -17,6 +17,8 @@ import Visual.TextureLoader
 import Visual.WindowConstants
 
 
+-- Levels
+
 level1 :: Level
 level1 = Level
   { levelMap = level1Map
@@ -38,6 +40,7 @@ objects1 = generateObjects level2 level1TileSize $ reverse level1Pattern
 coins1 :: [Object]
 coins1 = filter (\o -> "coin" `isInfixOf` objectName o) objects1
 
+
 level2 :: Level
 level2 = Level
   { levelMap = level2Map
@@ -54,10 +57,34 @@ level2 = Level
   }
 
 objects2 :: [Object]
-objects2 = generateObjects level1 level1TileSize $ reverse level2Pattern
+objects2 = generateObjects level3 level1TileSize $ reverse level2Pattern
 
 coins2 :: [Object]
 coins2 = filter (\o -> "coin" `isInfixOf` objectName o) objects2
+
+
+level3 :: Level
+level3 = Level
+  { levelMap = level3Map
+  , levelColNumber = length level3Map
+  , levelRowNumber = length (head level3Map)
+  , levelTileSize = level1TileSize
+  , levelObjects = objects3
+  , levelBackground = Appearance
+    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
+    , appearancePicture = snd backgroundTexture
+    , appearanceActualSize = fst backgroundTexture
+    }
+  , levelCoinNumber = length coins3
+  }
+
+objects3 :: [Object]
+objects3 = generateObjects level1 level1TileSize $ reverse level3Pattern
+
+coins3 :: [Object]
+coins3 = filter (\o -> "coin" `isInfixOf` objectName o) objects3
+
+-- /Levels
 
 generateObjects :: Level -> Float -> [String] -> [Object]
 generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1..] pattern
@@ -309,15 +336,16 @@ player2InitialState = Player
       , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 10))) (zeroAction)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
-      , bindAction (Char ']') (resetAction level1) (zeroAction)
+      , bindAction (Char ']') (resetAction) (zeroAction)
       ]
   , playerControlVector = zeroVector
   , playerCoins = 0
   }
 
-resetAction :: Level -> Action
-resetAction level =
-  GameAction (\player game -> changeLevel level True player (Object {}) game)
+resetAction :: Action
+resetAction =
+  GameAction (\player game -> changeLevel (gameLevel game) True player stubObject game)
+  where stubObject = Object {}
 
 activatePlayer :: String -> Object -> Game -> Game
 activatePlayer name object game =

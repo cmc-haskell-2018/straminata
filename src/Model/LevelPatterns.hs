@@ -25,13 +25,13 @@ level1Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w c t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w q t t t t t t t t t t t t t t t t t t t t t w w w t t t w"
   , "w w t w t w t w t w t w t w t w t w t w t w t t t t t t w w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t w t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t w t t w"
-  , "w t t t t c t c c t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t t t t t b1 t d1 t t t t t t t t w t t t t t w"
+  , "w t t t t c t c c t t t t t t t t t t t t t t t t c t t t w"
+  , "w t t t t t t t t t t t b1 t d1 t c t c t t t t w t t t t t w"
   , "w w t t t w t t t t t t w t w t t t t t t t w t t t t t t w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
@@ -67,8 +67,42 @@ level2Pattern =
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
-  , "w t t t t t t t c t c t c t c t c t c t c t c t c t c t t w"
+  , "w t t t t t t t c t c t c t c t c t c t c t c t c t c t c w"
   , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t q w"
+  , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
+  ]
+
+level3Pattern :: [String]
+level3Pattern =
+  [ "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t t t t t t t t t t t t t t t t t t t t t t t t t t w"
+  , "w t t t c t t t c t t t c t d1 t c t t t c t t t c t t t c w"
+  , "w t t t t t t t t t t t t t w t t t t b1 t t t t t t t t q w"
   , "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w"
   ]
 
@@ -91,3 +125,6 @@ level1Map = generate level1TileSize $ reverse level1Pattern
 
 level2Map :: Map
 level2Map = generate level1TileSize $ reverse level2Pattern
+
+level3Map :: Map
+level3Map = generate level1TileSize $ reverse level3Pattern
