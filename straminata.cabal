@@ -5,9 +5,9 @@ version:             0.2
 homepage: https://github.com/cmc-haskell-2018/straminata
 -- license:
 -- license-file:
-author:              Команда №1 (Team #1)
+author:              Team "Awesome"
 maintainer:          alois9866@gmail.com
-copyright:           2017 Team #1
+copyright:           2018 Team Awesome
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -16,13 +16,19 @@ library
   hs-source-dirs:      src
   ghc-options:         -Wall -fno-warn-type-defaults
   exposed-modules:     Straminata
-                     , WindowConstants
                      , Model.CommonTypes
+                     , Model.LevelPatterns
+                     , Model.Objects
                      , Util.Common
+                     , Util.Constants
+                     , Util.Controls
+                     , Visual.WindowConstants
                      , Visual.Renderer
-                     , Controls
+                     , Visual.TextureLoader
   build-depends:       base >= 4.7 && < 5
                      , gloss
+                     , gloss-juicy
+                     , gloss-game
   default-language:    Haskell2010
 
 executable straminata
@@ -32,6 +38,8 @@ executable straminata
   build-depends:       base
                      , straminata
                      , gloss
+                     , gloss-juicy
+                     , gloss-game
   default-language:    Haskell2010
 
 test-suite straminata-test
@@ -41,6 +49,8 @@ test-suite straminata-test
   build-depends:       base
                      , straminata
                      , gloss
+                     , gloss-juicy
+                     , gloss-game
                      , hspec
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010

@@ -2,9 +2,12 @@ module Visual.Renderer where
 
 import Graphics.Gloss
 
-import WindowConstants
+import Control.Monad (join)
+import Control.Arrow ((***))
+
 import Model.CommonTypes
-import Util.Common
+import Util.Constants
+import Visual.WindowConstants
 
 -- | Initial window state.
 newWindow :: Display
@@ -13,31 +16,63 @@ newWindow = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render = picture
+render game = Pictures $ [positionPicture (gameCamera game) (picture game)] ++ map coinText (zip [0..] $ gamePlayers game)
+
+coinText :: (Int, Player) -> Picture
+coinText (n, p) = uncurry Translate ( plusPos (fromIntegral n)
+                                    $ join (***) (negate . fromIntegral . (`div` 2)) initialWindowDimensions)
+             $ Scale (level1TileSize / 20) (level1TileSize / 20)
+             $ Text (name p ++ ":" ++ show (playerCoins p))
+  where name = objectName . playerObject
+        plusPos n' (x, y) = (x, y + level1TileSize * 3 + n' * level1TileSize * 7)
 
 
 -- | Composes all game @objects@ in a list of pictures.
 picture :: Game -> Picture
-picture game = let player1 = firstPlayer . players $ game
-                   player2 = secondPlayer . players $ game
-                   translate' = uncurry Translate . unwrap . position . hitbox
-                   polygon' = Polygon . formPath . hitbox
-                   picture' = \o -> translate' o $ polygon' o
-               in Pictures $ (Color (playerColor player1) (picture' (object player1)))
-                           : (Color (playerColor player2) (picture' (object player2)))
-                           : map picture' (objects game)
+picture game = let translate' = uncurry Translate . unwrap . objectPosition
+                   picture' = \o -> translate' o $ objectToPicture o
+               in Pictures
+                 $ (Scale (level1TileSize / 10) (level1TileSize / 10) . appearancePicture . levelBackground . gameLevel $ game)
+                   : map (tileToPicture) (concat . levelMap . gameLevel $ game)
+                   ++ map picture' (levelObjects . gameLevel $ game)
+                   ++ map (picture' . playerObject) (gamePlayers game)
 
 
 -- | Creates a path – a sequential list of polygon vertices.
-formPath :: Hitbox -> [(Float, Float)]
-formPath h = let pos = position h
-                 box = displayBox h
-                 x = fst . unwrap $ pos
-                 y = snd . unwrap $ pos
-                 p1 = unwrap . fst . unwrapRectangle $ box
-                 p2 = unwrap . snd . unwrapRectangle $ box
-                 x1 = fst p1 + x
-                 y1 = snd p1 + y
-                 x2 = fst p2 + x
-                 y2 = snd p2 + y
-             in [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+formPath :: Rectangle -> [(Float, Float)]
+formPath box = let p1 = unwrap . fst $ box
+                   p2 = unwrap . snd $ box
+                   x1 = fst p1
+                   y1 = snd p1
+                   x2 = fst p2
+                   y2 = snd p2
+               in [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+
+
+positionPicture :: Camera -> Picture -> Picture
+positionPicture camera pic = Scale ratio ratio (Translate x y pic)
+  where ratio = cameraRatio camera
+        offset = unwrap . invertVector . positionToVector . cameraPosition $ camera
+        x = fst offset
+        y = snd offset
+
+
+appearanceToPicture :: Appearance -> Picture
+appearanceToPicture app = (uncurry Scale $ computeScale (appearanceBox app) (appearanceActualSize app))
+                          (appearancePicture app)
+
+
+objectToPicture :: Object -> Picture
+objectToPicture obj = translate' obj $ appearanceToPicture . objectAppearance $ obj
+  where getOffset o = (plus (positionToVector . fst . appearanceBox . objectAppearance $ o)
+                            (positionToVector . snd . appearanceBox . objectAppearance $ o)
+                      ) `divByNumber` 2
+        translate' = uncurry Translate . unwrap . getOffset
+
+
+tileToPicture :: Tile -> Picture
+tileToPicture tile = (translate' $ getAppearance tile) $ appearanceToPicture . getAppearance $ tile
+  where getOffset app = (plus (positionToVector . fst . appearanceBox $ app)
+                              (positionToVector . snd . appearanceBox $ app)
+                        ) `divByNumber` 2
+        translate' = uncurry Translate . unwrap . getOffset
