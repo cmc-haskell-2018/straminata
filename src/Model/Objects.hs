@@ -110,8 +110,8 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
             { objectPosition = Position (x * size, y * size)
             , objectOnActivate = changeLevel nextLevel
             , objectName = "finish_" ++ case n of
-                "1" -> "mario"
-                "2" -> "luigi"
+                "1" -> "exa"
+                "2" -> "ine"
                 _ -> undefined
             , objectAppearance =
                 let tex = case n of
@@ -307,24 +307,24 @@ initialWorld = Game
         position2 = positions !! 1
 
 
-marioControls1 :: PlayerControls
-marioControls1 =
+exaControls1 :: PlayerControls
+exaControls1 =
   [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (-level1TileSize * 4, 0)) exaIdleAnimation)
   , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (level1TileSize * 4, 0)) exaIdleAnimation)
   , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 10)) exaJumpAnimation) (idlePlayer exaIdleAnimation)
-  , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
+  , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction exaControls2)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
 
-marioControls2 :: PlayerControls
-marioControls2 =
+exaControls2 :: PlayerControls
+exaControls2 =
   [ bindAction (SpecialKey KeyRight) (flightPlayer (Vector (level1TileSize * 10, 0))) (stopFlightPlayer (Vector (level1TileSize * 10, 0)))
   , bindAction (SpecialKey KeyLeft) (flightPlayer (Vector (-level1TileSize * 10, 0))) (stopFlightPlayer (Vector (-level1TileSize * 10, 0)))
   , bindAction (SpecialKey KeyUp) (flightPlayer (Vector (0, level1TileSize * 10))) (stopFlightPlayer (Vector (0, level1TileSize * 10)))
   , bindAction (SpecialKey KeyDown) (flightPlayer (Vector (0, -level1TileSize * 10))) (stopFlightPlayer (Vector (0, -level1TileSize * 10)))
   , bindAction (SpecialKey KeySpace) (stopPlayer) (zeroAction)
-  , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction marioControls1)
+  , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction exaControls1)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
@@ -348,7 +348,7 @@ playerInitialState = Player
     , objectAcceleration = zeroVector
     , objectAffectedByGravity = True
     }
-  , playerControls = marioControls1
+  , playerControls = exaControls1
   , playerControlVector = zeroVector
   , playerCoins = 0
   }
