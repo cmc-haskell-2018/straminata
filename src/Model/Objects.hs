@@ -41,13 +41,13 @@ level1 = Level
   , levelObjects = objects1
   , levelBackground = Appearance
     { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearancePicture = snd backgroundTexture
+    , appearanceAnimation = [snd backgroundTexture]
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins1
   , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 6)
-                          , Position (level1TileSize * 4, level1TileSize * 6)]
+  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 5)
+                          , Position (level1TileSize * 4, level1TileSize * 4)]
   , levelPlayerAbilities = abilitiesWithResize
   }
 
@@ -67,7 +67,7 @@ level2 = Level
   , levelObjects = objects2
   , levelBackground = Appearance
     { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearancePicture = snd backgroundTexture
+    , appearanceAnimation = [snd backgroundTexture]
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins2
@@ -93,7 +93,7 @@ level3 = Level
   , levelObjects = objects3
   , levelBackground = Appearance
     { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearancePicture = snd backgroundTexture
+    , appearanceAnimation = [snd backgroundTexture]
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins3
@@ -152,8 +152,8 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
             { objectPosition = Position (x * size, y * size)
             , objectOnActivate = changeLevel nextLevel
             , objectName = "finish_" ++ case n of
-                "1" -> "mario"
-                "2" -> "luigi"
+                "1" -> "exa"
+                "2" -> "ine"
                 _ -> undefined
             , objectAppearance =
                 let tex = case n of
@@ -163,7 +163,7 @@ generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t)
                 in Appearance
                 { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
                 , appearanceActualSize = fst tex
-                , appearancePicture = snd tex
+                , appearanceAnimation = [snd tex]
                 }
             }
           ]
@@ -191,7 +191,7 @@ defaultObject = Object
   , objectAppearance = Appearance
     { appearanceBox = (Position (0, 0), Position (0, 0))
     , appearanceActualSize = fst transparentTexture
-    , appearancePicture = snd transparentTexture
+    , appearanceAnimation = [snd transparentTexture]
     }
   , objectVelocity = Vector (0, 0)
   , objectOnUpdate = \_ -> id
@@ -242,11 +242,11 @@ changeLevel _ False _ _ game = game
 coinObject :: Object
 coinObject = defaultObject
   { objectName = "coin"
-  , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize))]
+  , objectCollisionBoxes = [(Position (level1TileSize / 16 * 5, level1TileSize / 4), Position (level1TileSize / 16 * 11, level1TileSize / 4 * 3))]
   , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize))
+      { appearanceBox = (Position (level1TileSize / 16 * 5, level1TileSize / 4), Position (level1TileSize / 16 * 11, level1TileSize / 4 * 3))
       , appearanceActualSize = fst coinTexture
-      , appearancePicture = snd coinTexture
+      , appearanceAnimation = [snd coinTexture]
       }
   , objectOnActivate = takeCoin
   }
@@ -276,7 +276,7 @@ buttonObject = defaultObject
   , objectAppearance = Appearance
     { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize / 5))
     , appearanceActualSize = fst buttonTexture
-    , appearancePicture = snd buttonTexture
+    , appearanceAnimation = [snd buttonTexture]
     }
   , objectAffectedByGravity = False
   }
@@ -295,7 +295,7 @@ doorObject = defaultObject
   , objectAppearance = Appearance
     { appearanceBox = (Position (0, -level1TileSize), Position (level1TileSize, 3 * level1TileSize))
     , appearanceActualSize = fst doorCloseTexture
-    , appearancePicture = snd doorCloseTexture
+    , appearanceAnimation = [snd doorCloseTexture]
     }
   , objectAffectedByGravity = False
   }
@@ -351,24 +351,24 @@ initialWorld = Game
         position2 = positions !! 1
 
 
-marioControls1 :: PlayerControls
-marioControls1 =
-  [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
-  , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 5))) (zeroAction)
-  , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
+exaControls1 :: PlayerControls
+exaControls1 =
+  [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (-level1TileSize * 4, 0)) exaIdleAnimation)
+  , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0)) exaWalkAnimation) (movePlayer (Vector (level1TileSize * 4, 0)) exaIdleAnimation)
+  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 5)) exaJumpAnimation) (idlePlayer exaIdleAnimation)
+  , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction exaControls2)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
 
-marioControls2 :: PlayerControls
-marioControls2 =
+exaControls2 :: PlayerControls
+exaControls2 =
   [ bindAction (SpecialKey KeyRight) (flightPlayer (Vector (level1TileSize * 10, 0))) (stopFlightPlayer (Vector (level1TileSize * 10, 0)))
   , bindAction (SpecialKey KeyLeft) (flightPlayer (Vector (-level1TileSize * 10, 0))) (stopFlightPlayer (Vector (-level1TileSize * 10, 0)))
   , bindAction (SpecialKey KeyUp) (flightPlayer (Vector (0, level1TileSize * 10))) (stopFlightPlayer (Vector (0, level1TileSize * 10)))
   , bindAction (SpecialKey KeyDown) (flightPlayer (Vector (0, -level1TileSize * 10))) (stopFlightPlayer (Vector (0, -level1TileSize * 10)))
   , bindAction (SpecialKey KeySpace) (stopPlayer) (zeroAction)
-  , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction marioControls1)
+  , bindAction (Char 'c') (setAffectionByGravity True) (switchControlsAction exaControls1)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
   ]
@@ -377,22 +377,22 @@ marioControls2 =
 playerInitialState :: Player
 playerInitialState = Player
   { playerObject = Object
-    { objectName = "mario"
-    , objectPosition = Position (level1TileSize * 2, level1TileSize * 8)
-    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 6))]
+    { objectName = "exa"
+    , objectPosition = Position (level1TileSize * 2, level1TileSize * 4)
+    , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 5))
-      , appearanceActualSize = fst marioTexture
-      , appearancePicture = snd marioTexture
+      { appearanceBox = (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
+      , appearanceActualSize = fst exaIdle1
+      , appearanceAnimation = exaIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = \o game -> activatePlayer "luigi" o $ activateCoin o game
+    , objectOnUpdate = \o game -> activatePlayer "ine" o $ activateCoin o game
     , objectOnActivate = \_ _ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
     , objectAffectedByGravity = True
     }
-  , playerControls = marioControls1
+  , playerControls = exaControls1
   , playerControlVector = zeroVector
   , playerCoins = 0
   }
@@ -400,13 +400,13 @@ playerInitialState = Player
 player2InitialState :: Player
 player2InitialState = Player
   { playerObject = Object
-    { objectName = "luigi"
-    , objectPosition = Position (level1TileSize * 4, level1TileSize * 8)
-    , objectCollisionBoxes = [(Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))]
+    { objectName = "ine"
+    , objectPosition = Position (level1TileSize * 4, level1TileSize * 6)
+    , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))]
     , objectAppearance = Appearance
-      { appearanceBox = (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))
-      , appearanceActualSize = fst luigiTexture
-      , appearancePicture = snd luigiTexture
+      { appearanceBox = (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
+      , appearanceActualSize = fst ineIdle1
+      , appearanceAnimation = ineIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
     , objectOnUpdate = activateCoin
@@ -416,9 +416,9 @@ player2InitialState = Player
     , objectAffectedByGravity = True
     }
   , playerControls =
-      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
-      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5))) (zeroAction)
+      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0)) ineWalkAnimation) (movePlayer (Vector (-level1TileSize * 4, 0)) ineIdleAnimation)
+      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0)) ineWalkAnimation) (movePlayer (Vector (level1TileSize * 4, 0)) ineIdleAnimation)
+      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5)) ineJumpAnimation) (idlePlayer ineIdleAnimation)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
       , bindAction (Char ']') (resetAction) (zeroAction)
@@ -454,7 +454,7 @@ resetAction =
 --activateCoin self game =
 --  foldr (\object acc ->
 --          if objectsCollide self object
---          then takeCoin ((appearancePicture . objectAppearance $ object) /= snd transparentTexture) player object acc
+--          then takeCoin ((appearanceAnimation . objectAppearance $ object) /= snd transparentTexture) player object acc
 --          else acc
 --        )
 --        game
@@ -466,7 +466,7 @@ resetAction =
 activateCoin ::  Object -> Game -> Game
 activateCoin object game =
   foldr (\coin acc ->
-                   takeCoin (((appearancePicture . objectAppearance $ coin) /= snd transparentTexture)
+                   takeCoin (((appearanceAnimation . objectAppearance $ coin) /= [snd transparentTexture])
                              && (objectsCollide (playerObject player) coin))
                              player coin acc
         )
@@ -499,8 +499,8 @@ resizeSelf state _ self game = game
                       ) (gamePlayers game)
   }
   where isSelf player = (objectName . playerObject $ player) == (objectName self)
-        enlarge = changeSize (Position (-level1TileSize / 5 * 3, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 9, level1TileSize / 5 * 12))
-        reduce = changeSize (Position (level1TileSize / 5 * 4, 0), Position (level1TileSize / 5 * 6, level1TileSize / 5 * 8))
+        enlarge = changeSize (Position (-level1TileSize / 5 * 4, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 10, level1TileSize / 5 * 10))
+        reduce = changeSize (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
         changeSize rect player = player
           { playerObject = (playerObject player)
             { objectAppearance = (objectAppearance . playerObject $ player)

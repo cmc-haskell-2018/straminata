@@ -79,17 +79,18 @@ generate size pattern = map transferLine $ zip [1..] pattern
   where transferLine (y, line) = map (transferSymbol y) $ zip [1..] (words line)
         transferSymbol y (x, 'w' : n) =
           let tex = case n of
-                    "1" -> floorTexture
+                    "1" -> dirtTextureWithGrass
+                    "2" -> dirtTextureWithoutGrass
                     _ -> undefined
           in Solid Appearance
             { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
             , appearanceActualSize = fst tex
-            , appearancePicture = snd tex
+            , appearanceAnimation = [snd tex]
             }
         transferSymbol y (x, _) = Transparent Appearance
           { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
           , appearanceActualSize = fst transparentTexture
-          , appearancePicture = snd transparentTexture
+          , appearanceAnimation = [snd transparentTexture]
           }
 
 level1Map :: Map

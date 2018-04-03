@@ -323,30 +323,47 @@ updateAcceleration time game object =
 
 
 nullifyAcceleration :: Object -> Object
-nullifyAcceleration object =
+nullifyAcceleration object  =
   object { objectAcceleration = zeroVector }
 
 
-movePlayer :: Vector -> Action
-movePlayer vector =
-  PlayerAction (\player _ ->
-    let currentControlVector = playerControlVector player
-    in player { playerControlVector = vector `plus` currentControlVector }
+movePlayer :: Vector -> Animation -> Action
+movePlayer vector moveAnimation =
+  PlayerAction (\player game ->
+    let
+      lvlMap = levelMap . gameLevel $ game
+      objects = levelObjects . gameLevel $ game
+      currentControlVector = playerControlVector player
+      changeAnimation player' = if objectOnGround (playerObject player') lvlMap objects
+                                then player' { playerObject = (playerObject player')
+                                                           { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = moveAnimation} } }
+                                else player'
+    in changeAnimation (player { playerControlVector = vector `plus` currentControlVector })
   )
 
+idlePlayer :: Animation -> Action
+idlePlayer idleAnimation =
+  PlayerAction (\player game ->
+    let
+      changeAnimation player' = player' { playerObject = (playerObject player')
+                                                                 { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = idleAnimation} } }
+    in changeAnimation (player)
+  )
 
-jumpPlayer :: Vector -> Action
-jumpPlayer vector =
+jumpPlayer :: Vector -> Animation -> Action
+jumpPlayer vector jumpAnimation =
   PlayerAction (\player game ->
     let
       obj = playerObject player
       currentVelocity = objectVelocity obj
-    in if objectOnGround (playerObject player) (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
+      changeAnimation player' = player' { playerObject = (playerObject player')
+                                                           { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = jumpAnimation} } }
+    in changeAnimation (if objectOnGround (playerObject player) (levelMap . gameLevel $ game) (levelObjects . gameLevel $ game)
        then player
               { playerObject = obj { objectVelocity = currentVelocity `plus` vector
                                    }
               }
-      else player
+      else player)
   )
 
 
@@ -430,7 +447,7 @@ setTextureByName name texture =
                                     playerObject = (playerObject player) {
                                       objectAppearance = (objectAppearance . playerObject $ player) {
                                         appearanceActualSize = fst texture
-                                      , appearancePicture = snd texture
+                                      , appearanceAnimation = [snd texture]
                                       }
                                     }
                                   }
@@ -441,10 +458,26 @@ setTextureByName name texture =
   where isTarget player = (objectName . playerObject $ player) == name
 
 
+updateAnimations :: Game -> Game
+updateAnimations game =
+  game { gamePlayers = map updatePlayer (gamePlayers game)
+       , gameLevel = (gameLevel game) {
+           levelObjects = map updateObject (levelObjects . gameLevel $ game)
+         }
+       }
+  where
+    updatePlayer player =
+      player { playerObject = updateObject (playerObject player) }
+    updateObject object =
+      object { objectAppearance = (objectAppearance object) { appearanceAnimation = cutHead . appearanceAnimation . objectAppearance $ object } }
+    cutHead [ x ] = [ x ]
+    cutHead (x : xs) = xs
+
+
 changeTexture :: Texture -> Object -> Object
 changeTexture texture object = object
   { objectAppearance = (objectAppearance object)
       { appearanceActualSize = fst texture
-      , appearancePicture = snd texture
+      , appearanceAnimation = [snd texture]
       }
   }
