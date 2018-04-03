@@ -372,8 +372,8 @@ player2InitialState = Player
     , objectAffectedByGravity = True
     }
   , playerControls =
-      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 10, 0))) (movePlayer (Vector (-level1TileSize * 10, 0)))
-      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 10, 0))) (movePlayer (Vector (level1TileSize * 10, 0)))
+      [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
+      , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
       , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5))) (zeroAction)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
