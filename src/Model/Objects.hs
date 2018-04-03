@@ -20,7 +20,7 @@ import Visual.WindowConstants
 -- Level abilities
 abilitiesWithResize :: PlayerAbilities
 abilitiesWithResize =
-  [ (\o game -> activatePlayer "luigi" o $ activateCoin o game, \_ _ _ -> id)
+  [ (\o game -> activatePlayer "ine" o $ activateCoin o game, \_ _ _ -> id)
   , (activateCoin, resizeSelf)
   ]
 
