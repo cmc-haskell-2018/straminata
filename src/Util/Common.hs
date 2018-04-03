@@ -1,7 +1,6 @@
 -- | Contains commonly used functions.
 module Util.Common where
 
-import Debug.Trace
 import Data.List(isInfixOf)
 
 import Model.CommonTypes
