@@ -16,7 +16,7 @@ newWindow = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render game = Pictures $ [positionPicture (gameCamera game) (picture game)] ++ map coinText (zip [0..] $ gamePlayers game)
+render game = Pictures $ [positionPicture (gameCamera game) (picture game)] -- ++ map coinText (zip [0..] $ gamePlayers game)
 
 coinText :: (Int, Player) -> Picture
 coinText (n, p) = uncurry Translate ( plusPos (fromIntegral n)

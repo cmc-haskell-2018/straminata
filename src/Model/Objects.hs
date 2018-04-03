@@ -311,7 +311,7 @@ marioControls1 :: PlayerControls
 marioControls1 =
   [ bindAction (SpecialKey KeyRight) (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
   , bindAction (SpecialKey KeyLeft) (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 10))) (zeroAction)
+  , bindAction (SpecialKey KeyUp) (jumpPlayer (Vector (0, level1TileSize * 5))) (zeroAction)
   , bindAction (Char 'c') (setAffectionByGravity False) (switchControlsAction marioControls2)
   , bindAction (SpecialKey KeyEnter) (activateObject True) (zeroAction)
   , bindAction (Char '/') (activateObject False) (zeroAction)
@@ -374,7 +374,7 @@ player2InitialState = Player
   , playerControls =
       [ bindAction (Char 'd') (movePlayer (Vector (level1TileSize * 4, 0))) (movePlayer (Vector (-level1TileSize * 4, 0)))
       , bindAction (Char 'a') (movePlayer (Vector (-level1TileSize * 4, 0))) (movePlayer (Vector (level1TileSize * 4, 0)))
-      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 10))) (zeroAction)
+      , bindAction (Char 'w') (jumpPlayer (Vector (0, level1TileSize * 5))) (zeroAction)
       , bindAction (Char 'e') (activateObject True) (zeroAction)
       , bindAction (Char 'q') (activateObject False) (zeroAction)
       , bindAction (Char ']') (resetAction) (zeroAction)
