@@ -17,6 +17,19 @@ import Visual.TextureLoader
 import Visual.WindowConstants
 
 
+-- Level abilities
+abilitiesWithResize :: PlayerAbilities
+abilitiesWithResize =
+  [ (\o game -> activatePlayer "luigi" o $ activateCoin o game, \_ _ _ -> id)
+  , (activateCoin, resizeSelf)
+  ]
+
+abilitiesWithoutResize :: PlayerAbilities
+abilitiesWithoutResize =
+  [ (activateCoin, \_ _ _ -> id)
+  , (activateCoin, \_ _ _ -> id)
+  ]
+
 -- Levels
 
 level1 :: Level
@@ -35,6 +48,7 @@ level1 = Level
   , levelPlayersOut = []
   , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 6)
                           , Position (level1TileSize * 4, level1TileSize * 6)]
+  , levelPlayerAbilities = abilitiesWithResize
   }
 
 objects1 :: [Object]
@@ -58,8 +72,9 @@ level2 = Level
     }
   , levelCoinNumber = length coins2
   , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 8)
-                          , Position (level1TileSize * 4, level1TileSize * 8)]
+  , levelStartPositions = [ Position (level1TileSize * 9, level1TileSize * 11)
+                          , Position (level1TileSize * 10, level1TileSize * 11)]
+  , levelPlayerAbilities = abilitiesWithoutResize
   }
 
 objects2 :: [Object]
@@ -85,6 +100,7 @@ level3 = Level
   , levelPlayersOut = []
   , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 8)
                           , Position (level1TileSize * 4, level1TileSize * 8)]
+  , levelPlayerAbilities = abilitiesWithoutResize
   }
 
 objects3 :: [Object]
@@ -169,15 +185,20 @@ changeLevel :: Level -> Bool -> Player -> Object -> Game -> Game
 changeLevel next True player object game =
   if (name player) `isSuffixOf` (objectName object)
   then let playersOut = (levelPlayersOut . gameLevel $ game) `union` [player]
-       in if null (playersOut \\ (gamePlayers game)) && null ((gamePlayers game) \\ playersOut)
+       in if null (playersOut \\ players) && null (players \\ playersOut)
           then Game
-            { gamePlayers = [ playerInitialState { playerCoins = playerCoins player1
-                                                 , playerObject = (playerObject player1) {objectPosition = position1}
-                                                 }
-                            , player2InitialState { playerCoins = playerCoins player2
-                                                  , playerObject = (playerObject player2) {objectPosition = position2}
-                                                  }
-                            ]
+            {
+              gamePlayers = map
+                (\(index, player') -> player'
+                    { playerCoins = (playerCoins player')
+                    , playerObject = (playerObject player')
+                        { objectPosition = positions !! index
+                        , objectOnUpdate =  fst (abilities !! index)
+                        , objectOnActivate =  snd (abilities !! index)
+                        }
+                    }
+                )
+                (zip [0..] players)
             , gameLevel = next
             , gameCamera = Camera
                { cameraPosition = Position (0, 0)
@@ -187,11 +208,8 @@ changeLevel next True player object game =
           else game {gameLevel = (gameLevel game) {levelPlayersOut = playersOut}} -- todo: remove exited player
   else game
   where players = gamePlayers game
-        player1 = players !! 0
-        player2 = players !! 1
+        abilities = levelPlayerAbilities next
         positions = levelStartPositions next
-        position1 = positions !! 0
-        position2 = positions !! 1
         name = objectName . playerObject
 changeLevel _ False _ _ game = game
 

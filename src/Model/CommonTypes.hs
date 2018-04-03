@@ -197,7 +197,13 @@ data Level = Level
   , levelCoinNumber :: Int
   , levelPlayersOut :: [Player]
   , levelStartPositions :: [Position]
-  } deriving (Show)
+  , levelPlayerAbilities :: PlayerAbilities
+  } -- deriving (Show)
+
+instance Show Level where
+  show _ = "Level"
+
+type PlayerAbilities = [(Object -> Game -> Game, Bool -> Player -> Object -> Game -> Game)]
 
 type Map = [MapRow]
 
