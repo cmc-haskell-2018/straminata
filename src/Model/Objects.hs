@@ -216,9 +216,9 @@ changeLevel _ False _ _ game = game
 coinObject :: Object
 coinObject = defaultObject
   { objectName = "coin"
-  , objectCollisionBoxes = [(Position (0, 0), Position (level1TileSize, level1TileSize))]
+  , objectCollisionBoxes = [(Position (level1TileSize / 16 * 5, level1TileSize / 4), Position (level1TileSize / 16 * 11, level1TileSize / 4 * 3))]
   , objectAppearance = Appearance
-      { appearanceBox = (Position (0, 0), Position (level1TileSize, level1TileSize))
+      { appearanceBox = (Position (level1TileSize / 16 * 5, level1TileSize / 4), Position (level1TileSize / 16 * 11, level1TileSize / 4 * 3))
       , appearanceActualSize = fst coinTexture
       , appearanceAnimation = [snd coinTexture]
       }
@@ -473,7 +473,7 @@ resizeSelf state _ self game = game
                       ) (gamePlayers game)
   }
   where isSelf player = (objectName . playerObject $ player) == (objectName self)
-        enlarge = changeSize (Position (-level1TileSize / 5 * 4, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 12, level1TileSize / 5 * 12))
+        enlarge = changeSize (Position (-level1TileSize / 5 * 4, -level1TileSize / 5 * 4), Position (level1TileSize / 5 * 10, level1TileSize / 5 * 10))
         reduce = changeSize (Position (0, 0), Position (level1TileSize / 4 * 3, level1TileSize / 4 * 3))
         changeSize rect player = player
           { playerObject = (playerObject player)

@@ -16,13 +16,13 @@ dirtTextureWithoutGrass = ((Dimensions (400, 400)), ) $! png "img/tilewograss.pn
 
 -- | exa idle
 exaIdle1 :: Texture
-exaIdle1 = ((Dimensions (100, 100)), ) $! png "img/exa/idle/id1.png"
+exaIdle1 = ((Dimensions (92, 93)), ) $! png "img/exa/idle/id1.png"
 
 exaIdle2 :: Texture
-exaIdle2 = ((Dimensions (100, 100)), ) $! png "img/exa/idle/id2.png"
+exaIdle2 = ((Dimensions (93, 92)), ) $! png "img/exa/idle/id2.png"
 
 exaIdle3 :: Texture
-exaIdle3 = ((Dimensions (100, 100)), ) $! png "img/exa/idle/id3.png"
+exaIdle3 = ((Dimensions (93, 89)), ) $! png "img/exa/idle/id3.png"
 
 -- | exa walk
 
@@ -103,51 +103,51 @@ exaWalkAnimationControl  i = (if i <  10
 
 -- | ine idle
 ineIdle1 :: Texture
-ineIdle1 = ((Dimensions (100, 100)), ) $! png "img/ine/idle/id_1.png"
+ineIdle1 = ((Dimensions (73, 84)), ) $! png "img/ine/idle/id_1.png"
 
 ineIdle2 :: Texture
-ineIdle2 = ((Dimensions (100, 100)), ) $! png "img/ine/idle/id_2.png"
+ineIdle2 = ((Dimensions (69, 77)), ) $! png "img/ine/idle/id_2.png"
 
 ineIdle3 :: Texture
-ineIdle3 = ((Dimensions (100, 100)), ) $! png "img/ine/idle/id_3.png"
+ineIdle3 = ((Dimensions (72, 84)), ) $! png "img/ine/idle/id_3.png"
 
 -- | ine walk
 ineWalk1 :: Texture
-ineWalk1 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_1.png"
+ineWalk1 = ((Dimensions (81, 80)), ) $! png "img/ine/walk/wa_1.png"
 
 ineWalk2 :: Texture
-ineWalk2 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_2.png"
+ineWalk2 = ((Dimensions (76, 82)), ) $! png "img/ine/walk/wa_2.png"
 
 ineWalk3 :: Texture
-ineWalk3 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_3.png"
+ineWalk3 = ((Dimensions (77, 86)), ) $! png "img/ine/walk/wa_3.png"
 
 ineWalk4 :: Texture
-ineWalk4 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_4.png"
+ineWalk4 = ((Dimensions (81, 86)), ) $! png "img/ine/walk/wa_4.png"
 
 ineWalk5 :: Texture
-ineWalk5 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_5.png"
+ineWalk5 = ((Dimensions (74, 88)), ) $! png "img/ine/walk/wa_5.png"
 
 ineWalk6 :: Texture
-ineWalk6 = ((Dimensions (100, 100)), ) $! png "img/ine/walk/wa_6.png"
+ineWalk6 = ((Dimensions (82, 81)), ) $! png "img/ine/walk/wa_6.png"
 
 -- | ine jump
 ineJump1 :: Texture
-ineJump1 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_1.png"
+ineJump1 = ((Dimensions (84, 85)), ) $! png "img/ine/jump/jp_1.png"
 
 ineJump2 :: Texture
-ineJump2 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_2.png"
+ineJump2 = ((Dimensions (72, 88)), ) $! png "img/ine/jump/jp_2.png"
 
 ineJump3 :: Texture
-ineJump3 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_3.png"
+ineJump3 = ((Dimensions (72, 90)), ) $! png "img/ine/jump/jp_3.png"
 
 ineJump4 :: Texture
-ineJump4 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_4.png"
+ineJump4 = ((Dimensions (71, 89)), ) $! png "img/ine/jump/jp_4.png"
 
 ineJump5 :: Texture
-ineJump5 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_5.png"
+ineJump5 = ((Dimensions (73, 86)), ) $! png "img/ine/jump/jp_5.png"
 
 ineJump6 :: Texture
-ineJump6 = ((Dimensions (100, 100)), ) $! png "img/ine/jump/jp_6.png"
+ineJump6 = ((Dimensions (76, 86)), ) $! png "img/ine/jump/jp_6.png"
 
 ineIdleAnimation :: [Picture]
 ineIdleAnimation = ineIdleAnimationControl 1
@@ -224,7 +224,7 @@ doorCloseTexture :: Texture
 doorCloseTexture = ((Dimensions (32, 128)), ) $! png "img/door.png"
 
 coinTexture :: Texture
-coinTexture = ((Dimensions (256, 256)), ) $! png "img/coinreel.png"
+coinTexture = ((Dimensions (135, 257)), ) $! png "img/coinreel.png"
 
 teleport1Texture :: Texture
 teleport1Texture = ((Dimensions (32, 128)), ) $! png "img/teleport1.png"
