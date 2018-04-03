@@ -26,7 +26,7 @@ level1Pattern =
   , "w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1"
   , "w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1"
   , "w1 c1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1"
-  , "w1 t t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 w1 w1 t1 t1 t1 w1"
+  , "w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 w1 w1 t1 t1 t1 w1"
   , "w1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 t1 t1 t1 t1 t1 w1 w1"
   , "w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 t1 w1"
   , "w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 t1 t1 w1"
@@ -109,11 +109,15 @@ level3Pattern =
 generate :: Float -> [String] -> Map
 generate size pattern = map transferLine $ zip [1..] pattern
   where transferLine (y, line) = map (transferSymbol y) $ zip [1..] (words line)
-        transferSymbol y (x, 'w' : _) = Solid Appearance
-          { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
-          , appearanceActualSize = fst floorTexture
-          , appearancePicture = snd floorTexture
-          }
+        transferSymbol y (x, 'w' : n) =
+          let tex = case n of
+                    "1" -> floorTexture
+                    _ -> undefined
+          in Solid Appearance
+            { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
+            , appearanceActualSize = fst tex
+            , appearancePicture = snd tex
+            }
         transferSymbol y (x, _) = Transparent Appearance
           { appearanceBox = (Position (x * size, y * size), Position ((x + 1) * size, (y + 1) * size))
           , appearanceActualSize = fst transparentTexture
