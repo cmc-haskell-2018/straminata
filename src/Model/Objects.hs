@@ -119,7 +119,7 @@ level4 = Level
   , levelObjects = objects4
   , levelBackground = Appearance
     { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearancePicture = snd backgroundTexture
+    , appearanceAnimation = [snd backgroundTexture]
     , appearanceActualSize = fst backgroundTexture
     }
   , levelCoinNumber = length coins4
