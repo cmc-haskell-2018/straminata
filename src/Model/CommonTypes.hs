@@ -101,7 +101,7 @@ type Time = Float
 data Appearance = Appearance
   { appearanceBox :: Rectangle
   , appearanceActualSize :: Dimensions
-  , appearancePicture :: Picture
+  , appearanceAnimation :: Animation
   } deriving (Show)
 
 computeScale :: Rectangle
@@ -109,6 +109,8 @@ computeScale :: Rectangle
              -> (Float, Float)
 computeScale ((Position (lx, ly)), (Position (rx, ry)))
              (Dimensions (width, height)) = ((abs $ rx - lx) / width, (abs $ ry - ly) / height)
+
+type Animation = [Picture]
 
 -- | Contains information about a movable game entity.
 data Object = Object
@@ -197,7 +199,13 @@ data Level = Level
   , levelCoinNumber :: Int
   , levelPlayersOut :: [Player]
   , levelStartPositions :: [Position]
-  } deriving (Show)
+  , levelPlayerAbilities :: PlayerAbilities
+  } -- deriving (Show)
+
+instance Show Level where
+  show _ = "Level"
+
+type PlayerAbilities = [(Object -> Game -> Game, Bool -> Player -> Object -> Game -> Game)]
 
 type Map = [MapRow]
 

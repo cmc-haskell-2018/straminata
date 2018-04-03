@@ -26,4 +26,4 @@ run = play
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
             -> Game
             -> Game
-advanceGame time = updateCamera . updatePhysics time . updateObjects
+advanceGame time = updateCamera . updateAnimations . updatePhysics time . updateObjects
