@@ -7,8 +7,11 @@ import Graphics.Gloss.Game (png)
 
 import Model.CommonTypes
 
-floorTexture :: Texture
-floorTexture = ((Dimensions (400, 400)), ) $! png "img/tile.png"
+dirtTextureWithGrass :: Texture
+dirtTextureWithGrass = ((Dimensions (400, 400)), ) $! png "img/tile.png"
+
+dirtTextureWithoutGrass :: Texture
+dirtTextureWithoutGrass = ((Dimensions (400, 400)), ) $! png "img/tilewograss.png"
 
 
 -- | exa idle
