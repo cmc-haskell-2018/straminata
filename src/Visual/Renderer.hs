@@ -16,15 +16,15 @@ newWindow = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render game = Pictures $ [positionPicture (gameCamera game) (picture game)] -- ++ map coinText (zip [0..] $ gamePlayers game)
+render game = Pictures $ [positionPicture (gameCamera game) (picture game)] ++ map coinText (zip [0..] $ gamePlayers game)
 
 coinText :: (Int, Player) -> Picture
 coinText (n, p) = uncurry Translate ( plusPos (fromIntegral n)
                                     $ join (***) (negate . fromIntegral . (`div` 2)) initialWindowDimensions)
-             $ Scale (level1TileSize / 20) (level1TileSize / 20)
+             $ Scale 0.3 0.3
              $ Text (name p ++ ":" ++ show (playerCoins p))
   where name = objectName . playerObject
-        plusPos n' (x, y) = (x, y + level1TileSize * 3 + n' * level1TileSize * 7)
+        plusPos n' (x, y) = (x + 10, y + 15 + n' * 40)
 
 
 -- | Composes all game @objects@ in a list of pictures.
