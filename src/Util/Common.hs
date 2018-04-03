@@ -131,7 +131,7 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
     restrictedVelocity = foldr
       (\rect vel -> foldr (restrictVelocity rect) vel boxes)
       velocity
-      ((map tileRect . filter isSolid $ tiles) )-- ++ (concat (map (\o -> map (offsetRectangle (objectPosition o)) $ objectCollisionBoxes o) objects)))
+      ((map tileRect . filter isSolid $ tiles) ++ (concat (map (\o -> map (offsetRectangle (objectPosition o)) $ objectCollisionBoxes o) objects)))
     restrictVelocity tileBox objBox newVelocity =
       let newObjBox = translateRectByVector (newVelocity `mulByNumber` time) objBox
           dUp = rectanglesDistanceUp objBox tileBox
@@ -152,108 +152,6 @@ restrictMovingObject object time game = object {objectVelocity = restrictedVeloc
               then maybeRestrictUp . maybeRestrictDown . maybeRestrictLeft . maybeRestrictRight $ newVelocity
               else newVelocity
 
---restrictMovingObject :: Object -> Float -> Game -> Object
---restrictMovingObject object time game = object {objectVelocity = restrictedVelocity}
--- where
---    boxes = map (offsetRectangle offset) (objectCollisionBoxes object)
---    offset = objectPosition object
---    velocity = objectVelocity object
---    tiles = concat . levelMap . gameLevel $ game
---    objects = filter isNotActive . levelObjects . gameLevel $ game
---    tileRect (Solid app) = appearanceBox app
---    tileRect (Transparent _) = infiniteRectangle
---    restrictedVelocity =
---      foldr (\rect vel -> foldr (restrictVelocity rect) vel boxes
---      ) velocity ((map tileRect . filter isSolid $ tiles)
---                   ++ (concat (map (\o -> map (offsetRectangle (objectPosition o)) $ objectCollisionBoxes o) objects)))
---    restrictVelocity tileBox objBox newVelocity =
---      let vx = getX newVelocity * time
---          vy = getY newVelocity * time
---          dUp = rectanglesDistanceUp objBox tileBox
---          dRight = rectanglesDistanceRight objBox tileBox
---          dDown = rectanglesDistanceDown objBox tileBox
---          dLeft = rectanglesDistanceLeft objBox tileBox
---          x1 = fst . unwrap . fst $ objBox
---          y1 = snd . unwrap . fst $ objBox
---          x2 = fst . unwrap . snd $ objBox
---          y2 = snd . unwrap . snd $ objBox
---      in case defineDescartesQuadrant newVelocity of
---           1 ->
---             if (dUp >= 0) && (dUp <= (vy + epsilon))
---             then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
---                  in if (dUp' >= 0) && (dUp' <= (vy + epsilon))
---                     then restrictUp newVelocity dUp
---                     else newVelocity
---             else if (dRight >= 0) && (dRight <= (vx + epsilon))
---                  then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
---                       in if (dRight' >= 0) && (dRight' <= (vx + epsilon))
---                          then restrictRight newVelocity dRight
---                          else newVelocity
---                  else restrictRightOrUp (Position (x2, y2), Position (x2 + vx, y2 + vy)) newVelocity tileBox
---           2 ->
---             if (dUp >= 0) && (dUp <= (vy + epsilon))
---             then let dUp' = rectanglesDistanceUp (translateRectByX (vx * dUp / vy) objBox) tileBox
---                  in if (dUp' >= 0) && (dUp' <= (vy + epsilon))
---                     then restrictUp newVelocity dUp
---                     else newVelocity
---             else if (dLeft >= 0) && (dLeft <= (- vx + epsilon))
---                  then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
---                       in if (dLeft' >= 0) && (dLeft' <= (- vx + epsilon))
---                          then restrictLeft newVelocity dLeft
---                          else newVelocity
---                  else restrictLeftOrUp (Position (x1, y2), Position (x1 + vx, y2 + vy)) newVelocity tileBox
---           3 ->
---             if (dDown >= 0) && (dDown <= (- vy + epsilon))
---             then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
---                  in if (dDown' >= 0) && (dDown' <= (- vy + epsilon))
---                     then restrictDown newVelocity dDown
---                     else newVelocity
---             else if (dLeft >= 0) && (dLeft <= (- vx + epsilon))
---                  then let dLeft' = rectanglesDistanceLeft (translateRectByY (vy * dLeft / (- vx)) objBox) tileBox
---                       in if (dLeft' >= 0) && (dLeft' <= (- vx + epsilon))
---                          then restrictLeft newVelocity dLeft
---                          else newVelocity
---                  else restrictLeftOrDown (Position (x1, y1), Position (x1 + vx, y1 + vy)) newVelocity tileBox
---           _ ->
---             if (dDown >= 0) && (dDown <= (- vy + epsilon))
---             then let dDown' = rectanglesDistanceDown (translateRectByX (vx * dDown / (- vy)) objBox) tileBox
---                  in if (dDown' >= 0) && (dDown' <= (- vy + epsilon))
---                     then restrictDown newVelocity dDown
---                     else newVelocity
---             else if (dRight >= 0) && (dRight <= (vx + epsilon))
---                  then let dRight' = rectanglesDistanceRight (translateRectByY (vy * dRight / vx) objBox) tileBox
---                       in if (dRight' >= 0) && (dRight' <= (vx + epsilon))
---                          then restrictRight newVelocity dRight
---                          else newVelocity
---                  else restrictRightOrDown (Position (x2, y1), Position (x2 + vx, y1 + vy)) newVelocity tileBox
---    restrictDown (Vector (x, _)) dist = (Vector (x, - (dist / time) + epsilon))
---    restrictUp (Vector (x, _)) dist = (Vector (x, (dist / time) - epsilon))
---    restrictLeft (Vector (_, y)) dist = (Vector (- (dist / time) + epsilon, y))
---    restrictRight (Vector (_, y)) dist = (Vector ((dist / time) - epsilon, y))
---    restrictRightOrUp (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
---      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x1, y2))
---      then restrictRight vel (x1 - lx1)
---      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x2, y1))
---           then restrictUp vel (y1 - ly1)
---           else vel
---    restrictLeftOrUp (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
---      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x2, y1), Position (x2, y2))
---      then restrictLeft vel (lx1 - x2)
---      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x2, y1))
---           then restrictUp vel (y1 - ly1)
---           else vel
---    restrictLeftOrDown (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
---      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x2, y1), Position (x2, y2))
---      then restrictLeft vel (lx1 - x2)
---      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y2), Position (x2, y2))
---           then restrictDown vel (ly1 - y2)
---           else vel
---    restrictRightOrDown (Position (lx1, ly1), Position (lx2, ly2)) vel (Position (x1, y1), Position (x2, y2)) =
---      if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y1), Position (x1, y2))
---      then restrictRight vel (x1 - lx1)
---      else if linesCollide (Position (lx1, ly1), Position (lx2, ly2)) (Position (x1, y2), Position (x2, y2))
---           then restrictDown vel (ly1 - y2)
---           else vel
 
 isNotActive :: Object -> Bool
 isNotActive obj = let name = objectName obj

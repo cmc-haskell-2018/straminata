@@ -18,10 +18,10 @@ gravitationalVector :: Vector
 gravitationalVector = Vector (0, - g)
 
 frictionCoef :: Float
-frictionCoef = 75 * level1TileSize
+frictionCoef = 1000 * level1TileSize
 
 infiniteRectangle :: Rectangle
 infiniteRectangle = (Position (-infinity, -infinity), Position(infinity, infinity))
 
 maxVelocity :: Float
-maxVelocity = 10 * level1TileSize
+maxVelocity = 100 * level1TileSize
