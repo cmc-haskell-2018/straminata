@@ -343,7 +343,7 @@ movePlayer vector moveAnimation =
 
 idlePlayer :: Animation -> Action
 idlePlayer idleAnimation =
-  PlayerAction (\player game ->
+  PlayerAction (\player _ ->
     let
       changeAnimation player' = player' { playerObject = (playerObject player')
                                                                  { objectAppearance = (objectAppearance . playerObject $ player') {appearanceAnimation = idleAnimation} } }
@@ -470,8 +470,9 @@ updateAnimations game =
       player { playerObject = updateObject (playerObject player) }
     updateObject object =
       object { objectAppearance = (objectAppearance object) { appearanceAnimation = cutHead . appearanceAnimation . objectAppearance $ object } }
-    cutHead [ x ] = [ x ]
-    cutHead (x : xs) = xs
+    cutHead [] = undefined
+    cutHead [x] = [x]
+    cutHead (_ : xs) = xs
 
 
 changeTexture :: Texture -> Object -> Object
