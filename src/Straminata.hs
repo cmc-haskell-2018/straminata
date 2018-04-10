@@ -12,6 +12,7 @@ import Util.Common
 import Util.Controls
 import Visual.WindowConstants
 import Visual.Renderer
+import Generator
 
 -- | Starts game main loop.
 run :: IO ()
@@ -26,14 +27,14 @@ startMachine GameRunner = play
                           render
                           handleInput
                           advanceGame
-startMachine Generator = play
+startMachine GeneratorRunner = play
                          newWindow
                          white
                          fps
-                         []
-                         (const (Text "a"))
-                         (\_ _ -> [])
-                         (\_ _ -> [])
+                         initialGeneratorState
+                         renderGenerator
+                         handleGeneratorInput
+                         advanceGenerator
 
 -- | Advances game state one step further.
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced

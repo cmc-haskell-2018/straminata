@@ -230,10 +230,10 @@ getAppearance (Transparent app) = app
 
 type Texture = (Dimensions, Picture)
 
-data Mode = Generator | GameRunner
+data Mode = GeneratorRunner | GameRunner
 
 parseMode :: [String] -> Mode
 parseMode [] = GameRunner
 parseMode ["game"] = GameRunner
-parseMode ["gen"] = Generator
+parseMode ["gen"] = GeneratorRunner
 parseMode as = error $ "Undefined arguments: " ++ show as
