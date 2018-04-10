@@ -4,6 +4,8 @@ module Straminata where
 
 import Graphics.Gloss
 
+import System.Environment(getArgs)
+
 import Model.CommonTypes
 import Model.Objects
 import Util.Common
@@ -13,14 +15,25 @@ import Visual.Renderer
 
 -- | Starts game main loop.
 run :: IO ()
-run = play
-      newWindow
-      backgroundColor
-      fps
-      initialWorld
-      render
-      handleInput
-      advanceGame
+run = getArgs >>= startMachine . parseMode
+
+startMachine :: Mode -> IO ()
+startMachine GameRunner = play
+                          newWindow
+                          backgroundColor
+                          fps
+                          initialWorld
+                          render
+                          handleInput
+                          advanceGame
+startMachine Generator = play
+                         newWindow
+                         white
+                         fps
+                         []
+                         (const (Text "a"))
+                         (\_ _ -> [])
+                         (\_ _ -> [])
 
 -- | Advances game state one step further.
 advanceGame :: Float -- ^ period of time (in seconds) needing to be advanced
