@@ -93,6 +93,12 @@ generate size pattern = map transferLine $ zip [1..] pattern
           , appearanceAnimation = [snd transparentTexture]
           }
 
+patterns :: [[String]]
+patterns = [level1Pattern, level2Pattern, level3Pattern, level4Pattern]
+
+maps :: [Map]
+maps = map (generate level1TileSize . reverse) patterns
+
 level1Map :: Map
 level1Map = generate level1TileSize $ reverse level1Pattern
 

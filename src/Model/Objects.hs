@@ -30,112 +30,92 @@ abilitiesWithoutResize =
   , (activateCoin, \_ _ _ -> id)
   ]
 
--- Levels
 
 level1 :: Level
-level1 = Level
-  { levelMap = level1Map
-  , levelColNumber = length level1Map
-  , levelRowNumber = length (head level1Map)
-  , levelTileSize = level1TileSize
-  , levelObjects = objects1
-  , levelBackground = Appearance
-    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearanceAnimation = [snd backgroundTexture]
-    , appearanceActualSize = fst backgroundTexture
-    }
-  , levelCoinNumber = length coins1
-  , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 5)
-                          , Position (level1TileSize * 4, level1TileSize * 4)]
-  , levelPlayerAbilities = abilitiesWithResize
-  }
-
-objects1 :: [Object]
-objects1 = generateObjects level2 level1TileSize $ reverse level1Pattern
-
-coins1 :: [Object]
-coins1 = filter (\o -> "coin" `isInfixOf` objectName o) objects1
-
+level1 = generateLevel
+         (maps !! 0)
+         (allObjects !! 0)
+         backgroundTexture
+         [ Position (level1TileSize * 2, level1TileSize * 5), Position (level1TileSize * 4, level1TileSize * 4)]
+         abilitiesWithResize
 
 level2 :: Level
-level2 = Level
-  { levelMap = level2Map
-  , levelColNumber = length level2Map
-  , levelRowNumber = length (head level2Map)
-  , levelTileSize = level1TileSize
-  , levelObjects = objects2
-  , levelBackground = Appearance
-    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearanceAnimation = [snd backgroundTexture]
-    , appearanceActualSize = fst backgroundTexture
-    }
-  , levelCoinNumber = length coins2
-  , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 9, level1TileSize * 11)
-                          , Position (level1TileSize * 10, level1TileSize * 11)]
-  , levelPlayerAbilities = abilitiesWithoutResize
-  }
-
-objects2 :: [Object]
-objects2 = generateObjects level3 level1TileSize $ reverse level2Pattern
-
-coins2 :: [Object]
-coins2 = filter (\o -> "coin" `isInfixOf` objectName o) objects2
-
+level2 = generateLevel
+         (maps !! 1)
+         (allObjects !! 1)
+         backgroundTexture
+         [ Position (level1TileSize * 9, level1TileSize * 11), Position (level1TileSize * 10, level1TileSize * 11)]
+         abilitiesWithoutResize
 
 level3 :: Level
-level3 = Level
-  { levelMap = level3Map
-  , levelColNumber = length level3Map
-  , levelRowNumber = length (head level3Map)
-  , levelTileSize = level1TileSize
-  , levelObjects = objects3
-  , levelBackground = Appearance
-    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearanceAnimation = [snd backgroundTexture]
-    , appearanceActualSize = fst backgroundTexture
-    }
-  , levelCoinNumber = length coins3
-  , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 2)
-                          , Position (level1TileSize * 4, level1TileSize * 2)]
-  , levelPlayerAbilities = abilitiesWithResize
-  }
-
-objects3 :: [Object]
-objects3 = generateObjects level4 level1TileSize $ reverse level3Pattern
-
-coins3 :: [Object]
-coins3 = filter (\o -> "coin" `isInfixOf` objectName o) objects3
-
+level3 = generateLevel
+         (maps !! 2)
+         (allObjects !! 2)
+         backgroundTexture
+         [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 4, level1TileSize * 2)]
+         abilitiesWithResize
 
 level4 :: Level
-level4 = Level
-  { levelMap = level4Map
-  , levelColNumber = length level4Map
-  , levelRowNumber = length (head level4Map)
-  , levelTileSize = level1TileSize
-  , levelObjects = objects4
-  , levelBackground = Appearance
-    { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
-    , appearanceAnimation = [snd backgroundTexture]
-    , appearanceActualSize = fst backgroundTexture
-    }
-  , levelCoinNumber = length coins4
-  , levelPlayersOut = []
-  , levelStartPositions = [ Position (level1TileSize * 2, level1TileSize * 2)
-                          , Position (level1TileSize * 28, level1TileSize * 2)]
-  , levelPlayerAbilities = abilitiesWithResize
-  }
+level4 = generateLevel
+         (maps !! 3)
+         (allObjects !! 3)
+         backgroundTexture
+         [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 28, level1TileSize * 2)]
+         abilitiesWithResize
 
-objects4 :: [Object]
-objects4 = generateObjects level1 level1TileSize $ reverse level4Pattern
+generateLevel :: Map -> [Object] -> Texture -> [Position] -> PlayerAbilities -> Level
+generateLevel levelMap' objects background initialPositions abilities
+  = Level
+      { levelMap = levelMap'
+      , levelColNumber = length levelMap'
+      , levelRowNumber = length (head levelMap')
+      , levelTileSize = level1TileSize
+      , levelObjects = objects
+      , levelBackground = Appearance
+        { appearanceBox = (Position (0, 0), Position . (join (***)) (fromIntegral) $ initialWindowDimensions)
+        , appearanceAnimation = [snd background]
+        , appearanceActualSize = fst background
+        }
+      , levelCoinNumber = length $ filter (\o -> "coin" `isInfixOf` objectName o) objects
+      , levelPlayersOut = []
+      , levelStartPositions = initialPositions
+      , levelPlayerAbilities = abilities
+      }
 
-coins4 :: [Object]
-coins4 = filter (\o -> "coin" `isInfixOf` objectName o) objects4
+generateLevelForPattern :: Int -> Level
+generateLevelForPattern number = generateLevel
+                                 (maps !! number)
+                                 (allObjects !! number)
+                                 backgroundTexture
+                                 (allPositions !! number)
+                                 (abilitiesList !! number)
 
--- /Levels
+levels :: [Level]
+levels = map generateLevelForPattern [0..length patterns - 1]
+
+generateObjectsForPattern :: Int -> [Object]
+generateObjectsForPattern number = generateObjects nextLevel level1TileSize $ reverse (patterns !! number)
+  where nextLevel = if number + 1 >= length levels then head levels else levels !! (number + 1)
+
+allObjects :: [[Object]]
+allObjects = map generateObjectsForPattern [0..length patterns - 1]
+
+allPositions :: [[Position]]
+allPositions =
+  [ [ Position (level1TileSize * 2, level1TileSize * 5), Position (level1TileSize * 4, level1TileSize * 4)]
+  , [ Position (level1TileSize * 9, level1TileSize * 11), Position (level1TileSize * 10, level1TileSize * 11)]
+  , [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 4, level1TileSize * 2)]
+  , [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 28, level1TileSize * 2)]
+  ]
+
+abilitiesList :: [PlayerAbilities]
+abilitiesList =
+  [ abilitiesWithResize
+  , abilitiesWithoutResize
+  , abilitiesWithResize
+  , abilitiesWithResize
+  ]
+
 
 generateObjects :: Level -> Float -> [String] -> [Object]
 generateObjects nextLevel size pattern = foldr (\t acc -> acc ++ transferLine t) [] $ zip [1..] pattern
