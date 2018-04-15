@@ -30,6 +30,7 @@ library
                      , gloss
                      , gloss-juicy
                      , gloss-game
+                     , directory
   default-language:    Haskell2010
 
 executable straminata

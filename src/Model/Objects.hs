@@ -30,39 +30,6 @@ abilitiesWithoutResize =
   , (activateCoin, \_ _ _ -> id)
   ]
 
-
-level1 :: Level
-level1 = generateLevel
-         (maps !! 0)
-         (allObjects !! 0)
-         backgroundTexture
-         [ Position (level1TileSize * 2, level1TileSize * 5), Position (level1TileSize * 4, level1TileSize * 4)]
-         abilitiesWithResize
-
-level2 :: Level
-level2 = generateLevel
-         (maps !! 1)
-         (allObjects !! 1)
-         backgroundTexture
-         [ Position (level1TileSize * 9, level1TileSize * 11), Position (level1TileSize * 10, level1TileSize * 11)]
-         abilitiesWithoutResize
-
-level3 :: Level
-level3 = generateLevel
-         (maps !! 2)
-         (allObjects !! 2)
-         backgroundTexture
-         [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 4, level1TileSize * 2)]
-         abilitiesWithResize
-
-level4 :: Level
-level4 = generateLevel
-         (maps !! 3)
-         (allObjects !! 3)
-         backgroundTexture
-         [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 28, level1TileSize * 2)]
-         abilitiesWithResize
-
 generateLevel :: Map -> [Object] -> Texture -> [Position] -> PlayerAbilities -> Level
 generateLevel levelMap' objects background initialPositions abilities
   = Level
@@ -82,39 +49,44 @@ generateLevel levelMap' objects background initialPositions abilities
       , levelPlayerAbilities = abilities
       }
 
+generateMapForPatterns :: Int -> Map
+generateMapForPatterns number = generate level1TileSize . reverse . fst' $ patterns !! number
+  where fst' (a, _, _, _) = a
+
 generateLevelForPattern :: Int -> Level
 generateLevelForPattern number = generateLevel
-                                 (maps !! number)
-                                 (allObjects !! number)
+                                 (generateMapForPatterns number)
+                                 (generateObjectsForPattern number)
                                  backgroundTexture
-                                 (allPositions !! number)
-                                 (abilitiesList !! number)
+                                 (generatePositionForPattern number)
+                                 (generateAbilitiesForPattern number)
 
 levels :: [Level]
 levels = map generateLevelForPattern [0..length patterns - 1]
 
 generateObjectsForPattern :: Int -> [Object]
-generateObjectsForPattern number = generateObjects nextLevel level1TileSize $ reverse (patterns !! number)
+generateObjectsForPattern number = generateObjects nextLevel level1TileSize . reverse . fst' $ patterns !! number
   where nextLevel = if number + 1 >= length levels then head levels else levels !! (number + 1)
+        fst' (a, _, _, _) = a
 
-allObjects :: [[Object]]
-allObjects = map generateObjectsForPattern [0..length patterns - 1]
+generatePositionForPattern :: Int -> [Position]
+generatePositionForPattern number = let strPos = thd (patterns !! number)
+  in toPos $ map toFloat $ words strPos
+  where thd (_, _, a, _) = a
+        toFloat :: String -> Float
+        toFloat str = read str
+        toPos [a, b, c, d] = [ Position (a * level1TileSize, b * level1TileSize)
+                             , Position (c * level1TileSize, d * level1TileSize)]
+        toPos _ = undefined
 
-allPositions :: [[Position]]
-allPositions =
-  [ [ Position (level1TileSize * 2, level1TileSize * 5), Position (level1TileSize * 4, level1TileSize * 4)]
-  , [ Position (level1TileSize * 9, level1TileSize * 11), Position (level1TileSize * 10, level1TileSize * 11)]
-  , [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 4, level1TileSize * 2)]
-  , [ Position (level1TileSize * 2, level1TileSize * 2), Position (level1TileSize * 28, level1TileSize * 2)]
-  ]
+generateAbilitiesForPattern :: Int -> PlayerAbilities
+generateAbilitiesForPattern number = let strAbilities = fth (patterns !! number)
+  in toAbility strAbilities
+  where fth (_, _, _, a) = a
+        toAbility "with" = abilitiesWithResize
+        toAbility "without" = abilitiesWithoutResize
+        toAbility _ = undefined
 
-abilitiesList :: [PlayerAbilities]
-abilitiesList =
-  [ abilitiesWithResize
-  , abilitiesWithoutResize
-  , abilitiesWithResize
-  , abilitiesWithResize
-  ]
 
 
 generateObjects :: Level -> Float -> [String] -> [Object]
@@ -320,13 +292,13 @@ initialWorld :: Game
 initialWorld = Game
   { gamePlayers = [ playerInitialState {playerObject = (playerObject playerInitialState) {objectPosition = position1}}
                   , player2InitialState {playerObject = (playerObject player2InitialState) {objectPosition = position2}}]
-  , gameLevel = level1
+  , gameLevel = levels !! 0
   , gameCamera = Camera
     { cameraPosition = Position (0, 0)
     , cameraRatio = 1
     }
   }
-  where positions = levelStartPositions level1
+  where positions = levelStartPositions $ levels !! 0
         position1 = positions !! 0
         position2 = positions !! 1
 

@@ -1,78 +1,29 @@
 module Model.LevelPatterns where
 
+import Data.List (isPrefixOf)
+import System.IO.Unsafe(unsafePerformIO)
+import System.Directory(doesFileExist, getDirectoryContents)
+
 import Model.CommonTypes
-import Util.Constants
 import Visual.TextureLoader
 
-level1Pattern :: [String]
-level1Pattern =
-  [ "w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 w1 w1 t1 t1 t1 w2"
-  , "w2 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 w1 t1 t1 t1 t1 t1 t1 w1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 c1 t1 w1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 c1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 b1 t1 d1 t1 c1 t1 c1 t1 c1 t1 t1 w1 t1 t1 t1 t1 t1 w2"
-  , "w2 w1 q2 t1 t1 w1 t1 t1 t1 t1 t1 t1 w1 t1 w1 t1 t1 t1 t1 t1 t1 t1 w1 t1 t1 t1 t1 t1 q1 w2"
-  , "w2 w2 w1 w1 w1 w2 w1 w1 w1 w1 w1 w1 w2 w1 w2 w1 w1 w1 t1 w1 w1 w1 w2 w1 w1 w1 w1 w1 w1 w2"
-  , "w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 t2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2"
-  , "w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w1 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2 w2"
-  ]
+levelsNumber :: Int
+levelsNumber = id $! length . filter (isPrefixOf "level") . unsafePerformIO . getDirectoryContents $ "level/"
 
-level2Pattern :: [String]
-level2Pattern =
-  [ "w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 d2 b1 t1 t1 t1 b2 d1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 w1 w1 w1 w1 w1 w1 w1 t1 t1 t1 t1 t1 w2"
-  , "w2 c1 t1 t1 t1 t1 t1 t1 t1 w2 t1 t1 t1 t1 t1 t1 t1 c1 w2"
-  , "w2 b3 t1 c1 t1 c1 d4 t1 t1 w2 t1 t1 d3 c1 t1 c1 t1 b4 w2"
-  , "w2 w1 w1 w1 w1 w1 w1 t1 t1 w2 t1 t1 w1 w1 w1 w1 w1 w1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 c1 c1 c1 c1 c1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 t1 w2"
-  , "t2 q1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 q2 t2"
-  , "w1 w1 w1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 w1 w1"
-  ]
-
-level3Pattern :: [String]
-level3Pattern =
-  [ "w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 c1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 c1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 d1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 t1 t1 t1 c1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w1 t1 t1 t1 t1 b1 t1 t1 t1 t1 t1 t1 q2 t1 q1 w2"
-  , "w2 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w2 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w2"
-  ]
-
-level4Pattern :: [String]
-level4Pattern =
-  [ "w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1 w1"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 w2"
-  , "w2 t1 t1 c1 c1 t1 c1 c1 t1 c1 c1 t1 c1 c1 t1 t1 c1 c1 t1 c1 c1 t1 c1 c1 t1 c1 c1 t1 c1 w2"
-  , "w2 q2 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 t1 q1 w2"
-  , "w2 w1 w1 t1 t1 w1 t1 t1 w1 t1 t1 w1 t1 t1 w1 w1 t1 t1 w1 t1 t1 w1 t1 t1 w1 t1 t1 w1 w1 w2"
-  ]
+loadFile :: Int -> ([String], String, String, String)
+loadFile number = id $! if unsafePerformIO $ doesFileExist filename
+                        then format . unsafePerformIO . readFile $ filename
+                        else error $ "Level file with number " ++ show number ++ " does not exist."
+  where filename = "level/level" ++ show number ++ ".lvl"
+        format content =
+          let lines' = lines content
+              mapSize :: Int
+              mapSize = read $ head lines'
+          in ( take mapSize (drop 1 lines')
+             , lines' !! (mapSize + 1)
+             , lines' !! (mapSize + 2)
+             , lines' !! (mapSize + 3)
+             )
 
 generate :: Float -> [String] -> Map
 generate size pattern = map transferLine $ zip [1..] pattern
@@ -93,20 +44,5 @@ generate size pattern = map transferLine $ zip [1..] pattern
           , appearanceAnimation = [snd transparentTexture]
           }
 
-patterns :: [[String]]
-patterns = [level1Pattern, level2Pattern, level3Pattern, level4Pattern]
-
-maps :: [Map]
-maps = map (generate level1TileSize . reverse) patterns
-
-level1Map :: Map
-level1Map = generate level1TileSize $ reverse level1Pattern
-
-level2Map :: Map
-level2Map = generate level1TileSize $ reverse level2Pattern
-
-level3Map :: Map
-level3Map = generate level1TileSize $ reverse level3Pattern
-
-level4Map :: Map
-level4Map = generate level1TileSize $ reverse level4Pattern
+patterns :: [([String], String, String, String)]
+patterns = map loadFile [1..levelsNumber]
