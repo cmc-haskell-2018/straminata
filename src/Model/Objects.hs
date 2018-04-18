@@ -20,14 +20,14 @@ import Visual.WindowConstants
 -- Level abilities
 abilitiesWithResize :: PlayerAbilities
 abilitiesWithResize =
-  [ (\o game -> activatePlayer "ine" o $ activateCoin o game, \_ _ _ -> id)
-  , (activateCoin, resizeSelf)
+  [ (\o game -> activatePlayer "ine" o $ activateCoin o (positionOut o game), \_ _ _ -> id)
+  , (\o game -> activateCoin o $ positionOut o game, resizeSelf)
   ]
 
 abilitiesWithoutResize :: PlayerAbilities
 abilitiesWithoutResize =
-  [ (activateCoin, \_ _ _ -> id)
-  , (activateCoin, \_ _ _ -> id)
+  [ (\o game -> activateCoin o $ positionOut o game, \_ _ _ -> id)
+  , (\o game -> activateCoin o $ positionOut o game, \_ _ _ -> id)
   ]
 
 -- Levels
@@ -386,7 +386,7 @@ playerInitialState = Player
       , appearanceAnimation = exaIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = \o game -> activatePlayer "ine" o $ activateCoin o game
+    , objectOnUpdate = \o game -> activatePlayer "ine" o $ activateCoin o (positionOut o game)
     , objectOnActivate = \_ _ _ -> id
     , objectMass = 0
     , objectAcceleration = zeroVector
@@ -409,7 +409,7 @@ player2InitialState = Player
       , appearanceAnimation = ineIdleAnimation
       }
     , objectVelocity = Vector (0, 0)
-    , objectOnUpdate = activateCoin
+    , objectOnUpdate = \o game -> activateCoin o $ positionOut o game
     , objectOnActivate = resizeSelf
     , objectMass = 0
     , objectAcceleration = zeroVector
@@ -426,6 +426,33 @@ player2InitialState = Player
   , playerControlVector = zeroVector
   , playerCoins = 0
   }
+
+
+ordinate :: Position -> Float
+ordinate (Position (_, y)) = y 
+
+positionOut :: Object -> Game -> Game
+positionOut object game = if (ordinate (objectPosition object) > -200) 
+                          then game
+                          else Game { gamePlayers = [ 
+                                           playerInitialState { playerCoins = playerCoins player1
+                                                              , playerObject = (playerObject player1) {objectPosition = position1}
+                                                              }
+                                         , player2InitialState { playerCoins = playerCoins player2
+                                                               , playerObject = (playerObject player2) {objectPosition = position2}
+                                                               }
+                                                        ]
+                                         , gameLevel = (gameLevel game) {levelPlayersOut = []}
+                                         , gameCamera = Camera { cameraPosition = Position (0, 0)
+                                                               , cameraRatio = 1
+                                                               }
+                                    }
+                          where players = gamePlayers game
+                                player1 = players !! 0
+                                player2 = players !! 1
+                                positions = levelStartPositions (gameLevel game)
+                                position1 = positions !! 0
+                                position2 = positions !! 1
 
 resetAction :: Action
 resetAction =
