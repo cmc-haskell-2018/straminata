@@ -5,7 +5,7 @@ import Graphics.Gloss.Interface.IO.Game
 
 import Control.Monad (join)
 import Control.Arrow ((***))
-import Debug.Trace(trace)
+import System.IO.Unsafe(unsafePerformIO)
 
 import Model.CommonTypes
 import Visual.Renderer
@@ -15,11 +15,13 @@ import Visual.WindowConstants
 -- | Map generator
 data Generator = Generator
   { generatorButtons :: [[Button]]
+  , generatorSubmitted :: Bool
   }
 
 initialGeneratorState :: Generator
 initialGeneratorState = Generator
   { generatorButtons = generateEmptyButtons
+  , generatorSubmitted = False
   }
 
 -- | Button that represents a map tile
@@ -96,7 +98,7 @@ generateEmptyButtons = map (scaleRow buttonLinearSize) rowSetter
     multPos times (Position (x, y)) = Position (x * times, y * times)
 
 createWithNumber :: Float -> (a -> Float -> a) -> a -> [a]
-createWithNumber maxNum setter base = map (setter base) [-maxNum / 2 .. maxNum / 2]
+createWithNumber maxNum setter base = map (setter base) [-maxNum / 2 + 1 .. maxNum / 2]
 
 
 
@@ -133,7 +135,7 @@ renderGenerator generator = Pictures
         correctState button = let s = buttonState button
                               in s == Door
                               || s == ButtonObject
-        system button = trace "AAA" $ Pictures
+        system button = Pictures
           [ Color black
             $ uncurry Translate ((\(x, y) -> (x + 80, y)) . unwrap . systemButtonPosition $ button)
             $ uncurry rectangleWire (160, 50) -- fixme
@@ -147,14 +149,23 @@ renderGenerator generator = Pictures
 
 handleGeneratorInput :: Event -> Generator -> Generator
 handleGeneratorInput (EventKey (MouseButton LeftButton) Up (Modifiers {shift = Up, ctrl = Up, alt = Up}) (x, y)) generator
-  = generator
-  { generatorButtons = map (map (clickLeftOnTileButton (x, y))) $ generatorButtons generator
-  }
+  = if clickedSubmit (x, y)
+    then generator { generatorSubmitted = True }
+    else generator
+         { generatorButtons = map (map (clickLeftOnTileButton (x, y))) $ generatorButtons generator
+         }
 handleGeneratorInput (EventKey (MouseButton LeftButton) Up (Modifiers {shift = Down, ctrl = Up, alt = Up}) (x, y)) generator
   = generator
   { generatorButtons = map (map (clickLeftOnTileButtonWithShift (x, y))) $ generatorButtons generator
   }
 handleGeneratorInput _ generator = generator
+
+clickedSubmit :: (Float, Float) -> Bool
+clickedSubmit (x, y) = let (x', y') = unwrap . systemButtonPosition . head $ systemButtons
+                       in x >= x'
+                       && x <= x' + 160
+                       && y >= y' - 25
+                       && y <= y' + 25
 
 clickLeftOnTileButton :: (Float, Float) -> Button -> Button
 clickLeftOnTileButton (x, y) button = if hit (x, y) (unwrap . buttonPos $ button)
@@ -175,4 +186,37 @@ hit (x, y) (x', y') = x >= x' - buttonLinearSize / 2
 
 
 advanceGenerator :: Float -> Generator -> Generator
-advanceGenerator _ = id
+advanceGenerator _ generator =
+  if generatorSubmitted generator
+  then let bs = generatorButtons generator
+       in unsafePerformIO (writeFile "level/level.lvl" ("30\n"
+                                                        ++ toString bs
+                                                        ++ addBack bs
+                                                        ++ addPlayers bs
+                                                        ++ addAbilities bs)
+                           >> return initialGeneratorState)
+  else generator
+
+toString :: [[Button]] -> String
+toString = unlines . reverse . map toStringRow
+  where toStringRow = unwords . map toStringElem
+        toStringElem elem' = case buttonState elem' of
+          None -> "t1"
+          Grass -> "w1"
+          Dirt -> "w2"
+          Coin -> "c1"
+          ButtonObject -> "b" ++ show (buttonNum elem')
+          Door -> "d" ++ show (buttonNum elem')
+          Exit1 -> "q1"
+          Exit2 -> "q2"
+          Player1 -> "t1"
+          Player2 -> "t1"
+
+addPlayers :: [[Button]] -> String
+addPlayers buttons = "2 5 4 4\n"
+
+addBack :: [[Button]] -> String
+addBack = const "default\n"
+
+addAbilities :: [[Button]] -> String
+addAbilities = const "with\n"
