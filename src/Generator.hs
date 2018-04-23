@@ -5,6 +5,7 @@ import Graphics.Gloss.Interface.IO.Game
 
 import Control.Monad (join)
 import Control.Arrow ((***))
+import Data.Maybe(isJust, fromJust)
 import System.IO.Unsafe(unsafePerformIO)
 
 import Model.CommonTypes
@@ -39,6 +40,10 @@ data ButtonState = None | Grass | Dirt | Coin | ButtonObject | Door | Exit1 | Ex
 nextState :: ButtonState -> ButtonState
 nextState s = if s == (maxBound :: ButtonState) then minBound else succ s
 
+-- | Get previous tile variant
+prevState :: ButtonState -> ButtonState
+prevState s = if s == (minBound :: ButtonState) then maxBound else pred s
+
 -- | Get map tile appearance
 buttonAppearance :: ButtonState -> Position -> Appearance
 buttonAppearance None = createAppearance transparentTexture
@@ -65,6 +70,9 @@ nextNum :: Int -> Int
 nextNum 9 = 0
 nextNum n = n + 1
 
+prevNum :: Int -> Int
+prevNum 0 = 9
+prevNum n = n - 1
 
 -- | UI button
 data SystemButton = SystemButton
@@ -138,7 +146,7 @@ renderGenerator generator = Pictures
         system button = Pictures
           [ Color black
             $ uncurry Translate ((\(x, y) -> (x + 80, y)) . unwrap . systemButtonPosition $ button)
-            $ uncurry rectangleWire (160, 50) -- fixme
+            $ uncurry rectangleWire (160, 50)
           , Color black
             $ uncurry Translate (unwrap . systemButtonPosition $ button)
             $ Scale 0.15 0.15
@@ -158,6 +166,14 @@ handleGeneratorInput (EventKey (MouseButton LeftButton) Up (Modifiers {shift = D
   = generator
   { generatorButtons = map (map (clickLeftOnTileButtonWithShift (x, y))) $ generatorButtons generator
   }
+handleGeneratorInput (EventKey (MouseButton RightButton) Up (Modifiers {shift = Up, ctrl = Up, alt = Up}) (x, y)) generator
+  = generator
+  { generatorButtons = map (map (clickRightOnTileButton (x, y))) $ generatorButtons generator
+  }
+handleGeneratorInput (EventKey (MouseButton RightButton) Up (Modifiers {shift = Down, ctrl = Up, alt = Up}) (x, y)) generator
+  = generator
+  { generatorButtons = map (map (clickRightOnTileButtonWithShift (x, y))) $ generatorButtons generator
+  }
 handleGeneratorInput _ generator = generator
 
 clickedSubmit :: (Float, Float) -> Bool
@@ -172,9 +188,19 @@ clickLeftOnTileButton (x, y) button = if hit (x, y) (unwrap . buttonPos $ button
                                       then button { buttonState = nextState . buttonState $ button }
                                       else button
 
+clickRightOnTileButton :: (Float, Float) -> Button -> Button
+clickRightOnTileButton (x, y) button = if hit (x, y) (unwrap . buttonPos $ button)
+                                      then button { buttonState = prevState . buttonState $ button }
+                                      else button
+
 clickLeftOnTileButtonWithShift :: (Float, Float) -> Button -> Button
 clickLeftOnTileButtonWithShift (x, y) button = if hit (x, y) (unwrap . buttonPos $ button)
                                                then button { buttonNum = nextNum . buttonNum $ button }
+                                               else button
+
+clickRightOnTileButtonWithShift :: (Float, Float) -> Button -> Button
+clickRightOnTileButtonWithShift (x, y) button = if hit (x, y) (unwrap . buttonPos $ button)
+                                               then button { buttonNum = prevNum . buttonNum $ button }
                                                else button
 
 hit :: (Float, Float) -> (Float, Float) -> Bool
@@ -213,7 +239,19 @@ toString = unlines . reverse . map toStringRow
           Player2 -> "t1"
 
 addPlayers :: [[Button]] -> String
-addPlayers buttons = "2 5 4 4\n"
+addPlayers buttons = unwords [addPlayer Player1, addPlayer Player2] ++ "\n"
+  where addPlayer player = toStr . fromJust . head . filter isJust . map (findInRow player) . zip [1..] $ buttons
+        findInRow player (n, buttonRow)
+          = foldr
+            (\(m, button) acc -> if isJust acc
+                                 then acc
+                                 else if buttonState button == player
+                                      then Just (n, m)
+                                      else Nothing
+            )
+            Nothing
+            $ zip [1..] buttonRow
+        toStr (n, m) = show m ++ " " ++ show n
 
 addBack :: [[Button]] -> String
 addBack = const "default\n"
