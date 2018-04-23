@@ -13,7 +13,7 @@ import Visual.Renderer
 import Visual.TextureLoader
 import Visual.WindowConstants
 
--- | Map generator
+-- | Map generator representation
 data Generator = Generator
   { generatorButtons :: [[Button]]
   , generatorSubmitted :: Bool
@@ -66,23 +66,27 @@ createAppearance texture (Position (x, y)) = Appearance
   , appearanceAnimation = [snd texture]
   }
 
+-- | Get next tile number (for buttons and doors)
 nextNum :: Int -> Int
 nextNum 9 = 0
 nextNum n = n + 1
 
+-- | Get previous tile number (for buttons and doors)
 prevNum :: Int -> Int
 prevNum 0 = 9
 prevNum n = n - 1
 
--- | UI button
+-- | UI button representation
 data SystemButton = SystemButton
   { systemButtonPosition :: Position
   , systemButtonText :: String
   }
 
+-- | Add system buttons
 systemButtons :: [SystemButton]
 systemButtons = generateSystemButtons
 
+-- | Creates all system buttons
 generateSystemButtons :: [SystemButton]
 generateSystemButtons =
   [ SystemButton
@@ -93,6 +97,7 @@ generateSystemButtons =
 
 
 
+-- | Generate initial button list
 generateEmptyButtons :: [[Button]]
 generateEmptyButtons = map (scaleRow buttonLinearSize) rowSetter
   where
@@ -105,23 +110,28 @@ generateEmptyButtons = map (scaleRow buttonLinearSize) rowSetter
     scaleRow times = map (\b -> b { buttonPos = multPos times (buttonPos b) })
     multPos times (Position (x, y)) = Position (x * times, y * times)
 
+-- | Generates list of maxNum elements in range (-maxNum/2+1;maxNum/2) with setter function
 createWithNumber :: Float -> (a -> Float -> a) -> a -> [a]
 createWithNumber maxNum setter base = map (setter base) [-maxNum / 2 + 1 .. maxNum / 2]
 
 
 
+-- | Map size in tiles. Fixed value
 maximumMapSize :: Float
 maximumMapSize = 30
 
+-- | Button size as dimension pair
 buttonSize :: Dimensions
 buttonSize = Dimensions $ double . (/ maximumMapSize) . fromIntegral . (\x -> x - 100) . snd $ initialWindowDimensions
   where double x = (x, x)
 
+-- | Length of a side of a button tile
 buttonLinearSize :: Float
 buttonLinearSize = fst . unwrap $ buttonSize
 
 
 
+-- | Renders everything
 renderGenerator :: Generator -> Picture
 renderGenerator generator = Pictures
                           $ map draw (concat . generatorButtons $ generator)
@@ -154,7 +164,7 @@ renderGenerator generator = Pictures
           ]
 
 
-
+-- | Handles user mouse input
 handleGeneratorInput :: Event -> Generator -> Generator
 handleGeneratorInput (EventKey (MouseButton LeftButton) Up (Modifiers {shift = Up, ctrl = Up, alt = Up}) (x, y)) generator
   = if clickedSubmit (x, y)
@@ -176,6 +186,7 @@ handleGeneratorInput (EventKey (MouseButton RightButton) Up (Modifiers {shift = 
   }
 handleGeneratorInput _ generator = generator
 
+-- | Check if user clicked on "Generate" system button
 clickedSubmit :: (Float, Float) -> Bool
 clickedSubmit (x, y) = let (x', y') = unwrap . systemButtonPosition . head $ systemButtons
                        in x >= x'
@@ -203,6 +214,7 @@ clickRightOnTileButtonWithShift (x, y) button = if hit (x, y) (unwrap . buttonPo
                                                then button { buttonNum = prevNum . buttonNum $ button }
                                                else button
 
+-- | Click position is inside the specified tile
 hit :: (Float, Float) -> (Float, Float) -> Bool
 hit (x, y) (x', y') = x >= x' - buttonLinearSize / 2
                    && x <= x' + buttonLinearSize / 2
@@ -211,6 +223,7 @@ hit (x, y) (x', y') = x >= x' - buttonLinearSize / 2
 
 
 
+-- | Advances generator state and extracts map to file if needed
 advanceGenerator :: Float -> Generator -> Generator
 advanceGenerator _ generator =
   if generatorSubmitted generator
@@ -223,6 +236,7 @@ advanceGenerator _ generator =
                            >> return initialGeneratorState)
   else generator
 
+-- | Converts button tiles representing map to the actual map that can be extracted to file
 toString :: [[Button]] -> String
 toString = unlines . reverse . map toStringRow
   where toStringRow = unwords . map toStringElem
@@ -238,6 +252,7 @@ toString = unlines . reverse . map toStringRow
           Player1 -> "t1"
           Player2 -> "t1"
 
+-- | Generate player information to extract
 addPlayers :: [[Button]] -> String
 addPlayers buttons = unwords [addPlayer Player1, addPlayer Player2] ++ "\n"
   where addPlayer player = toStr . fromJust . head . filter isJust . map (findInRow player) . zip [1..] $ buttons
@@ -253,8 +268,10 @@ addPlayers buttons = unwords [addPlayer Player1, addPlayer Player2] ++ "\n"
             $ zip [1..] buttonRow
         toStr (n, m) = show m ++ " " ++ show n
 
+-- | Background information. Fixed
 addBack :: [[Button]] -> String
 addBack = const "default\n"
 
+-- | Abilities information. Fixed
 addAbilities :: [[Button]] -> String
 addAbilities = const "with\n"
