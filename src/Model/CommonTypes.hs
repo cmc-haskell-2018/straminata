@@ -182,6 +182,7 @@ data Game = Game
   { gamePlayers :: Players
   , gameLevel :: Level
   , gameCamera :: Camera
+  , gameRules :: Bool
   } deriving (Show)
 
 data Camera = Camera
@@ -190,7 +191,8 @@ data Camera = Camera
   } deriving (Show)
 
 data Level = Level
-  { levelMap :: Map
+  { levelNumber :: Int
+  , levelMap :: Map
   , levelColNumber :: Int
   , levelRowNumber :: Int
   , levelTileSize :: Float
@@ -200,6 +202,7 @@ data Level = Level
   , levelPlayersOut :: [Player]
   , levelStartPositions :: [Position]
   , levelPlayerAbilities :: PlayerAbilities
+  , levelStart :: Bool
   } -- deriving (Show)
 
 instance Show Level where

@@ -4,10 +4,12 @@ import Graphics.Gloss
 
 import Control.Monad (join)
 import Control.Arrow ((***))
+import Foreign.Marshal.Unsafe(unsafeLocalState)
 
 import Model.CommonTypes
 import Util.Constants
 import Visual.WindowConstants
+import Visual.TextureLoader
 
 -- | Initial window state.
 newWindow :: Display
@@ -16,7 +18,62 @@ newWindow = InWindow windowName initialWindowDimensions initialWindowPosition
 
 -- | Performs scene rendering inside a window.
 render :: Game -> Picture
-render game = Pictures $ [positionPicture (gameCamera game) (picture game)] ++ map coinText (zip [0..] $ gamePlayers game)
+render game 
+  | rules == True = Pictures $ [positionPicture (gameCamera game) (picture game)] 
+                           ++ (map coinText (zip [0..] $ gamePlayers game)) 
+                           ++ drawRules
+  | start == True = Pictures $ [positionPicture (gameCamera game) (picture game)] 
+                           ++ (map coinText (zip [0..] $ gamePlayers game)) 
+                           ++ drawStartLevel ++ drawTextStart game
+  | otherwise = Pictures $ [positionPicture (gameCamera game) (picture game)] ++ map coinText (zip [0..] $ gamePlayers game)
+  where start = levelStart $ gameLevel game
+        rules = gameRules game
+
+
+appearanceRules :: Appearance
+appearanceRules = Appearance
+    { appearanceBox = (Position (0, 0), Position (600, 400))
+    , appearanceActualSize = fst rulesTexture
+    , appearanceAnimation = [snd rulesTexture]
+    }
+
+
+drawRules :: [Picture]
+drawRules = let translate' = uncurry Translate . unwrap $ Position (0, 0)
+                  in [translate' $ appearanceToPicture appearanceRules]
+
+
+appearanceStart :: Appearance
+appearanceStart = Appearance
+    { appearanceBox = (Position (0, 0), Position (600, 400))
+    , appearanceActualSize = fst startTexture
+    , appearanceAnimation = [snd startTexture]
+    }
+
+
+drawTextStart :: Game -> [Picture]
+drawTextStart game 
+  | levelNumber level == 1 = [ uncurry Translate (x - 60, y) (Scale t t (Color red (Text ("Hey! Welcome to the game Straminata\n")))) ]
+  | otherwise = [Pictures 
+                        [ uncurry Translate (x, y) (Scale t t (Color orange (Text (linesStart !! 0))))
+                        , uncurry Translate (x - 60, y - 30) (Scale t t (Color violet (Text (linesStart !! 1))))
+                        , uncurry Translate (x - 20, y - 60) (Scale t t (Color red (Text (linesStart !! 2))))
+                        , uncurry Translate (x - 20, y - 90) (Scale t t (Color blue (Text (linesStart !! 3))))
+                        ]
+                ]
+  where linesStart = unsafeLocalState $ (do
+                                          textStart <- readFile "dataLevel.txt"
+                                          return (lines textStart))
+        level = gameLevel game
+        x = -190
+        y = 40
+        t = 0.2 
+
+
+drawStartLevel :: [Picture]
+drawStartLevel = let translate' = uncurry Translate . unwrap $ Position (0, 0)
+                 in [translate' $ appearanceToPicture appearanceStart]
+
 
 coinText :: (Int, Player) -> Picture
 coinText (n, p) = uncurry Translate ( plusPos (fromIntegral n)

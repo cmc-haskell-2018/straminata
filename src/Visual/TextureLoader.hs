@@ -7,6 +7,12 @@ import Graphics.Gloss.Game (png)
 
 import Model.CommonTypes
 
+startTexture :: Texture
+startTexture = ((Dimensions (603, 404)), ) $! png "img/start.png"
+
+rulesTexture :: Texture
+rulesTexture = ((Dimensions (603, 404)), ) $! png "img/rules.png"
+
 dirtTextureWithGrass :: Texture
 dirtTextureWithGrass = ((Dimensions (400, 400)), ) $! png "img/tile.png"
 

@@ -1,0 +1,4 @@
+Number of current level - 1
+Number of all coins in this level - 11
+exa - 5 coins
+ine - 0 coins
