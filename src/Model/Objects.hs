@@ -7,7 +7,6 @@ import Control.Arrow ((***))
 import Data.Maybe(isJust, fromJust)
 import Data.List(elemIndex, isInfixOf, isSuffixOf, union, (\\))
 import Data.Tuple(swap)
-import Foreign.Marshal.Unsafe(unsafeLocalState)
 
 import Model.CommonTypes
 import Model.LevelPatterns
@@ -234,6 +233,7 @@ changeLevel next True player object game =
                                                 , cameraRatio = 1
                                                 }
                           , gameRules = False
+                          , gameText = gameText game
                           }
        else game {gameLevel = (gameLevel game) {levelPlayersOut = playersOut}} -- todo: remove exited player
   else game
@@ -257,30 +257,26 @@ coinObject = defaultObject
 
 takeCoin :: Bool -> Player -> Object -> Game -> Game
 takeCoin False _ _ game = game
-takeCoin True player self game = unsafeLocalState $ do
-  let level = gameLevel game
-      objects = levelObjects level
-      name = objectName . playerObject
-  writeFile "dataLevel.txt" ("Number of current level - " ++ show(levelNumber level) ++ "\n")
-  appendFile "dataLevel.txt" ("Number of all coins in this level - " ++ show(levelCoinNumber level) ++ "\n")
-  mapM_ (\p -> if name player == name p
-               then appendFile "dataLevel.txt" (name p ++ " - " ++ show (playerCoins p + 1) ++ " coins\n")
-               else appendFile "dataLevel.txt" (name p ++ " - " ++ show (playerCoins p) ++ " coins\n"))
-        (gamePlayers game)
-  return (game { gameLevel = level { levelObjects = map (\o -> if objectName self == objectName o
+takeCoin True player self game = game { gameLevel = level { levelObjects = map (\o -> if objectName self == objectName o
                                                                then changeTexture transparentTexture 
                                                                                   (o {objectOnActivate = \_ _ _ -> id})
                                                                else o
-                                                        ) $ objects
-                                   }
-                                   , gamePlayers = map (\p -> if name player == name p
+                                                                                ) $ objects
+                                                          }
+                                      , gamePlayers = map (\p -> if name player == name p
                                                               then p {playerCoins = (playerCoins p) + 1}
                                                               else p
-                                                       ) (gamePlayers game)
-               })
-  -- where level = gameLevel game
-  --       objects = levelObjects level
-  --       name = objectName . playerObject
+                                                          ) (gamePlayers game)
+                                      , gameText = "Number of current level - " ++ show(levelNumber level) ++ "\n" 
+                                                ++ "Number of all coins in this level - " ++ show(levelCoinNumber level) ++ "\n"
+                                                ++ unlines (map (\p -> if name player == name p
+                                                     then (name p ++ " - " ++ show (playerCoins p + 1) ++ " coins")
+                                                     else (name p ++ " - " ++ show (playerCoins p) ++ " coins"))
+                                                       (gamePlayers game))
+                                      }
+  where level = gameLevel game
+        objects = levelObjects level
+        name = objectName . playerObject
 
 
 buttonObject :: Object
@@ -359,6 +355,7 @@ initialWorld = Game
     , cameraRatio = 1
     }
   , gameRules = False
+  , gameText = ""
   }
   where positions = levelStartPositions level1
         position1 = positions !! 0
@@ -461,6 +458,7 @@ positionOut object game = if (ordinate (objectPosition object) > -200)
                                                                , cameraRatio = 1
                                                                }
                                          , gameRules = False
+                                         , gameText = ""
                                     }
                           where players = gamePlayers game
                                 player1 = players !! 0
@@ -491,6 +489,7 @@ resetAction =
         , cameraRatio = 1
         }
     , gameRules = False
+    , gameText = ""
     })
 
 --activateCoin :: Object -> Game -> Game

@@ -183,6 +183,7 @@ data Game = Game
   , gameLevel :: Level
   , gameCamera :: Camera
   , gameRules :: Bool
+  , gameText :: String
   } deriving (Show)
 
 data Camera = Camera

@@ -4,7 +4,6 @@ import Graphics.Gloss
 
 import Control.Monad (join)
 import Control.Arrow ((***))
-import Foreign.Marshal.Unsafe(unsafeLocalState)
 
 import Model.CommonTypes
 import Util.Constants
@@ -61,9 +60,7 @@ drawTextStart game
                         , uncurry Translate (x - 20, y - 90) (Scale t t (Color blue (Text (linesStart !! 3))))
                         ]
                 ]
-  where linesStart = unsafeLocalState $ (do
-                                          textStart <- readFile "dataLevel.txt"
-                                          return (lines textStart))
+  where linesStart = lines (gameText game) 
         level = gameLevel game
         x = -190
         y = 40
