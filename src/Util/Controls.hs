@@ -13,6 +13,7 @@ handleInput event game =
   let players = gamePlayers game
   in case event of
     (EventKey (MouseButton LeftButton) Down _ point) -> downOk game point
+    (EventKey (Char '/') Down _ _) -> downQ game
     (EventKey (Char 'o') _ _ _) -> game { gameLevel = (gameLevel game) { levelStart = False} 
                                         , gameRules = False
                                         }
@@ -33,6 +34,13 @@ handleInput event game =
                                                else game'
           findAction key state player = (upOrDown state) <$> find (predicate key) (playerControls player)
           predicate key (key', _, _) = key == key'
+
+downQ :: Game -> Game
+downQ game = if rules == True 
+             then game { gameRules = False }
+             else game { gameRules = True }
+  where rules = gameRules game
+
 
 downOk :: Game -> Point -> Game
 downOk game (x, y) 

@@ -458,7 +458,7 @@ positionOut object game = if (ordinate (objectPosition object) > -200)
                                                                , cameraRatio = 1
                                                                }
                                          , gameRules = False
-                                         , gameText = ""
+                                         , gameText = gameText game
                                     }
                           where players = gamePlayers game
                                 player1 = players !! 0
@@ -489,7 +489,7 @@ resetAction =
         , cameraRatio = 1
         }
     , gameRules = False
-    , gameText = ""
+    , gameText = gameText game
     })
 
 --activateCoin :: Object -> Game -> Game
